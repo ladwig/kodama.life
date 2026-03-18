@@ -30,6 +30,8 @@ export default function ChefPage() {
         if (savedPw) {
             setPassword(savedPw);
             setAuthorized(true);
+            // Fetch latest guestlist in background for scanner
+            setTimeout(() => fetchGuestlist(savedPw), 500);
         }
         
         if (cachedGuestlist) {
@@ -56,13 +58,13 @@ export default function ChefPage() {
         }
     };
 
-    const fetchGuestlist = async () => {
+    const fetchGuestlist = async (providedPw) => {
         setLoadingGuestlist(true);
         try {
             const res = await fetch('/api/chef/guestlist', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: password || sessionStorage.getItem('chef_pw') })
+                body: JSON.stringify({ password: providedPw || password || sessionStorage.getItem('chef_pw') })
             });
             const data = await res.json();
             if (res.ok) {
@@ -157,6 +159,16 @@ export default function ChefPage() {
         isScanApiCallInProgress.current = true;
         lastScannedCode.current = ticketCode;
 
+        // 1. Local Validation (Faster)
+        const localTicket = guestlist.find(t => t.ticket_code === ticketCode);
+        if (localTicket) {
+            setScannedTicket(localTicket);
+            setScanError('');
+            isScanApiCallInProgress.current = false;
+            return;
+        }
+
+        // 2. Online Validation (Fallback/Secondary)
         setProcessing(true);
         try {
             const res = await fetch('/api/chef/scan', {
@@ -211,7 +223,14 @@ export default function ChefPage() {
 
             const data = await res.json();
             if (res.ok) {
-                setScannedTicket({ ...scannedTicket, checked_in: true, checked_in_at: new Date().toISOString() });
+                const updatedTicket = { ...scannedTicket, checked_in: true, checked_in_at: new Date().toISOString() };
+                setScannedTicket(updatedTicket);
+                
+                // Update local guestlist state so they appear as "IN" there too
+                setGuestlist(prev => prev.map(t => 
+                    t.ticket_code === updatedTicket.ticket_code ? updatedTicket : t
+                ));
+
                 setStatus(`Successfully checked in ${scannedTicket.holder_name}!`);
                 setTimeout(() => setStatus(''), 3000);
             } else {
