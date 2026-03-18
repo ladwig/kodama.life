@@ -1,0 +1,149 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    width: 100%;
+    max-width: 320px;
+    animation: fadeIn 2.4s ease-out;
+}
+
+.fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    width: 100%;
+}
+
+.inputWrapper {
+    width: 100%;
+}
+
+.input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1.5px solid var(--ink);
+    outline: none;
+    font-family: 'Caveat', cursive;
+    font-size: 1.15rem;
+    color: var(--ink);
+    padding: 0.4rem 0.1rem;
+    text-align: center;
+    letter-spacing: 0.06em;
+    transition: border-color 0.2s ease, opacity 0.2s ease;
+    border-radius: 0;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.input::placeholder {
+    color: var(--ink);
+    opacity: 0.35;
+}
+
+.input:focus {
+    border-bottom-color: var(--accent);
+}
+
+.input:disabled {
+    opacity: 0.45;
+}
+
+.error {
+    font-family: 'Caveat', cursive;
+    font-size: 0.95rem;
+    color: #8b3030;
+    letter-spacing: 0.03em;
+    text-align: center;
+    opacity: 0.9;
+}
+
+.button {
+    margin-top: 0.25rem;
+    background: transparent;
+    border: 1.5px solid var(--ink);
+    color: var(--ink);
+    font-family: 'Caveat', cursive;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 0.45rem 2rem;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.4rem;
+}
+
+.button:hover:not(:disabled) {
+    background-color: var(--ink);
+    color: var(--bg);
+}
+
+.button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* Spinner */
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+/* Success state */
+.success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 1.25rem;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.successIcon {
+    font-size: 1.4rem;
+    color: var(--accent);
+    animation: popIn 0.5s ease-out;
+}
+
+.success p {
+    font-family: 'Caveat', cursive;
+    font-size: 1.15rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-light);
+    text-align: center;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    70% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

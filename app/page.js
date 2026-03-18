@@ -1,5 +1,6 @@
 import Image from "next/image";
 import styles from "./page.module.css";
+import SignupForm from "./components/SignupForm";
 
 export default function Home() {
   return (
@@ -29,6 +30,8 @@ export default function Home() {
           height={240}
           priority
         />
+
+        <SignupForm />
       </div>
     </main>
   );
