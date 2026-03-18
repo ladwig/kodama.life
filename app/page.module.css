@@ -32,6 +32,8 @@
   gap: 0.5rem;
   z-index: 1;
   animation: fadeIn 2s ease-out;
+  width: 100%;
+  max-width: 560px;
 }
 
 .title {
@@ -43,7 +45,6 @@
   line-height: 1;
   color: var(--ink);
   text-align: center;
-  /* Slight hand-drawn wobble */
   transform: rotate(-0.5deg);
 }
 
@@ -61,13 +62,13 @@
 
 .illustration {
   margin-top: 1.5rem;
-  width: clamp(120px, 25vw, 220px);
+  width: clamp(120px, 25vw, 180px);
   height: auto;
   opacity: 0.85;
   animation: float 6s ease-in-out infinite;
 }
 
-/* Scattered dots — like ink splatters */
+/* ── Scattered dots ── */
 .dot {
   position: absolute;
   width: 3px;
@@ -128,6 +129,206 @@
   animation: twinkle 4s ease-in-out 3s infinite;
 }
 
+/* ── Guest section ── */
+.guestSection {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.infoRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.pill {
+  background: rgba(26, 26, 26, 0.07);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.02em;
+  color: var(--ink-light);
+}
+
+.formLabel {
+  font-family: 'Caveat', cursive;
+  font-size: 1.1rem;
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+.newsletterForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+  align-items: center;
+}
+
+.inputRow {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.input {
+  flex: 1;
+  min-width: 130px;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  color: var(--ink);
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--ink-muted);
+}
+
+.btnPrimary {
+  padding: 0.6rem 1.2rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.btnPrimary:hover {
+  background: var(--accent-light);
+}
+
+.btnPrimary:active {
+  transform: scale(0.98);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.errorText {
+  font-size: 0.8rem;
+  color: #c0392b;
+  text-align: center;
+}
+
+.successBox {
+  background: var(--accent-bg);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 0.75rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--accent);
+  font-family: 'Caveat', cursive;
+  font-size: 1.1rem;
+}
+
+.ticketCTA {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-family: 'Caveat', cursive;
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.ticketCTA:hover {
+  background: var(--ink-light);
+  transform: translateY(-1px);
+}
+
+.ticketCTA:active {
+  transform: translateY(0);
+}
+
+/* ── Ticket section (buyer) ── */
+.ticketSection {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.sectionLabel {
+  font-family: 'Caveat', cursive;
+  font-size: 1.2rem;
+  color: var(--ink-muted);
+}
+
+.ticketGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+}
+
+.ticketCard {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.6rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  box-shadow: var(--shadow);
+}
+
+.ticketCode {
+  font-family: 'Caveat', cursive;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+
+.ticketHolder {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+}
+
+.linkBtn {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.linkBtn:hover {
+  opacity: 0.7;
+}
+
+/* ── Animations ── */
 @keyframes fadeIn {
   0% {
     opacity: 0;
