@@ -1,11 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function ChefPage() {
     const [password, setPassword] = useState('');
     const [authorized, setAuthorized] = useState(false);
     
+    // Tabs
+    const [activeTab, setActiveTab] = useState('offline');
+    const [guestlist, setGuestlist] = useState([]);
+    const [loadingGuestlist, setLoadingGuestlist] = useState(false);
+
+    // Initial check for session and cached guestlist
+    useEffect(() => {
+        const savedPw = sessionStorage.getItem('chef_pw');
+        const cachedGuestlist = localStorage.getItem('kodama_guestlist');
+        
+        if (savedPw) {
+            setPassword(savedPw);
+            setAuthorized(true);
+        }
+        
+        if (cachedGuestlist) {
+            try {
+                setGuestlist(JSON.parse(cachedGuestlist));
+            } catch (e) {
+                console.error('Failed to parse cached guestlist', e);
+            }
+        }
+    }, []);
+
     // Form data
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -15,10 +39,36 @@ export default function ChefPage() {
 
     const handleLogin = (e) => {
         e.preventDefault();
-        // We will verify the password on the actual API call, 
-        // but for UX we just enter the "form mode" here.
         if (password.length > 0) {
             setAuthorized(true);
+            sessionStorage.setItem('chef_pw', password);
+        }
+    };
+
+    const fetchGuestlist = async () => {
+        setLoadingGuestlist(true);
+        try {
+            const res = await fetch('/api/chef/guestlist', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: password || sessionStorage.getItem('chef_pw') })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setGuestlist(data.tickets);
+                localStorage.setItem('kodama_guestlist', JSON.stringify(data.tickets));
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoadingGuestlist(false);
+        }
+    };
+
+    const toggleTab = (tab) => {
+        setActiveTab(tab);
+        if (tab === 'guestlist') {
+            fetchGuestlist();
         }
     };
 
@@ -47,7 +97,7 @@ export default function ChefPage() {
                 setQuantity(1);
             } else {
                 setStatus(`Error: ${data.error}`);
-                if (res.status === 401) setAuthorized(false); // Kick back to login if wrong
+                if (res.status === 401) setAuthorized(false);
             }
         } catch (err) {
             setStatus(`Error: ${err.message}`);
@@ -104,80 +154,166 @@ export default function ChefPage() {
                 .submit-btn:active {
                     transform: translateY(0);
                 }
+
+                .tab-btn {
+                    padding: 12px 0;
+                    flex: 1;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    color: var(--ink-muted);
+                    background: none;
+                    border: none;
+                    border-bottom: 2px solid transparent;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+
+                .tab-btn.active {
+                    color: var(--accent);
+                    border-color: var(--accent);
+                }
             `}} />
             
             <div className="chef-container" style={styles.container}>
-                <form onSubmit={handleSubmit} style={styles.form}>
-                    <div style={styles.fieldGroup}>
-                        <label style={styles.label}>Buyer Name</label>
-                        <input
-                            type="text"
-                            required
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            style={styles.input}
-                            placeholder="Full Name"
-                        />
+                <div style={styles.tabsCol}>
+                    <div style={styles.tabNav}>
+                        <button 
+                            onClick={() => toggleTab('offline')} 
+                            className={`tab-btn ${activeTab === 'offline' ? 'active' : ''}`}
+                        >
+                            Offline Ticket
+                        </button>
+                        <button 
+                            onClick={() => toggleTab('scanner')} 
+                            className={`tab-btn ${activeTab === 'scanner' ? 'active' : ''}`}
+                        >
+                            Scanner
+                        </button>
+                        <button 
+                            onClick={() => toggleTab('guestlist')} 
+                            className={`tab-btn ${activeTab === 'guestlist' ? 'active' : ''}`}
+                        >
+                            Guestlist
+                        </button>
                     </div>
 
-                    <div style={styles.fieldGroup}>
-                        <label style={styles.label}>Buyer Email</label>
-                        <input
-                            type="email"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            style={styles.input}
-                            placeholder="hello@kodama.life"
-                        />
+                    <div style={styles.tabContent}>
+                        {activeTab === 'offline' && (
+                            <form onSubmit={handleSubmit} style={styles.form}>
+                                <div style={styles.fieldGroup}>
+                                    <label style={styles.label}>Buyer Name</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        style={styles.input}
+                                        placeholder="Full Name"
+                                    />
+                                </div>
+
+                                <div style={styles.fieldGroup}>
+                                    <label style={styles.label}>Buyer Email</label>
+                                    <input
+                                        type="email"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        style={styles.input}
+                                        placeholder="hello@kodama.life"
+                                    />
+                                </div>
+
+                                <div style={styles.row}>
+                                    <div style={{ ...styles.fieldGroup, flex: 1 }}>
+                                        <label style={styles.label}>Quantity</label>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            required
+                                            value={quantity}
+                                            onChange={(e) => setQuantity(e.target.value)}
+                                            style={styles.input}
+                                        />
+                                    </div>
+                                    <div style={{ ...styles.fieldGroup, flex: 1 }}>
+                                        <label style={styles.label}>Price (Euro)</label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            required
+                                            value={price}
+                                            onChange={(e) => setPrice(e.target.value)}
+                                            style={styles.input}
+                                            placeholder="0.00"
+                                        />
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className="submit-btn"
+                                    style={styles.button}
+                                >
+                                    Issue Offline Tickets
+                                </button>
+
+                                {status && (
+                                    <div style={{
+                                        ...styles.status,
+                                        backgroundColor: status.includes('Error') ? 'rgba(220, 38, 38, 0.1)' : 'rgba(74, 103, 65, 0.1)',
+                                        color: status.includes('Error') ? '#dc2626' : 'var(--accent)',
+                                        borderColor: status.includes('Error') ? 'rgba(220, 38, 38, 0.2)' : 'rgba(74, 103, 65, 0.2)'
+                                    }}>
+                                        {status}
+                                    </div>
+                                )}
+                            </form>
+                        )}
+
+                        {activeTab === 'scanner' && (
+                            <div style={styles.scannerPlaceholder}>
+                                🌿 Ticket Scanner Coming Soon
+                            </div>
+                        )}
+
+                        {activeTab === 'guestlist' && (
+                            <div style={styles.listContainer}>
+                                <div style={styles.listHeader}>
+                                    <span style={styles.countText}>{guestlist.length} Tickets total</span>
+                                    <button 
+                                        onClick={fetchGuestlist} 
+                                        disabled={loadingGuestlist}
+                                        style={styles.refreshBtn}
+                                    >
+                                        {loadingGuestlist ? '...' : 'Refresh'}
+                                    </button>
+                                </div>
+                                {loadingGuestlist && guestlist.length === 0 ? (
+                                    <div style={styles.placeholderText}>Loading...</div>
+                                ) : (
+                                    <div style={styles.table}>
+                                        <div style={styles.tableHeader}>
+                                            <span style={{ flex: 2 }}>Name</span>
+                                            <span style={{ flex: 1, textAlign: 'right' }}>Code</span>
+                                        </div>
+                                        {guestlist.length === 0 ? (
+                                            <div style={styles.placeholderText}>No tickets sold yet.</div>
+                                        ) : (
+                                            guestlist.map((t) => (
+                                                <div key={t.id} style={styles.tableRow}>
+                                                    <span style={{ flex: 2, fontWeight: 500 }}>{t.holder_name}</span>
+                                                    <span style={{ flex: 1, textAlign: 'right', fontFamily: 'monospace', opacity: 0.6 }}>{t.ticket_code}</span>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
-
-                    <div style={styles.row}>
-                        <div style={{ ...styles.fieldGroup, flex: 1 }}>
-                            <label style={styles.label}>Quantity</label>
-                            <input
-                                type="number"
-                                min="1"
-                                required
-                                value={quantity}
-                                onChange={(e) => setQuantity(e.target.value)}
-                                style={styles.input}
-                            />
-                        </div>
-                        <div style={{ ...styles.fieldGroup, flex: 1 }}>
-                            <label style={styles.label}>Price (Euro)</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                required
-                                value={price}
-                                onChange={(e) => setPrice(e.target.value)}
-                                style={styles.input}
-                                placeholder="0.00"
-                            />
-                        </div>
-                    </div>
-
-                    <button
-                        type="submit"
-                        className="submit-btn"
-                        style={styles.button}
-                    >
-                        Issue Offline Tickets
-                    </button>
-
-                    {status && (
-                        <div style={{
-                            ...styles.status,
-                            backgroundColor: status.includes('Error') ? 'rgba(220, 38, 38, 0.1)' : 'rgba(74, 103, 65, 0.1)',
-                            color: status.includes('Error') ? '#dc2626' : 'var(--accent)',
-                            borderColor: status.includes('Error') ? 'rgba(220, 38, 38, 0.2)' : 'rgba(74, 103, 65, 0.2)'
-                        }}>
-                            {status}
-                        </div>
-                    )}
-                </form>
+                </div>
             </div>
         </main>
     );
@@ -211,12 +347,25 @@ const styles = {
     },
     container: {
         width: '100%',
-        maxWidth: '440px',
+        maxWidth: '600px',
         backgroundColor: '#fff',
         padding: '3rem',
         borderRadius: '24px',
         boxShadow: 'var(--shadow-lg, 0 8px 40px rgba(0,0,0,0.08))',
         border: '1px solid var(--border, rgba(26, 26, 26, 0.08))',
+    },
+    tabsCol: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '2.5rem',
+    },
+    tabNav: {
+        display: 'flex',
+        borderBottom: '1px solid var(--border)',
+        gap: '2rem',
+    },
+    tabContent: {
+        minHeight: '300px',
     },
     form: {
         display: 'flex',
@@ -266,5 +415,66 @@ const styles = {
         fontSize: '0.9rem',
         textAlign: 'center',
         border: '1px solid transparent',
+    },
+    scannerPlaceholder: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '200px',
+        color: 'var(--ink-muted)',
+        fontFamily: "'Caveat', cursive",
+        fontSize: '1.5rem',
+    },
+    listContainer: {
+        animation: 'fadeIn 0.4s ease-out',
+    },
+    listHeader: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '1.5rem',
+        padding: '0 8px',
+    },
+    countText: {
+        fontSize: '0.8rem',
+        color: 'var(--ink-muted)',
+        fontWeight: '500',
+    },
+    refreshBtn: {
+        backgroundColor: 'transparent',
+        border: '1px solid var(--border)',
+        borderRadius: '8px',
+        padding: '6px 14px',
+        fontSize: '0.75rem',
+        fontWeight: '600',
+        color: 'var(--ink-light)',
+        cursor: 'pointer',
+        transition: 'all 0.2s',
+    },
+    table: {
+        display: 'flex',
+        flexDirection: 'column',
+    },
+    tableHeader: {
+        display: 'flex',
+        padding: '0 8px 12px 8px',
+        fontSize: '0.75rem',
+        fontWeight: '700',
+        color: 'var(--ink-muted)',
+        textTransform: 'uppercase',
+        letterSpacing: '0.05em',
+        borderBottom: '1px solid var(--border)',
+    },
+    tableRow: {
+        display: 'flex',
+        padding: '16px 8px',
+        borderBottom: '1px solid var(--border-light, rgba(26, 26, 26, 0.04))',
+        fontSize: '0.95rem',
+    },
+    placeholderText: {
+        padding: '40px',
+        textAlign: 'center',
+        color: 'var(--ink-muted)',
+        fontSize: '0.9rem',
     }
 };
