@@ -160,28 +160,7 @@
   width: 100%;
 }
 
-.primaryTicketCTA {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem 3rem;
-  background: var(--ink);
-  color: var(--bg);
-  border-radius: 100px;
-  text-decoration: none;
-  font-family: 'Caveat', cursive;
-  font-size: 1.8rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
 
-.primaryTicketCTA:hover {
-  background: var(--accent);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
 
 .newsletterMinimal {
   display: flex;

@@ -49,16 +49,10 @@ function PaymentScreen({ total, quantity, pricePerTicket, holderNames, onBack })
         <div className={styles.paymentScreen}>
             {/* Order summary */}
             <div className={styles.orderSummaryCard}>
-                <div className={styles.orderSummaryRow}>
-                    <span className={styles.orderSummaryLabel}>
-                        {quantity} × Ticket{quantity > 1 ? 's' : ''} · {pricePerTicket} € / Ticket
-                    </span>
-                    <span className={styles.orderSummaryTotal}>{total} €</span>
-                </div>
                 {holderNames.length > 0 && (
                     <div className={styles.holderList}>
                         {holderNames.map((name, i) => (
-                            <span key={i} className={styles.holderChip}>🌿 {name}</span>
+                            <span key={i} className={styles.holderChip}>🌿 {name || 'Ticket ' + (i + 1)}</span>
                         ))}
                     </div>
                 )}
@@ -117,6 +111,7 @@ export default function TicketsPage() {
     const [quantity, setQuantity] = useState(1);
     const [pricePerTicket, setPricePerTicket] = useState(MIN_PRICE);
     const [holderNames, setHolderNames] = useState(['']);
+    const [holder0Touched, setHolder0Touched] = useState(false);
 
     const [step, setStep] = useState('form'); // 'form' | 'payment'
     const [clientSecret, setClientSecret] = useState('');
@@ -131,9 +126,20 @@ export default function TicketsPage() {
         });
     }, [quantity]);
 
+    useEffect(() => {
+        if (!holder0Touched) {
+            setHolderNames((prev) => {
+                const next = [...prev];
+                next[0] = buyerName;
+                return next;
+            });
+        }
+    }, [buyerName, holder0Touched]);
+
     const total = quantity * pricePerTicket;
 
     function updateHolder(idx, val) {
+        if (idx === 0) setHolder0Touched(true);
         setHolderNames((prev) => {
             const next = [...prev];
             next[idx] = val;
@@ -306,12 +312,7 @@ export default function TicketsPage() {
                             </div>
                         </section>
 
-                        <div className={styles.summary}>
-                            <div className={styles.summaryRow}>
-                                <span>{quantity} × {pricePerTicket} €</span>
-                                <span className={styles.summaryTotal}>{total} €</span>
-                            </div>
-                        </div>
+
 
                         {formError && <p className={styles.errorText}>{formError}</p>}
 

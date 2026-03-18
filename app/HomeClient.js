@@ -68,10 +68,6 @@ export default function HomeClient({ buyer, orders, tickets }) {
                     <div className={styles.guestSection}>
 
                         <div className={styles.actionContainer}>
-                            <Link href="/tickets" className={styles.primaryTicketCTA}>
-                                Tickets sichern
-                            </Link>
-
                             <div className={styles.newsletterMinimal}>
                                 {newsletterState === 'success' ? (
                                     <div className={styles.successBox}>
@@ -112,6 +108,10 @@ export default function HomeClient({ buyer, orders, tickets }) {
                                         )}
                                     </form>
                                 )}
+
+                                <Link href="/tickets" className={styles.moreTicketsLink} style={{ marginTop: '0.25rem' }}>
+                                    Ticket kaufen →
+                                </Link>
                             </div>
                         </div>
                     </div>
