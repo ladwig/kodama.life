@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { verifyJWT } from '@/lib/jwt';
-import { getSupabaseAdmin } from '@/lib/supabase';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
@@ -15,8 +17,12 @@ export async function GET(req) {
         return NextResponse.redirect(new URL('/login?error=invalid_token', req.url));
     }
 
-    const supabase = getSupabaseAdmin();
-    await supabase.from('subscribers').delete().eq('email', payload.email);
+    // Statt DB-Delete: unsubscribed: true in Resend setzen
+    // Contact + Segment-Zugehörigkeit bleiben erhalten (Audit Trail)
+    await resend.contacts.update({
+        email: payload.email,
+        unsubscribed: true,
+    });
 
     return NextResponse.redirect(new URL('/unsubscribed', req.url));
 }

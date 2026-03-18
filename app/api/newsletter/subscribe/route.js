@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase';
-import { signUnsubscribeJWT } from '@/lib/jwt';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req) {
     try {
@@ -13,22 +14,24 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Ungültige E-Mail-Adresse.' }, { status: 400 });
         }
 
-        const supabase = getSupabaseAdmin();
+        const segmentId = process.env.RESEND_SEGMENT_SUBSCRIBERS_ID;
 
-        // Upsert subscriber (update name if email exists)
-        const { error } = await supabase.from('subscribers').upsert(
-            { email: email.toLowerCase().trim(), name: name.trim() },
-            { onConflict: 'email' }
-        );
+        // 1. Contact anlegen / aktualisieren (idempotent)
+        await resend.contacts.create({
+            email: email.toLowerCase().trim(),
+            firstName: name.trim(),   // voller Name → in Mails als {{firstName}}
+            unsubscribed: false,
+        });
 
-        if (error) throw error;
+        // 2. In "Subscribers" Segment eintragen
+        if (segmentId) {
+            await resend.contacts.segments.add({
+                email: email.toLowerCase().trim(),
+                segmentId,
+            });
+        }
 
-        // Generate unsubscribe token
-        const unsubToken = await signUnsubscribeJWT(email.toLowerCase().trim());
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://kodama.life';
-        const unsubLink = `${baseUrl}/api/newsletter/unsubscribe?token=${unsubToken}`;
-
-        return NextResponse.json({ success: true, unsubscribe_link: unsubLink });
+        return NextResponse.json({ success: true });
     } catch (err) {
         console.error('Newsletter subscribe error:', err);
         return NextResponse.json({ error: 'Fehler beim Anmelden.' }, { status: 500 });

@@ -133,30 +133,41 @@ export async function POST(req) {
         // 6. Send confirmation email (non-fatal — don't let email failure kill the webhook)
         try {
             if (resend) {
-                const ticketList = tickets
-                    .map((t) => `<li><strong>${t.ticket_code}</strong> – ${t.holder_name}</li>`)
-                    .join('');
+                // 6a. Contact anlegen / aktualisieren (idempotent)
+                await resend.contacts.create({
+                    email: meta.buyer_email,
+                    firstName: meta.buyer_name,  // voller Name z.B. "Daniel Ladwig" → {{firstName}}
+                    unsubscribed: false,
+                });
 
+                // 6b. In "Ticket Holders" Segment eintragen
+                if (process.env.RESEND_SEGMENT_TICKET_HOLDERS_ID) {
+                    await resend.contacts.segments.add({
+                        email: meta.buyer_email,
+                        segmentId: process.env.RESEND_SEGMENT_TICKET_HOLDERS_ID,
+                    });
+                }
+
+                // 6c. Confirmation Mail via Resend Template
                 await resend.emails.send({
                     from: process.env.RESEND_FROM_ADDRESS,
                     to: meta.buyer_email,
-                    subject: `🌿 Dein Kodama-Ticket – 22. August 2026`,
-                    html: `
-              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
-                <h1 style="color: #4a6741;">Willkommen, ${meta.buyer_name}! 🌿</h1>
-                <p>Du hast erfolgreich ${quantity} Ticket${quantity > 1 ? 's' : ''} für <strong>Kodama am 22. August 2026</strong> am Kiekebusch See gekauft.</p>
-                <h2>Deine Tickets</h2>
-                <ul>${ticketList}</ul>
-                <p>Zeige deinen Ticket-Code beim Einlass vor.</p>
-                <h2>Deine Ticket-Seite</h2>
-                <p>Rufe jederzeit deine Tickets ab – auch auf anderen Geräten:</p>
-                <p><a href="${magicLink}" style="display:inline-block; background:#4a6741; color:#fff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:bold;">Meine Tickets anzeigen</a></p>
-                <p style="font-size:0.8em; color:#666;">Dieser Link ist 90 Tage gültig.</p>
-                <hr style="margin: 2rem 0; border: none; border-top: 1px solid #eee;" />
-                <p style="font-size:0.75em; color:#999;">Du möchtest keine E-Mails mehr erhalten? <a href="${unsubLink}">Abmelden</a></p>
-              </div>
-            `,
+                    template_id: process.env.RESEND_TEMPLATE_TICKET_PURCHASE_CONFIRMATION_ID,
+                    variables: {
+                        firstName: meta.buyer_name,
+                        magicLink,
+                        tickets: tickets.map((t) => ({
+                            code: t.ticket_code,
+                            holderName: t.holder_name,
+                            qrUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${t.ticket_code}`,
+                        })),
+                    },
+                    headers: {
+                        'List-Unsubscribe': `<${unsubLink}>`,
+                        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+                    },
                 });
+
                 console.log('Confirmation email sent to', meta.buyer_email);
             } else if (process.env.MAIL_WEBHOOK_URL && !process.env.MAIL_WEBHOOK_URL.trim().startsWith('#')) {
                 await fetch(process.env.MAIL_WEBHOOK_URL, {
