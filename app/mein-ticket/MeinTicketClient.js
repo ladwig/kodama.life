@@ -35,30 +35,11 @@ export default function MeinTicketClient({ buyer, orders, tickets }) {
                 {/* ── Header ── */}
                 <div className={styles.header}>
                     <h1 className={styles.title}>
-                        Deine Tickets{' '}
-                        <span className={styles.titleAccent}>🌿</span>
+                        Willkommen, {buyer.name} <span className={styles.titleAccent}>🌿</span>
                     </h1>
                     <p className={styles.subtitle}>
-                        {buyer.name} · {totalTickets} Ticket{totalTickets !== 1 ? 's' : ''} für Kodama
+                        Hier findest du später alle Infos zur Anreise, Lineup und mehr.
                     </p>
-                </div>
-
-                {/* ── Event info banner ── */}
-                <div className={styles.eventBanner}>
-                    <div className={styles.eventBannerItem}>
-                        <span className={styles.bannerIcon}>📅</span>
-                        <span>22. August 2026</span>
-                    </div>
-                    <div className={styles.eventBannerDivider} />
-                    <div className={styles.eventBannerItem}>
-                        <span className={styles.bannerIcon}>📍</span>
-                        <span>Kiekebusch See</span>
-                    </div>
-                    <div className={styles.eventBannerDivider} />
-                    <div className={styles.eventBannerItem}>
-                        <span className={styles.bannerIcon}>🎟</span>
-                        <span>{totalTickets} Ticket{totalTickets !== 1 ? 's' : ''}</span>
-                    </div>
                 </div>
 
                 {/* ── No tickets state ── */}
@@ -78,12 +59,7 @@ export default function MeinTicketClient({ buyer, orders, tickets }) {
                         <div key={order.id} className={styles.orderCard}>
                             <div className={styles.orderHeader}>
                                 <div>
-                                    <p className={styles.orderLabel}>Bestellung</p>
-                                    <p className={styles.orderId}>#{order.id.slice(0, 8).toUpperCase()}</p>
-                                </div>
-                                <div className={styles.orderMeta}>
-                                    <span className={styles.badge}>bezahlt</span>
-                                    <span className={styles.orderPrice}>{formatPrice(order.total_price)}</span>
+                                    <p className={styles.orderLabel}>Ticket{orderTickets.length > 1 ? 's' : ''}</p>
                                 </div>
                             </div>
 
@@ -100,8 +76,6 @@ export default function MeinTicketClient({ buyer, orders, tickets }) {
                                             ))}
                                         </div>
                                         <div className={styles.ticketCardRight}>
-                                            <span className={styles.ticketRightLabel}>Kodama</span>
-                                            <span className={styles.ticketRightDate}>22.08.2026</span>
                                             <span className={styles.ticketPrice}>{formatPrice(order.price_per_ticket)}</span>
                                         </div>
                                     </div>
