@@ -87,6 +87,7 @@ export async function POST(req) {
                 total_price: pi.amount,
                 status: 'paid',
                 payment_method: paymentSource,
+                source: 'online',
             })
             .select()
             .single();
