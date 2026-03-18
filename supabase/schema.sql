@@ -22,8 +22,7 @@ create table if not exists orders (
   price_per_ticket  int not null,   -- in Cent (z.B. 2500 = 25,00 €)
   total_price       int not null,   -- in Cent
   status            text default 'pending',  -- 'pending' | 'paid' | 'refunded'
-  event_date        date,
-  token             text,           -- buyer JWT (for reference)
+  payment_method    text,           -- e.g. 'stripe_card', 'stripe_sofort', etc.
   created_at        timestamptz default now()
 );
 

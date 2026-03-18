@@ -46,14 +46,8 @@ export default function ConfirmationClient() {
                 if (data.ready) {
                     clearInterval(interval);
 
-                    // If we got the JWT, set the ticket_token cookie via the verify endpoint
                     if (data.token) {
-                        try {
-                            await fetch(`/api/auth/verify?token=${data.token}`, { redirect: 'manual' });
-                        } catch {
-                            // Non-fatal — user can always use the magic link from email
-                        }
-                        setHasToken(true);
+                        setHasToken(data.token);
                     }
 
                     setState('success');
@@ -65,7 +59,7 @@ export default function ConfirmationClient() {
 
             if (attempts >= maxAttempts) {
                 clearInterval(interval);
-                // Show success anyway — webhook processes in background, email will follow
+                // Show success anyway
                 setState('success');
             }
         }, 1000);
@@ -98,9 +92,12 @@ export default function ConfirmationClient() {
                         )}
                         <div className={styles.actions}>
                             {hasToken ? (
-                                <a href="/" className={styles.btnPrimary}>
+                                <button
+                                    onClick={() => window.location.href = `/api/auth/verify?token=${hasToken}`}
+                                    className={styles.btnPrimary}
+                                >
                                     Meine Tickets ansehen
-                                </a>
+                                </button>
                             ) : (
                                 <Link href="/" className={styles.btnPrimary}>
                                     Zur Startseite

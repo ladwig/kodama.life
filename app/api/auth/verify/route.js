@@ -14,7 +14,7 @@ export async function GET(req) {
         return NextResponse.redirect(new URL('/login?error=invalid_token', req.url));
     }
 
-    const response = NextResponse.redirect(new URL('/mein-ticket', req.url));
+    const response = NextResponse.redirect(new URL('/', req.url));
     response.cookies.set('ticket_token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',

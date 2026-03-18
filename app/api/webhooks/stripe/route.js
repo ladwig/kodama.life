@@ -73,6 +73,8 @@ export async function POST(req) {
 
         // 1. Create order
         console.log('[webhook] Step 1: inserting order...');
+        const paymentSource = `stripe_${pi.payment_method_types?.[0] || 'unknown'}`;
+
         const { data: order, error: orderError } = await supabase
             .from('orders')
             .insert({
@@ -84,6 +86,7 @@ export async function POST(req) {
                 price_per_ticket,
                 total_price: pi.amount,
                 status: 'paid',
+                payment_method: paymentSource,
             })
             .select()
             .single();
@@ -166,13 +169,6 @@ export async function POST(req) {
             }
         } catch (mailErr) {
             console.warn('Email sending failed (non-fatal):', mailErr.message);
-        }
-
-        // 7. Update order with token (non-fatal — used by confirmation page to set cookie)
-        try {
-            await supabase.from('orders').update({ token: jwt }).eq('id', order.id);
-        } catch (tokenErr) {
-            console.warn('Could not store token on order (non-fatal):', tokenErr.message);
         }
 
         return NextResponse.json({ received: true });

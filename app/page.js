@@ -9,7 +9,7 @@ async function getBuyerData(email) {
 
   const { data: orders } = await supabase
     .from("orders")
-    .select("id, quantity, price_per_ticket, total_price, event_date, created_at, status")
+    .select("id, quantity, price_per_ticket, total_price, created_at, status")
     .eq("buyer_email", email)
     .eq("status", "paid")
     .order("created_at", { ascending: false });
