@@ -4,7 +4,7 @@ import { getSupabaseAdmin } from '@/lib/supabase';
 export async function POST(req) {
     try {
         const body = await req.json();
-        const { password, ticketCode, action } = body;
+        const { password, ticketCode, action, checkedIn } = body;
 
         if (password !== process.env.CHEF_PASSWORD) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -29,11 +29,12 @@ export async function POST(req) {
 
         // 2. Check-in Ticket
         if (action === 'checkin') {
+            const isCheckingIn = checkedIn !== undefined ? checkedIn : true;
             const { data: ticket, error } = await supabase
                 .from('tickets')
                 .update({ 
-                    checked_in: true, 
-                    checked_in_at: new Date().toISOString() 
+                    checked_in: isCheckingIn, 
+                    checked_in_at: isCheckingIn ? new Date().toISOString() : null
                 })
                 .eq('ticket_code', ticketCode)
                 .select()

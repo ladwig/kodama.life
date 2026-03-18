@@ -11,6 +11,7 @@ export default function ChefPage() {
     const [activeTab, setActiveTab] = useState('offline');
     const [guestlist, setGuestlist] = useState([]);
     const [loadingGuestlist, setLoadingGuestlist] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
     // Scanner
     const [scannedTicket, setScannedTicket] = useState(null);
@@ -59,12 +60,15 @@ export default function ChefPage() {
     };
 
     const fetchGuestlist = async (providedPw) => {
+        // Ensure providedPw is a string and not a React event object
+        const actualPw = (typeof providedPw === 'string') ? providedPw : (password || sessionStorage.getItem('chef_pw'));
+        
         setLoadingGuestlist(true);
         try {
             const res = await fetch('/api/chef/guestlist', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: providedPw || password || sessionStorage.getItem('chef_pw') })
+                body: JSON.stringify({ password: actualPw })
             });
             const data = await res.json();
             if (res.ok) {
@@ -206,41 +210,82 @@ export default function ChefPage() {
         // We don't want to show these to the user
     }
 
-    const handleCheckIn = async () => {
-        if (!scannedTicket || processing) return;
+    const handleCheckInAndNext = async () => {
+        if (!scannedTicket) return;
         
-        setProcessing(true);
-        try {
-            const res = await fetch('/api/chef/scan', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    password: password || sessionStorage.getItem('chef_pw'),
-                    ticketCode: scannedTicket.ticket_code,
-                    action: 'checkin'
-                })
-            });
+        const ticketToFinalize = scannedTicket;
+        const checkedInAt = new Date().toISOString();
+        
+        // 1. OPTIMISTIC UPDATE: Update local state immediately
+        setGuestlist(prev => prev.map(t => 
+            t.ticket_code === ticketToFinalize.ticket_code 
+                ? { ...t, checked_in: true, checked_in_at: checkedInAt } 
+                : t
+        ));
+        
+        // 2. IMMEDIATE RESET: Clear scanner for next person
+        resetScanner();
+        setStatus(`Checked in ${ticketToFinalize.holder_name} (local)`);
+        setTimeout(() => setStatus(''), 2000);
 
-            const data = await res.json();
-            if (res.ok) {
-                const updatedTicket = { ...scannedTicket, checked_in: true, checked_in_at: new Date().toISOString() };
-                setScannedTicket(updatedTicket);
-                
-                // Update local guestlist state so they appear as "IN" there too
-                setGuestlist(prev => prev.map(t => 
-                    t.ticket_code === updatedTicket.ticket_code ? updatedTicket : t
-                ));
-
-                setStatus(`Successfully checked in ${scannedTicket.holder_name}!`);
-                setTimeout(() => setStatus(''), 3000);
+        // 3. BACKGROUND SYNC: Call API without blocking the UI
+        fetch('/api/chef/scan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                password: password || sessionStorage.getItem('chef_pw'),
+                ticketCode: ticketToFinalize.ticket_code,
+                action: 'checkin'
+            })
+        }).then(res => {
+            if (!res.ok) {
+                console.error('Background check-in sync failed');
+                setStatus(`Sync failed for ${ticketToFinalize.holder_name}!`);
             } else {
-                setScanError(data.error || 'Failed to check in');
+                setStatus(`Checked in ${ticketToFinalize.holder_name} (synced)`);
+                setTimeout(() => setStatus(''), 2000);
             }
-        } catch (err) {
-            setScanError('Error communicating with server.');
-        } finally {
-            setProcessing(false);
-        }
+        }).catch(err => {
+            console.error('Network error during sync', err);
+            setStatus(`Network error syncing ${ticketToFinalize.holder_name}`);
+        });
+    };
+
+    const handleManualCheckIn = async (ticket) => {
+        if (processing) return;
+        
+        const newStatus = !ticket.checked_in;
+        const confirmMsg = newStatus 
+            ? `Check in ${ticket.holder_name}?` 
+            : `Uncheck ${ticket.holder_name}? (Set back to OPEN)`;
+
+        if (!window.confirm(confirmMsg)) return;
+
+        const checkedInAt = newStatus ? new Date().toISOString() : null;
+        
+        // 1. OPTIMISTIC UPDATE
+        setGuestlist(prev => prev.map(t => 
+            t.id === ticket.id 
+                ? { ...t, checked_in: newStatus, checked_in_at: checkedInAt } 
+                : t
+        ));
+        
+        setStatus(newStatus ? `Checked in ${ticket.holder_name}` : `Unchecked ${ticket.holder_name}`);
+        setTimeout(() => setStatus(''), 2000);
+
+        // 2. BACKGROUND SYNC
+        fetch('/api/chef/scan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                password: password || sessionStorage.getItem('chef_pw'),
+                ticketCode: ticket.ticket_code,
+                action: 'checkin',
+                checkedIn: newStatus
+            })
+        }).catch(err => {
+            console.error('Manual check-in sync failed', err);
+        });
     };
 
     const resetScanner = () => {
@@ -514,19 +559,25 @@ export default function ChefPage() {
                                         </div>
 
                                         {!scannedTicket.checked_in ? (
-                                            <button 
-                                                onClick={handleCheckIn} 
-                                                disabled={processing}
-                                                style={styles.checkInBtn}
-                                            >
-                                                {processing ? 'Processing...' : 'Check In Now'}
-                                            </button>
+                                            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
+                                                <button 
+                                                    onClick={handleCheckInAndNext} 
+                                                    disabled={processing}
+                                                    style={styles.checkInBtn}
+                                                >
+                                                    {processing ? 'Processing...' : '✅ Check In & Next'}
+                                                </button>
+                                                <button onClick={resetScanner} style={styles.cancelBtn}>
+                                                    Back without Check In
+                                                </button>
+                                            </div>
                                         ) : (
-                                            <button onClick={resetScanner} style={styles.scanNextBtn}>Next Scan</button>
-                                        )}
-                                        
-                                        {!scannedTicket.checked_in && (
-                                            <button onClick={resetScanner} style={styles.cancelBtn}>Cancel</button>
+                                            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
+                                                <div style={{ color: 'var(--accent)', fontWeight: '600', marginBottom: '0.5rem' }}>
+                                                    Already checked in!
+                                                </div>
+                                                <button onClick={resetScanner} style={styles.scanNextBtn}>Next Scan</button>
+                                            </div>
                                         )}
                                     </div>
                                 )}
@@ -536,9 +587,18 @@ export default function ChefPage() {
                         {activeTab === 'guestlist' && (
                             <div style={styles.listContainer}>
                                 <div style={styles.listHeader}>
-                                    <span style={styles.countText}>{guestlist.length} Tickets total</span>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        <span style={styles.countText}>{guestlist.length} Tickets total</span>
+                                        <input 
+                                            type="text" 
+                                            placeholder="Search name..." 
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            style={styles.searchBar}
+                                        />
+                                    </div>
                                     <button 
-                                        onClick={fetchGuestlist} 
+                                        onClick={() => fetchGuestlist()} 
                                         disabled={loadingGuestlist}
                                         style={styles.refreshBtn}
                                     >
@@ -554,28 +614,36 @@ export default function ChefPage() {
                                             <span style={{ flex: 1 }}>Status</span>
                                             <span style={{ flex: 0.8, textAlign: 'right' }}>Code</span>
                                         </div>
-                                        {guestlist.length === 0 ? (
-                                            <div style={styles.placeholderText}>No tickets sold yet.</div>
+                                        {guestlist.filter(t => t.holder_name.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 ? (
+                                            <div style={styles.placeholderText}>No matches found.</div>
                                         ) : (
-                                            guestlist.map((t) => (
-                                                <div key={t.id} style={styles.tableRow}>
-                                                    <span style={{ flex: 1.5, fontWeight: 500 }}>{t.holder_name}</span>
-                                                    <span style={{ flex: 1 }}>
-                                                        <span style={{
-                                                            fontSize: '0.7rem',
-                                                            padding: '2px 8px',
-                                                            borderRadius: '10px',
-                                                            backgroundColor: t.checked_in ? 'rgba(74, 103, 65, 0.1)' : 'rgba(0,0,0,0.05)',
-                                                            color: t.checked_in ? 'var(--accent)' : 'var(--ink-muted)',
-                                                            fontWeight: '600',
-                                                            textTransform: 'uppercase'
-                                                        }}>
-                                                            {t.checked_in ? 'IN' : 'WAIT'}
+                                            guestlist
+                                                .filter(t => t.holder_name.toLowerCase().includes(searchTerm.toLowerCase()))
+                                                .map((t) => (
+                                                    <div key={t.id} style={styles.tableRow}>
+                                                        <span style={{ flex: 1.5, fontWeight: 500 }}>{t.holder_name}</span>
+                                                        <span style={{ flex: 1 }}>
+                                                            <span 
+                                                                onClick={() => handleManualCheckIn(t)}
+                                                                style={{
+                                                                    fontSize: '0.7rem',
+                                                                    padding: '4px 10px',
+                                                                    borderRadius: '10px',
+                                                                    backgroundColor: t.checked_in ? 'rgba(34, 197, 94, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                                                                    color: t.checked_in ? '#16a34a' : 'rgba(0, 0, 0, 0.4)',
+                                                                    fontWeight: '700',
+                                                                    textTransform: 'uppercase',
+                                                                    cursor: 'pointer',
+                                                                    border: t.checked_in ? '1px solid rgba(34, 197, 94, 0.2)' : '1px solid rgba(0, 0, 0, 0.1)',
+                                                                    transition: 'all 0.2s'
+                                                                }}
+                                                            >
+                                                                {t.checked_in ? 'IN' : 'OPEN'}
+                                                            </span>
                                                         </span>
-                                                    </span>
-                                                    <span style={{ flex: 0.8, textAlign: 'right', fontFamily: 'monospace', opacity: 0.6 }}>{t.ticket_code}</span>
-                                                </div>
-                                            ))
+                                                        <span style={{ flex: 0.8, textAlign: 'right', fontFamily: 'monospace', opacity: 0.6 }}>{t.ticket_code}</span>
+                                                    </div>
+                                                ))
                                         )}
                                     </div>
                                 )}
@@ -812,6 +880,14 @@ const styles = {
         fontWeight: '600',
         cursor: 'pointer',
         textDecoration: 'underline',
+    },
+    searchBar: {
+        padding: '6px 12px',
+        borderRadius: '8px',
+        border: '1px solid var(--border)',
+        fontSize: '0.85rem',
+        width: '180px',
+        backgroundColor: 'rgba(0,0,0,0.02)',
     },
     scannerPlaceholder: {
         display: 'flex',
