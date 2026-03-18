@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
-import { headers } from 'next/headers';
 import { stripe } from '@/lib/stripe';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { signTicketJWT, signUnsubscribeJWT } from '@/lib/jwt';
 import { Resend } from 'resend';
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+// Only init Resend if the key looks real (not the placeholder 're_...')
+const resend = (process.env.RESEND_API_KEY && !process.env.RESEND_API_KEY.endsWith('_...'))
+    ? new Resend(process.env.RESEND_API_KEY)
+    : null;
 
 function generateTicketCode() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -32,8 +34,7 @@ async function generateUniqueTicketCode(supabase) {
 
 export async function POST(req) {
     const body = await req.text();
-    const headersList = await headers();
-    const signature = headersList.get('stripe-signature');
+    const signature = req.headers.get('stripe-signature');
 
     let event;
     try {
@@ -68,7 +69,10 @@ export async function POST(req) {
     const ticket_holders = JSON.parse(meta.ticket_holders || '[]');
 
     try {
+        console.log('[webhook] Processing payment:', pi.id, '| buyer:', meta.buyer_email);
+
         // 1. Create order
+        console.log('[webhook] Step 1: inserting order...');
         const { data: order, error: orderError } = await supabase
             .from('orders')
             .insert({
@@ -80,14 +84,15 @@ export async function POST(req) {
                 price_per_ticket,
                 total_price: pi.amount,
                 status: 'paid',
-                event_date: meta.event_date || null,
             })
             .select()
             .single();
 
-        if (orderError) throw orderError;
+        if (orderError) { console.error('[webhook] Order insert failed:', orderError); throw orderError; }
+        console.log('[webhook] Step 1 done: order', order.id);
 
         // 2. Create tickets
+        console.log('[webhook] Step 2: inserting', quantity, 'ticket(s)...');
         const ticketsToInsert = [];
         for (let i = 0; i < quantity; i++) {
             const ticket_code = await generateUniqueTicketCode(supabase);
@@ -103,13 +108,16 @@ export async function POST(req) {
             .insert(ticketsToInsert)
             .select();
 
-        if (ticketError) throw ticketError;
+        if (ticketError) { console.error('[webhook] Ticket insert failed:', ticketError); throw ticketError; }
+        console.log('[webhook] Step 2 done:', tickets.map(t => t.ticket_code));
 
         // 3. Generate JWT for buyer
+        console.log('[webhook] Step 3: signing JWT...');
         const jwt = await signTicketJWT({
             buyer_email: meta.buyer_email,
             buyer_name: meta.buyer_name,
         });
+        console.log('[webhook] Step 3 done.');
 
         // 4. Generate unsubscribe token
         const unsubToken = await signUnsubscribeJWT(meta.buyer_email);
@@ -119,63 +127,57 @@ export async function POST(req) {
         const magicLink = `${baseUrl}/api/auth/verify?token=${jwt}`;
         const unsubLink = `${baseUrl}/api/newsletter/unsubscribe?token=${unsubToken}`;
 
-        // 6. Send confirmation email via Resend
-        if (resend) {
-            const ticketList = tickets
-                .map((t) => `<li><strong>${t.ticket_code}</strong> – ${t.holder_name}</li>`)
-                .join('');
+        // 6. Send confirmation email (non-fatal — don't let email failure kill the webhook)
+        try {
+            if (resend) {
+                const ticketList = tickets
+                    .map((t) => `<li><strong>${t.ticket_code}</strong> – ${t.holder_name}</li>`)
+                    .join('');
 
-            await resend.emails.send({
-                from: process.env.RESEND_FROM_ADDRESS || 'tickets@kodama.life',
-                to: meta.buyer_email,
-                subject: `🌿 Dein Kodama-Ticket – 22. August 2026`,
-                html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
-            <h1 style="color: #4a6741;">Willkommen, ${meta.buyer_name}! 🌿</h1>
-            <p>Du hast erfolgreich ${quantity} Ticket${quantity > 1 ? 's' : ''} für <strong>Kodama am 22. August 2026</strong> am Kiekebusch See gekauft.</p>
-
-            <h2>Deine Tickets</h2>
-            <ul>${ticketList}</ul>
-
-            <p>Zeige deinen Ticket-Code beim Einlass vor.</p>
-
-            <h2>Deine Ticket-Seite</h2>
-            <p>Rufe jederzeit deine Tickets ab – auch auf anderen Geräten:</p>
-            <p><a href="${magicLink}" style="display:inline-block; background:#4a6741; color:#fff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:bold;">Meine Tickets anzeigen</a></p>
-            <p style="font-size:0.8em; color:#666;">Dieser Link ist 90 Tage gültig.</p>
-
-            <hr style="margin: 2rem 0; border: none; border-top: 1px solid #eee;" />
-            <p style="font-size:0.75em; color:#999;">
-              Du möchtest keine E-Mails mehr erhalten?
-              <a href="${unsubLink}">Abmelden</a>
-            </p>
-          </div>
-        `,
-            });
-        } else if (process.env.MAIL_WEBHOOK_URL) {
-            // Fallback: trigger external webhook (Make/n8n)
-            await fetch(process.env.MAIL_WEBHOOK_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    buyer_email: meta.buyer_email,
-                    buyer_name: meta.buyer_name,
-                    order_id: order.id,
-                    tickets,
-                    magic_link: magicLink,
-                }),
-            });
+                await resend.emails.send({
+                    from: process.env.RESEND_FROM_ADDRESS || 'tickets@kodama.life',
+                    to: meta.buyer_email,
+                    subject: `🌿 Dein Kodama-Ticket – 22. August 2026`,
+                    html: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a1a;">
+                <h1 style="color: #4a6741;">Willkommen, ${meta.buyer_name}! 🌿</h1>
+                <p>Du hast erfolgreich ${quantity} Ticket${quantity > 1 ? 's' : ''} für <strong>Kodama am 22. August 2026</strong> am Kiekebusch See gekauft.</p>
+                <h2>Deine Tickets</h2>
+                <ul>${ticketList}</ul>
+                <p>Zeige deinen Ticket-Code beim Einlass vor.</p>
+                <h2>Deine Ticket-Seite</h2>
+                <p>Rufe jederzeit deine Tickets ab – auch auf anderen Geräten:</p>
+                <p><a href="${magicLink}" style="display:inline-block; background:#4a6741; color:#fff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:bold;">Meine Tickets anzeigen</a></p>
+                <p style="font-size:0.8em; color:#666;">Dieser Link ist 90 Tage gültig.</p>
+                <hr style="margin: 2rem 0; border: none; border-top: 1px solid #eee;" />
+                <p style="font-size:0.75em; color:#999;">Du möchtest keine E-Mails mehr erhalten? <a href="${unsubLink}">Abmelden</a></p>
+              </div>
+            `,
+                });
+                console.log('Confirmation email sent to', meta.buyer_email);
+            } else if (process.env.MAIL_WEBHOOK_URL && !process.env.MAIL_WEBHOOK_URL.trim().startsWith('#')) {
+                await fetch(process.env.MAIL_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ buyer_email: meta.buyer_email, buyer_name: meta.buyer_name, order_id: order.id, tickets, magic_link: magicLink }),
+                });
+            } else {
+                console.log('No mail provider configured — skipping email. Magic link:', magicLink);
+            }
+        } catch (mailErr) {
+            console.warn('Email sending failed (non-fatal):', mailErr.message);
         }
 
-        // 7. Update order with token (for reference)
-        await supabase
-            .from('orders')
-            .update({ token: jwt })
-            .eq('id', order.id);
+        // 7. Update order with token (non-fatal — used by confirmation page to set cookie)
+        try {
+            await supabase.from('orders').update({ token: jwt }).eq('id', order.id);
+        } catch (tokenErr) {
+            console.warn('Could not store token on order (non-fatal):', tokenErr.message);
+        }
 
         return NextResponse.json({ received: true });
     } catch (err) {
-        console.error('Webhook processing error:', err);
+        console.error('Webhook processing error:', err?.message || err, '| code:', err?.code);
         return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
     }
 }

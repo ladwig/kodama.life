@@ -5,10 +5,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import styles from './page.module.css';
 
-export default function HomeClient({ buyer, tickets }) {
+function formatPrice(cents) {
+    return `${(cents / 100).toFixed(0)} €`;
+}
+
+export default function HomeClient({ buyer, orders, tickets }) {
     const [newsletterName, setNewsletterName] = useState('');
     const [newsletterEmail, setNewsletterEmail] = useState('');
-    const [newsletterState, setNewsletterState] = useState('idle'); // idle | loading | success | error
+    const [newsletterState, setNewsletterState] = useState('idle');
     const [newsletterError, setNewsletterError] = useState('');
 
     async function handleNewsletter(e) {
@@ -30,8 +34,17 @@ export default function HomeClient({ buyer, tickets }) {
         }
     }
 
+    // Group tickets by order
+    const ticketsByOrder = {};
+    tickets.forEach((t) => {
+        if (!ticketsByOrder[t.order_id]) ticketsByOrder[t.order_id] = [];
+        ticketsByOrder[t.order_id].push(t);
+    });
+
+    const isBuyer = !!buyer;
+
     return (
-        <main className={styles.container}>
+        <main className={`${styles.container} ${isBuyer ? styles.containerBuyer : ''}`}>
             {/* Ink splatter dots */}
             <span className={styles.dot} />
             <span className={styles.dot} />
@@ -42,6 +55,7 @@ export default function HomeClient({ buyer, tickets }) {
             <span className={styles.dot} />
 
             <div className={styles.content}>
+                {/* ── Hero ── */}
                 <h1 className={styles.title}>Kodama</h1>
                 <p className={styles.details}>
                     22. August 2026
@@ -58,28 +72,9 @@ export default function HomeClient({ buyer, tickets }) {
                     priority
                 />
 
-                {/* ── Ticket-Käufer: Ticket Cards ── */}
-                {buyer && tickets.length > 0 && (
-                    <div className={styles.ticketSection}>
-                        <p className={styles.sectionLabel}>Deine Tickets, {buyer.name.split(' ')[0]} 🌿</p>
-                        <div className={styles.ticketGrid}>
-                            {tickets.map((t) => (
-                                <div key={t.id} className={styles.ticketCard}>
-                                    <span className={styles.ticketCode}>{t.ticket_code}</span>
-                                    <span className={styles.ticketHolder}>{t.holder_name}</span>
-                                </div>
-                            ))}
-                        </div>
-                        <Link href="/mein-ticket" className={styles.linkBtn}>
-                            Alle Tickets ansehen →
-                        </Link>
-                    </div>
-                )}
-
-                {/* ── Gast: Newsletter + CTA ── */}
-                {!buyer && (
+                {/* ── Guest view ── */}
+                {!isBuyer && (
                     <div className={styles.guestSection}>
-                        {/* Programm / Info */}
                         <div className={styles.infoRow}>
                             <span className={styles.pill}>🎶 Live-Musik</span>
                             <span className={styles.pill}>🌊 Badesee</span>
@@ -87,10 +82,9 @@ export default function HomeClient({ buyer, tickets }) {
                             <span className={styles.pill}>🌲 Natur</span>
                         </div>
 
-                        {/* Newsletter */}
                         {newsletterState === 'success' ? (
                             <div className={styles.successBox}>
-                                <span>🌿 Du bist dabei! Wir melden uns.</span>
+                                🌿 Du bist dabei! Wir melden uns.
                             </div>
                         ) : (
                             <form onSubmit={handleNewsletter} className={styles.newsletterForm}>
@@ -116,10 +110,10 @@ export default function HomeClient({ buyer, tickets }) {
                                     />
                                     <button
                                         type="submit"
-                                        className={styles.btnPrimary}
+                                        className={styles.btnSmall}
                                         disabled={newsletterState === 'loading'}
                                     >
-                                        {newsletterState === 'loading' ? '...' : 'Anmelden'}
+                                        {newsletterState === 'loading' ? '…' : 'Anmelden'}
                                     </button>
                                 </div>
                                 {newsletterState === 'error' && (
@@ -128,18 +122,71 @@ export default function HomeClient({ buyer, tickets }) {
                             </form>
                         )}
 
-                        {/* Ticket CTA */}
                         <Link href="/tickets" className={styles.ticketCTA}>
                             Ticket kaufen →
                         </Link>
                     </div>
                 )}
 
-                {/* ── Ticket-Käufer ohne Tickets (Edge-Case) ── */}
-                {buyer && tickets.length === 0 && (
-                    <div className={styles.guestSection}>
-                        <Link href="/tickets" className={styles.ticketCTA}>
-                            Ticket kaufen →
+                {/* ── Buyer view: full ticket cards inline ── */}
+                {isBuyer && (
+                    <div className={styles.buyerSection}>
+                        <p className={styles.welcomeLabel}>
+                            Willkommen zurück, {buyer.name.split(' ')[0]} 🌿
+                        </p>
+
+                        {/* Event banner */}
+                        <div className={styles.eventBanner}>
+                            <span className={styles.bannerItem}>📅 22. August 2026</span>
+                            <span className={styles.bannerDivider} />
+                            <span className={styles.bannerItem}>📍 Kiekebusch See</span>
+                            <span className={styles.bannerDivider} />
+                            <span className={styles.bannerItem}>🎟 {tickets.length} Ticket{tickets.length !== 1 ? 's' : ''}</span>
+                        </div>
+
+                        {/* Ticket cards grouped by order */}
+                        {orders.length === 0 && (
+                            <div className={styles.emptyTickets}>
+                                <p>Noch keine Tickets.</p>
+                                <Link href="/tickets" className={styles.ticketCTA}>Jetzt kaufen →</Link>
+                            </div>
+                        )}
+
+                        {orders.map((order) => {
+                            const orderTickets = ticketsByOrder[order.id] || [];
+                            return (
+                                <div key={order.id} className={styles.orderBlock}>
+                                    <div className={styles.orderMeta}>
+                                        <span className={styles.orderLabel}>#{order.id.slice(0, 8).toUpperCase()}</span>
+                                        <span className={styles.orderBadge}>bezahlt</span>
+                                        <span className={styles.orderTotal}>{formatPrice(order.total_price)}</span>
+                                    </div>
+
+                                    <div className={styles.ticketList}>
+                                        {orderTickets.map((ticket) => (
+                                            <div key={ticket.id} className={styles.ticketCard}>
+                                                <div className={styles.ticketLeft}>
+                                                    <span className={styles.ticketCode}>{ticket.ticket_code}</span>
+                                                    <span className={styles.ticketHolder}>{ticket.holder_name}</span>
+                                                </div>
+                                                <div className={styles.ticketPerfs}>
+                                                    {Array.from({ length: 7 }).map((_, i) => (
+                                                        <span key={i} className={styles.perf} />
+                                                    ))}
+                                                </div>
+                                                <div className={styles.ticketRight}>
+                                                    <span className={styles.ticketRightLabel}>Kodama</span>
+                                                    <span className={styles.ticketRightDate}>22.08.26</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        })}
+
+                        <Link href="/tickets" className={styles.moreTicketsLink}>
+                            + Weitere Tickets kaufen
                         </Link>
                     </div>
                 )}

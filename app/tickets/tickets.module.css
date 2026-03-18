@@ -336,48 +336,99 @@
     border-radius: var(--radius);
 }
 
-/* ── Form locked state (when payment is shown) ── */
-.formLocked {
-    opacity: 0.55;
-    pointer-events: none;
-    user-select: none;
-}
-
-/* ── Inline payment wrapper (slides in below form) ── */
-.paymentWrapper {
-    margin-top: 1.5rem;
-    animation: slideDown 0.4s ease-out;
-}
-
-.stripeSection {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-}
-
-.stripeDivider {
+/* ── Step indicator ── */
+.steps {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    color: var(--ink-muted);
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
 }
 
-.stripeDivider::before,
-.stripeDivider::after {
-    content: '';
+.step {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--ink-muted);
+    white-space: nowrap;
+}
+
+.stepActive {
+    color: var(--accent);
+}
+
+.stepDone {
+    color: var(--accent-light);
+}
+
+.stepLine {
     flex: 1;
     height: 1px;
     background: var(--border);
 }
 
+/* ── Payment screen ── */
+.cardPayment {
+    /* slightly narrower for the payment screen */
+    max-width: 520px;
+}
+
+.paymentScreen {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    animation: slideUp 0.35s ease-out;
+}
+
+.orderSummaryCard {
+    background: var(--accent-bg);
+    border: 1px solid rgba(74, 103, 65, 0.2);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.orderSummaryRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.orderSummaryLabel {
+    font-size: 0.875rem;
+    color: var(--ink-light);
+}
+
+.orderSummaryTotal {
+    font-family: 'Caveat', cursive;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+}
+
+.holderList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.holderChip {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(74, 103, 65, 0.2);
+    border-radius: 100px;
+    padding: 0.2rem 0.65rem;
+    font-size: 0.78rem;
+    color: var(--ink-light);
+}
+
+/* ── Stripe loading / payment form ── */
 .stripeLoading {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 1.5rem;
+    padding: 2rem;
     justify-content: center;
     color: var(--ink-muted);
     font-size: 0.875rem;
@@ -402,19 +453,7 @@
 @keyframes slideUp {
     from {
         opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-12px);
+        transform: translateY(16px);
     }
 
     to {

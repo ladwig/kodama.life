@@ -2,11 +2,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 100vh;
   min-height: 100dvh;
-  padding: 2rem;
+  padding: 3rem 1.5rem 4rem;
   position: relative;
+  overflow-x: hidden;
+}
+
+/* Guest view: vertically centered */
+.container:not(.containerBuyer) {
+  justify-content: center;
   overflow: hidden;
 }
 
@@ -31,11 +37,12 @@
   align-items: center;
   gap: 0.5rem;
   z-index: 1;
-  animation: fadeIn 2s ease-out;
+  animation: fadeIn 1.2s ease-out;
   width: 100%;
   max-width: 560px;
 }
 
+/* ── Hero ── */
 .title {
   font-family: 'Caveat', cursive;
   font-size: clamp(3.5rem, 10vw, 7rem);
@@ -61,69 +68,73 @@
 }
 
 .illustration {
-  margin-top: 1.5rem;
-  width: clamp(120px, 25vw, 180px);
+  margin-top: 1rem;
+  width: clamp(100px, 20vw, 160px);
   height: auto;
   opacity: 0.85;
   animation: float 6s ease-in-out infinite;
 }
 
-/* ── Scattered dots ── */
+/* ── Ink dots ── */
 .dot {
   position: absolute;
-  width: 3px;
-  height: 3px;
   border-radius: 50%;
   background-color: var(--ink);
-  opacity: 0.15;
+  opacity: 0.12;
   z-index: 0;
 }
 
 .dot:nth-child(1) {
+  width: 3px;
+  height: 3px;
   top: 12%;
   left: 8%;
   animation: twinkle 4s ease-in-out infinite;
 }
 
 .dot:nth-child(2) {
-  top: 25%;
-  right: 15%;
   width: 2px;
   height: 2px;
+  top: 25%;
+  right: 15%;
   animation: twinkle 5s ease-in-out 1s infinite;
 }
 
 .dot:nth-child(3) {
+  width: 3px;
+  height: 3px;
   bottom: 20%;
   left: 20%;
   animation: twinkle 3.5s ease-in-out 0.5s infinite;
 }
 
 .dot:nth-child(4) {
-  top: 40%;
-  right: 8%;
   width: 4px;
   height: 4px;
+  top: 40%;
+  right: 8%;
   animation: twinkle 6s ease-in-out 2s infinite;
 }
 
 .dot:nth-child(5) {
-  bottom: 15%;
-  right: 25%;
   width: 2px;
   height: 2px;
+  bottom: 15%;
+  right: 25%;
   animation: twinkle 4.5s ease-in-out 0.8s infinite;
 }
 
 .dot:nth-child(6) {
-  top: 8%;
-  left: 45%;
   width: 2px;
   height: 2px;
+  top: 8%;
+  left: 45%;
   animation: twinkle 5.5s ease-in-out 1.5s infinite;
 }
 
 .dot:nth-child(7) {
+  width: 3px;
+  height: 3px;
   bottom: 30%;
   right: 10%;
   animation: twinkle 4s ease-in-out 3s infinite;
@@ -147,13 +158,11 @@
 }
 
 .pill {
-  background: rgba(26, 26, 26, 0.07);
+  background: rgba(26, 26, 26, 0.06);
   border: 1px solid var(--border);
   border-radius: 100px;
   padding: 0.3rem 0.8rem;
   font-size: 0.8rem;
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.02em;
   color: var(--ink-light);
 }
 
@@ -161,7 +170,6 @@
   font-family: 'Caveat', cursive;
   font-size: 1.1rem;
   color: var(--ink-muted);
-  text-align: center;
 }
 
 .newsletterForm {
@@ -201,8 +209,8 @@
   color: var(--ink-muted);
 }
 
-.btnPrimary {
-  padding: 0.6rem 1.2rem;
+.btnSmall {
+  padding: 0.6rem 1.1rem;
   background: var(--accent);
   color: #fff;
   border: none;
@@ -211,19 +219,15 @@
   font-family: 'Inter', sans-serif;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  transition: background 0.2s;
   white-space: nowrap;
 }
 
-.btnPrimary:hover {
+.btnSmall:hover {
   background: var(--accent-light);
 }
 
-.btnPrimary:active {
-  transform: scale(0.98);
-}
-
-.btnPrimary:disabled {
+.btnSmall:disabled {
   opacity: 0.6;
   cursor: default;
 }
@@ -236,13 +240,12 @@
 
 .successBox {
   background: var(--accent-bg);
-  border: 1px solid var(--accent);
+  border: 1px solid rgba(74, 103, 65, 0.3);
   border-radius: var(--radius);
   padding: 0.75rem 1.25rem;
-  font-size: 0.9rem;
-  color: var(--accent);
   font-family: 'Caveat', cursive;
   font-size: 1.1rem;
+  color: var(--accent);
 }
 
 .ticketCTA {
@@ -264,51 +267,138 @@
   transform: translateY(-1px);
 }
 
-.ticketCTA:active {
-  transform: translateY(0);
+/* ── Buyer section ── */
+.buyerSection {
+  margin-top: 1.75rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
-/* ── Ticket section (buyer) ── */
-.ticketSection {
-  margin-top: 1.5rem;
+.welcomeLabel {
+  font-family: 'Caveat', cursive;
+  font-size: 1.3rem;
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+.eventBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.65rem 1.1rem;
+  width: 100%;
+}
+
+.bannerItem {
+  font-size: 0.8rem;
+  color: var(--ink-light);
+}
+
+.bannerDivider {
+  width: 1px;
+  height: 14px;
+  background: var(--border);
+}
+
+.emptyTickets {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
-  width: 100%;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
 }
 
-.sectionLabel {
+/* ── Order block ── */
+.orderBlock {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.orderMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.orderLabel {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.06em;
+  font-weight: 500;
+}
+
+.orderBadge {
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid rgba(74, 103, 65, 0.25);
+  border-radius: 100px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.orderTotal {
+  margin-left: auto;
   font-family: 'Caveat', cursive;
   font-size: 1.2rem;
-  color: var(--ink-muted);
+  font-weight: 700;
+  color: var(--ink);
 }
 
-.ticketGrid {
+/* ── Ticket cards ── */
+.ticketList {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 0.6rem;
-  justify-content: center;
 }
 
 .ticketCard {
-  background: rgba(255, 255, 255, 0.75);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: stretch;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(74, 103, 65, 0.2);
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(74, 103, 65, 0.08);
+  min-height: 72px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.ticketCard:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(74, 103, 65, 0.13);
+}
+
+.ticketLeft {
+  flex: 1;
+  padding: 0.9rem 1.1rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.15rem;
-  box-shadow: var(--shadow);
+  justify-content: center;
+  gap: 0.2rem;
 }
 
 .ticketCode {
   font-family: 'Caveat', cursive;
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   font-weight: 700;
   color: var(--accent);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
+  line-height: 1;
 }
 
 .ticketHolder {
@@ -316,26 +406,90 @@
   color: var(--ink-muted);
 }
 
-.linkBtn {
-  color: var(--accent);
-  text-decoration: none;
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: opacity 0.2s;
+/* Perforation strip */
+.ticketPerfs {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6px 0;
+  position: relative;
 }
 
-.linkBtn:hover {
-  opacity: 0.7;
+.ticketPerfs::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -1px;
+  bottom: -1px;
+  width: 1px;
+  background: repeating-linear-gradient(to bottom,
+      rgba(74, 103, 65, 0.2) 0, rgba(74, 103, 65, 0.2) 4px,
+      transparent 4px, transparent 8px);
+}
+
+.perf {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid rgba(74, 103, 65, 0.12);
+  margin: 0 -5px;
+  position: relative;
+  z-index: 1;
+}
+
+.ticketRight {
+  width: 72px;
+  background: var(--accent);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  padding: 0.75rem 0.5rem;
+}
+
+.ticketRightLabel {
+  font-family: 'Caveat', cursive;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.ticketRightDate {
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.04em;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.moreTicketsLink {
+  font-size: 0.82rem;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+  margin-top: 0.25rem;
+}
+
+.moreTicketsLink:hover {
+  opacity: 1;
 }
 
 /* ── Animations ── */
 @keyframes fadeIn {
-  0% {
+  from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(16px);
   }
 
-  100% {
+  to {
     opacity: 1;
     transform: translateY(0);
   }
@@ -357,10 +511,10 @@
 
   0%,
   100% {
-    opacity: 0.1;
+    opacity: 0.08;
   }
 
   50% {
-    opacity: 0.3;
+    opacity: 0.2;
   }
 }

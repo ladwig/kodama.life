@@ -1,18 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from './confirmation.module.css';
 
 export default function ConfirmationClient() {
     const searchParams = useSearchParams();
-    const router = useRouter();
-    const [state, setState] = useState('loading'); // loading | success | error
+    const [state, setState] = useState('loading');
     const [message, setMessage] = useState('');
+    const [hasToken, setHasToken] = useState(false);
 
     useEffect(() => {
-        // Stripe redirects here with ?payment_intent=...&payment_intent_client_secret=...&redirect_status=succeeded
         const status = searchParams.get('redirect_status');
         const paymentIntentId = searchParams.get('payment_intent');
 
@@ -22,37 +21,56 @@ export default function ConfirmationClient() {
             return;
         }
 
-        if (status === 'succeeded') {
-            // Poll until webhook has processed (up to ~10s)
-            let attempts = 0;
-            const maxAttempts = 10;
-            const interval = setInterval(async () => {
-                attempts++;
-                try {
-                    const res = await fetch(`/api/confirmation/status?payment_intent=${paymentIntentId}`);
-                    const data = await res.json();
-                    if (data.ready) {
-                        clearInterval(interval);
-                        setState('success');
-                    }
-                } catch {
-                    // ignore
-                }
-                if (attempts >= maxAttempts) {
-                    clearInterval(interval);
-                    // Show success anyway – webhook may still process in background
-                    setState('success');
-                }
-            }, 1000);
-
-            return () => clearInterval(interval);
-        } else if (status === 'processing') {
+        if (status === 'processing') {
             setState('success');
             setMessage('Deine Zahlung wird verarbeitet. Du erhältst eine Bestätigungs-E-Mail.');
-        } else {
+            return;
+        }
+
+        if (status !== 'succeeded') {
             setState('error');
             setMessage('Die Zahlung wurde nicht abgeschlossen. Bitte versuche es erneut.');
+            return;
         }
+
+        // Poll until webhook has processed the order (up to ~15s)
+        let attempts = 0;
+        const maxAttempts = 15;
+
+        const interval = setInterval(async () => {
+            attempts++;
+            try {
+                const res = await fetch(`/api/confirmation/status?payment_intent=${paymentIntentId}`);
+                const data = await res.json();
+
+                if (data.ready) {
+                    clearInterval(interval);
+
+                    // If we got the JWT, set the ticket_token cookie via the verify endpoint
+                    if (data.token) {
+                        try {
+                            await fetch(`/api/auth/verify?token=${data.token}`, { redirect: 'manual' });
+                        } catch {
+                            // Non-fatal — user can always use the magic link from email
+                        }
+                        setHasToken(true);
+                    }
+
+                    setState('success');
+                    return;
+                }
+            } catch {
+                // ignore, keep polling
+            }
+
+            if (attempts >= maxAttempts) {
+                clearInterval(interval);
+                // Show success anyway — webhook processes in background, email will follow
+                setState('success');
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
     }, [searchParams]);
 
     return (
@@ -70,17 +88,24 @@ export default function ConfirmationClient() {
                         <div className={styles.successIcon}>🌿</div>
                         <h1 className={styles.title}>Vielen Dank!</h1>
                         <p className={styles.body}>
-                            Deine Tickets wurden erfolgreich gebucht.{' '}
-                            {message || 'Wir haben dir eine Bestätigungs-E-Mail mit deinen Tickets und einem Link zu dieser Seite geschickt.'}
+                            {message || 'Deine Tickets wurden erfolgreich gebucht. Wir haben dir eine Bestätigungs-E-Mail geschickt.'}
                         </p>
-                        <p className={styles.hint}>
-                            Über den Link in der E-Mail kannst du deine Tickets jederzeit,
-                            auch auf anderen Geräten, aufrufen.
-                        </p>
+                        {!message && (
+                            <p className={styles.hint}>
+                                Über den Link in der E-Mail kannst du deine Tickets jederzeit,
+                                auch auf anderen Geräten, aufrufen.
+                            </p>
+                        )}
                         <div className={styles.actions}>
-                            <Link href="/mein-ticket" className={styles.btnPrimary}>
-                                Meine Tickets ansehen
-                            </Link>
+                            {hasToken ? (
+                                <a href="/" className={styles.btnPrimary}>
+                                    Meine Tickets ansehen
+                                </a>
+                            ) : (
+                                <Link href="/" className={styles.btnPrimary}>
+                                    Zur Startseite
+                                </Link>
+                            )}
                             <Link href="/" className={styles.btnSecondary}>
                                 Zurück zur Startseite
                             </Link>
