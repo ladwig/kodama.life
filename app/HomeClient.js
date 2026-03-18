@@ -15,6 +15,32 @@ export default function HomeClient({ buyer, orders, tickets }) {
     const [newsletterState, setNewsletterState] = useState('idle');
     const [newsletterError, setNewsletterError] = useState('');
 
+    const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
+    async function handleDownloadPDF(e) {
+        e.preventDefault();
+        if (isGeneratingPDF) return;
+        setIsGeneratingPDF(true);
+        try {
+            const res = await fetch('/api/tickets/download');
+            if (!res.ok) throw new Error('PDF Error');
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'kodama-tickets.pdf';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error(err);
+            alert('Fehler beim Generieren der PDF.');
+        } finally {
+            setIsGeneratingPDF(false);
+        }
+    }
+
     async function handleNewsletter(e) {
         e.preventDefault();
         setNewsletterState('loading');
@@ -136,6 +162,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
 
                         {orders.map((order) => {
                             const orderTickets = ticketsByOrder[order.id] || [];
+                            if (orderTickets.length === 0) return null; // Hier lag das Problem mit dem Ghost-Spacing!
                             return (
                                 <div key={order.id} className={styles.orderBlock}>
                                     {/* Order meta removed as requested */}
@@ -161,9 +188,19 @@ export default function HomeClient({ buyer, orders, tickets }) {
                             );
                         })}
 
-                        <Link href="/tickets" className={styles.moreTicketsLink}>
-                            + Weitere Tickets kaufen
-                        </Link>
+                        <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'center', marginTop: '-0.25rem', flexWrap: 'wrap' }}>
+                            <a 
+                                href="#" 
+                                onClick={handleDownloadPDF} 
+                                className={styles.moreTicketsLink} 
+                                style={{ margin: 0, opacity: isGeneratingPDF ? 0.6 : 1, pointerEvents: isGeneratingPDF ? 'none' : 'auto' }}
+                            >
+                                {isGeneratingPDF ? '⏳ Generiere...' : '↓ als PDF laden'} 
+                            </a>
+                            <Link href="/tickets" className={styles.moreTicketsLink} style={{ margin: 0 }}>
+                                + Weitere Tickets
+                            </Link>
+                        </div>
                     </div>
                 )}
             </div>

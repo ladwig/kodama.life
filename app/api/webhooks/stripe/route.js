@@ -125,6 +125,7 @@ export async function POST(req) {
         // 4. Build URLs
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://kodama.life';
         const magicLink = `${baseUrl}/api/auth/verify?token=${jwt}`;
+        const pdfLink = `${baseUrl}/api/tickets/download?token=${jwt}`;
 
         // 5. Send confirmation email (non-fatal — don't let email failure kill the webhook)
         try {
@@ -154,6 +155,7 @@ export async function POST(req) {
                         variables: {
                             firstName: meta.buyer_name,
                             magicLink,
+                            pdfLink,
                             tickets: tickets.map((t) => ({
                                 code: t.ticket_code,
                                 holderName: t.holder_name,
