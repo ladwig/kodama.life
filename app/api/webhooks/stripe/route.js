@@ -122,15 +122,11 @@ export async function POST(req) {
         });
         console.log('[webhook] Step 3 done.');
 
-        // 4. Generate unsubscribe token
-        const unsubToken = await signUnsubscribeJWT(meta.buyer_email);
-
-        // 5. Build URLs
+        // 4. Build URLs
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://kodama.life';
         const magicLink = `${baseUrl}/api/auth/verify?token=${jwt}`;
-        const unsubLink = `${baseUrl}/api/newsletter/unsubscribe?token=${unsubToken}`;
 
-        // 6. Send confirmation email (non-fatal — don't let email failure kill the webhook)
+        // 5. Send confirmation email (non-fatal — don't let email failure kill the webhook)
         try {
             if (resend) {
                 // 6a. Contact anlegen / aktualisieren (idempotent)
@@ -149,26 +145,29 @@ export async function POST(req) {
                 }
 
                 // 6c. Confirmation Mail via Resend Template
-                await resend.emails.send({
+                const resendResponse = await resend.emails.send({
                     from: process.env.RESEND_FROM_ADDRESS,
                     to: meta.buyer_email,
-                    template_id: process.env.RESEND_TEMPLATE_TICKET_PURCHASE_CONFIRMATION_ID,
-                    variables: {
-                        firstName: meta.buyer_name,
-                        magicLink,
-                        tickets: tickets.map((t) => ({
-                            code: t.ticket_code,
-                            holderName: t.holder_name,
-                            qrUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${t.ticket_code}`,
-                        })),
-                    },
-                    headers: {
-                        'List-Unsubscribe': `<${unsubLink}>`,
-                        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+                    subject: '🌿 Dein Kodama-Ticket', // Resend templates sometimes still require a subject param
+                    template: {
+                        id: process.env.RESEND_TEMPLATE_TICKET_PURCHASE_CONFIRMATION_ID,
+                        variables: {
+                            firstName: meta.buyer_name,
+                            magicLink,
+                            tickets: tickets.map((t) => ({
+                                code: t.ticket_code,
+                                holderName: t.holder_name,
+                                qrUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${t.ticket_code}`,
+                            })),
+                        },
                     },
                 });
 
-                console.log('Confirmation email sent to', meta.buyer_email);
+                if (resendResponse.error) {
+                    console.error('[webhook] Resend email failed:', resendResponse.error);
+                } else {
+                    console.log('[webhook] Confirmation email sent to', meta.buyer_email, '| ID:', resendResponse.data?.id);
+                }
             } else if (process.env.MAIL_WEBHOOK_URL && !process.env.MAIL_WEBHOOK_URL.trim().startsWith('#')) {
                 await fetch(process.env.MAIL_WEBHOOK_URL, {
                     method: 'POST',
