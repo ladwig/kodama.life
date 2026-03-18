@@ -69,15 +69,14 @@ export default function MeinTicketClient({ buyer, orders, tickets }) {
                                         <div className={styles.ticketCardLeft}>
                                             <span className={styles.ticketCode}>{ticket.ticket_code}</span>
                                             <span className={styles.ticketHolder}>{ticket.holder_name}</span>
+                                            <span className={styles.ticketHolder}>{formatPrice(order.price_per_ticket)}</span>
                                         </div>
                                         <div className={styles.ticketPerforations}>
                                             {Array.from({ length: 8 }).map((_, i) => (
                                                 <span key={i} className={styles.perforation} />
                                             ))}
                                         </div>
-                                        <div className={styles.ticketCardRight}>
-                                            <span className={styles.ticketPrice}>{formatPrice(order.price_per_ticket)}</span>
-                                        </div>
+                                        <div className={styles.ticketCardRight} />
                                     </div>
                                 ))}
                             </div>

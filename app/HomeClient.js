@@ -135,14 +135,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                             Willkommen zurück, {buyer.name.split(' ')[0]} 🌿
                         </p>
 
-                        {/* Event banner */}
-                        <div className={styles.eventBanner}>
-                            <span className={styles.bannerItem}>📅 22. August 2026</span>
-                            <span className={styles.bannerDivider} />
-                            <span className={styles.bannerItem}>📍 Kiekebusch See</span>
-                            <span className={styles.bannerDivider} />
-                            <span className={styles.bannerItem}>🎟 {tickets.length} Ticket{tickets.length !== 1 ? 's' : ''}</span>
-                        </div>
+                        {/* Event banner removed as requested */}
 
                         {/* Ticket cards grouped by order */}
                         {orders.length === 0 && (
@@ -156,11 +149,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                             const orderTickets = ticketsByOrder[order.id] || [];
                             return (
                                 <div key={order.id} className={styles.orderBlock}>
-                                    <div className={styles.orderMeta}>
-                                        <span className={styles.orderLabel}>#{order.id.slice(0, 8).toUpperCase()}</span>
-                                        <span className={styles.orderBadge}>bezahlt</span>
-                                        <span className={styles.orderTotal}>{formatPrice(order.total_price)}</span>
-                                    </div>
+                                    {/* Order meta removed as requested */}
 
                                     <div className={styles.ticketList}>
                                         {orderTickets.map((ticket) => (
@@ -168,16 +157,14 @@ export default function HomeClient({ buyer, orders, tickets }) {
                                                 <div className={styles.ticketLeft}>
                                                     <span className={styles.ticketCode}>{ticket.ticket_code}</span>
                                                     <span className={styles.ticketHolder}>{ticket.holder_name}</span>
+                                                    <span className={styles.ticketHolder}>{formatPrice(order.price_per_ticket)}</span>
                                                 </div>
                                                 <div className={styles.ticketPerfs}>
                                                     {Array.from({ length: 7 }).map((_, i) => (
                                                         <span key={i} className={styles.perf} />
                                                     ))}
                                                 </div>
-                                                <div className={styles.ticketRight}>
-                                                    <span className={styles.ticketRightLabel}>Kodama</span>
-                                                    <span className={styles.ticketRightDate}>22.08.26</span>
-                                                </div>
+                                                <div className={styles.ticketRight} />
                                             </div>
                                         ))}
                                     </div>

@@ -326,39 +326,6 @@
   animation: fadeIn 0.5s ease-out;
 }
 
-.orderMeta {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.orderLabel {
-  font-size: 0.72rem;
-  color: var(--ink-muted);
-  letter-spacing: 0.06em;
-  font-weight: 500;
-}
-
-.orderBadge {
-  background: var(--accent-bg);
-  color: var(--accent);
-  border: 1px solid rgba(74, 103, 65, 0.25);
-  border-radius: 100px;
-  padding: 0.15rem 0.55rem;
-  font-size: 0.68rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.orderTotal {
-  margin-left: auto;
-  font-family: 'Caveat', cursive;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--ink);
-}
-
 /* ── Ticket cards ── */
 .ticketList {
   display: flex;
@@ -447,25 +414,6 @@
   justify-content: center;
   gap: 0.2rem;
   padding: 0.75rem 0.5rem;
-}
-
-.ticketRightLabel {
-  font-family: 'Caveat', cursive;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-}
-
-.ticketRightDate {
-  font-size: 0.6rem;
-  color: rgba(255, 255, 255, 0.7);
-  letter-spacing: 0.04em;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
 }
 
 .moreTicketsLink {
