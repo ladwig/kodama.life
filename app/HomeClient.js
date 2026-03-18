@@ -63,68 +63,57 @@ export default function HomeClient({ buyer, orders, tickets }) {
                     Kiekebusch See
                 </p>
 
-                <Image
-                    className={styles.illustration}
-                    src="/kodama.png"
-                    alt="Kodama spirit"
-                    width={200}
-                    height={240}
-                    priority
-                />
-
                 {/* ── Guest view ── */}
                 {!isBuyer && (
                     <div className={styles.guestSection}>
-                        <div className={styles.infoRow}>
-                            <span className={styles.pill}>🎶 Live-Musik</span>
-                            <span className={styles.pill}>🌊 Badesee</span>
-                            <span className={styles.pill}>🌙 Nacht</span>
-                            <span className={styles.pill}>🌲 Natur</span>
-                        </div>
 
-                        {newsletterState === 'success' ? (
-                            <div className={styles.successBox}>
-                                🌿 Du bist dabei! Wir melden uns.
-                            </div>
-                        ) : (
-                            <form onSubmit={handleNewsletter} className={styles.newsletterForm}>
-                                <p className={styles.formLabel}>Updates erhalten</p>
-                                <div className={styles.inputRow}>
-                                    <input
-                                        id="newsletter-name"
-                                        type="text"
-                                        placeholder="Name"
-                                        value={newsletterName}
-                                        onChange={(e) => setNewsletterName(e.target.value)}
-                                        required
-                                        className={styles.input}
-                                    />
-                                    <input
-                                        id="newsletter-email"
-                                        type="email"
-                                        placeholder="E-Mail"
-                                        value={newsletterEmail}
-                                        onChange={(e) => setNewsletterEmail(e.target.value)}
-                                        required
-                                        className={styles.input}
-                                    />
-                                    <button
-                                        type="submit"
-                                        className={styles.btnSmall}
-                                        disabled={newsletterState === 'loading'}
-                                    >
-                                        {newsletterState === 'loading' ? '…' : 'Anmelden'}
-                                    </button>
-                                </div>
-                                {newsletterState === 'error' && (
-                                    <p className={styles.errorText}>{newsletterError}</p>
+                        <div className={styles.actionContainer}>
+                            <Link href="/tickets" className={styles.primaryTicketCTA}>
+                                Tickets sichern
+                            </Link>
+
+                            <div className={styles.newsletterMinimal}>
+                                {newsletterState === 'success' ? (
+                                    <div className={styles.successBox}>
+                                        🌿 Du bist dabei! Wir melden uns.
+                                    </div>
+                                ) : (
+                                    <form onSubmit={handleNewsletter} className={styles.newsletterForm}>
+                                        <p className={styles.formLabel}>Bleib auf dem Laufenden</p>
+                                        <div className={styles.inputGroup}>
+                                            <input
+                                                id="newsletter-name"
+                                                type="text"
+                                                placeholder="Name"
+                                                value={newsletterName}
+                                                onChange={(e) => setNewsletterName(e.target.value)}
+                                                required
+                                                className={styles.minimalInput}
+                                            />
+                                            <input
+                                                id="newsletter-email"
+                                                type="email"
+                                                placeholder="E-Mail"
+                                                value={newsletterEmail}
+                                                onChange={(e) => setNewsletterEmail(e.target.value)}
+                                                required
+                                                className={styles.minimalInput}
+                                            />
+                                            <button
+                                                type="submit"
+                                                className={styles.minimalBtn}
+                                                disabled={newsletterState === 'loading'}
+                                            >
+                                                {newsletterState === 'loading' ? '…' : '→'}
+                                            </button>
+                                        </div>
+                                        {newsletterState === 'error' && (
+                                            <p className={styles.errorText}>{newsletterError}</p>
+                                        )}
+                                    </form>
                                 )}
-                            </form>
-                        )}
-
-                        <Link href="/tickets" className={styles.ticketCTA}>
-                            Ticket kaufen →
-                        </Link>
+                            </div>
+                        </div>
                     </div>
                 )}
 
