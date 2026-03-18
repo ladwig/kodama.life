@@ -12,7 +12,7 @@ export async function POST(req) {
         const supabase = getSupabaseAdmin();
         const { data: tickets, error } = await supabase
             .from('tickets')
-            .select('id, holder_name, ticket_code, created_at')
+            .select('id, holder_name, ticket_code, checked_in, checked_in_at, created_at')
             .order('created_at', { ascending: false });
 
         if (error) throw error;
