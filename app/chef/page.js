@@ -486,6 +486,37 @@ export default function ChefPage() {
                 }
             `}} />
             
+            <div style={{
+                position: 'fixed',
+                top: '20px',
+                right: '20px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-end',
+                gap: '8px',
+                fontSize: '0.85rem',
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                padding: '12px 16px',
+                borderRadius: '12px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                border: '1px solid var(--border, rgba(26, 26, 26, 0.08))',
+                zIndex: 1000
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-muted)' }}>
+                    <div style={{
+                        width: '8px', height: '8px', borderRadius: '50%',
+                        backgroundColor: isOnline ? '#10b981' : '#ef4444',
+                        boxShadow: isOnline ? '0 0 8px rgba(16, 185, 129, 0.4)' : '0 0 8px rgba(239, 68, 68, 0.4)'
+                    }}></div>
+                    <span style={{ fontWeight: '500' }}>{isOnline ? 'Network Online' : 'Network Offline (Local Mode)'}</span>
+                </div>
+                {syncQueue.length > 0 && (
+                    <div style={{ color: '#f59e0b', fontWeight: '700', fontSize: '0.8rem' }}>
+                        {syncQueue.length} pending sync(s)
+                    </div>
+                )}
+            </div>
+
             <div className="chef-container" style={styles.container}>
                 <div style={styles.tabsCol}>
                     <div style={styles.tabNav}>
@@ -507,28 +538,6 @@ export default function ChefPage() {
                         >
                             Guestlist
                         </button>
-                    </div>
-
-                    <div style={{
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
-                        alignItems: 'center',
-                        fontSize: '0.8rem',
-                        padding: '12px 16px 0 16px',
-                        color: 'var(--ink-muted)'
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <div style={{
-                                width: '8px', height: '8px', borderRadius: '50%',
-                                backgroundColor: isOnline ? '#10b981' : '#ef4444'
-                            }}></div>
-                            {isOnline ? 'Network Online' : 'Network Offline (Local Mode)'}
-                        </div>
-                        {syncQueue.length > 0 && (
-                            <div style={{ color: '#f59e0b', fontWeight: '600' }}>
-                                {syncQueue.length} pending sync(s)
-                            </div>
-                        )}
                     </div>
 
                     <div style={styles.tabContent}>
