@@ -13,6 +13,15 @@ export default function ChefPage() {
     const [loadingGuestlist, setLoadingGuestlist] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Offline Sync Config
+    const [isOnline, setIsOnline] = useState(true);
+    const [syncQueue, setSyncQueue] = useState([]);
+
+    const updateGuestlist = (newList) => {
+        setGuestlist(newList);
+        localStorage.setItem('kodama_guestlist', JSON.stringify(newList));
+    };
+
     // Scanner
     const [scannedTicket, setScannedTicket] = useState(null);
     const [scanError, setScanError] = useState('');
@@ -42,7 +51,84 @@ export default function ChefPage() {
                 console.error('Failed to parse cached guestlist', e);
             }
         }
+
+        // Offline Sync Init
+        setIsOnline(navigator.onLine);
+        const cachedQueue = localStorage.getItem('kodama_sync_queue');
+        if (cachedQueue) {
+            try { setSyncQueue(JSON.parse(cachedQueue)); } catch(e) {}
+        }
+
+        const handleOnline = () => {
+            setIsOnline(true);
+            setTimeout(attemptSync, 1000);
+        }
+        const handleOffline = () => setIsOnline(false);
+
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
+        return () => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
+        };
     }, []);
+
+    const attemptSync = async () => {
+        if (!navigator.onLine) return;
+        
+        const cached = localStorage.getItem('kodama_sync_queue');
+        if (!cached) return;
+        
+        let currentQueue = [];
+        try { currentQueue = JSON.parse(cached); } catch(e) { return; }
+        if (currentQueue.length === 0) return;
+
+        const actualPw = sessionStorage.getItem('chef_pw');
+        if (!actualPw) return;
+
+        const remainingQueue = [];
+        for (const item of currentQueue) {
+            try {
+                const res = await fetch('/api/chef/scan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        password: actualPw,
+                        ticketCode: item.ticketCode,
+                        action: 'checkin',
+                        checkedIn: item.checkedIn
+                    })
+                });
+                
+                if (!res.ok) {
+                    if (res.status >= 500) {
+                        remainingQueue.push(item);
+                    } else if (res.status === 401) {
+                        return; // Stop on auth error
+                    }
+                }
+            } catch (err) {
+                remainingQueue.push(item);
+            }
+        }
+
+        setSyncQueue(remainingQueue);
+        localStorage.setItem('kodama_sync_queue', JSON.stringify(remainingQueue));
+    };
+
+    const queueSyncAction = (ticketCode, checkedIn) => {
+        setSyncQueue(prev => {
+            const cleanQueue = prev.filter(i => i.ticketCode !== ticketCode);
+            const newQueue = [...cleanQueue, { ticketCode, checkedIn, timestamp: Date.now() }];
+            localStorage.setItem('kodama_sync_queue', JSON.stringify(newQueue));
+            return newQueue;
+        });
+        
+        if (navigator.onLine) {
+            setTimeout(attemptSync, 1000);
+        }
+    };
 
     // Form data
     const [name, setName] = useState('');
@@ -72,8 +158,7 @@ export default function ChefPage() {
             });
             const data = await res.json();
             if (res.ok) {
-                setGuestlist(data.tickets);
-                localStorage.setItem('kodama_guestlist', JSON.stringify(data.tickets));
+                updateGuestlist(data.tickets);
             }
         } catch (err) {
             console.error(err);
@@ -217,38 +302,20 @@ export default function ChefPage() {
         const checkedInAt = new Date().toISOString();
         
         // 1. OPTIMISTIC UPDATE: Update local state immediately
-        setGuestlist(prev => prev.map(t => 
+        const updatedList = guestlist.map(t => 
             t.ticket_code === ticketToFinalize.ticket_code 
                 ? { ...t, checked_in: true, checked_in_at: checkedInAt } 
                 : t
-        ));
+        );
+        updateGuestlist(updatedList);
         
         // 2. IMMEDIATE RESET: Clear scanner for next person
         resetScanner();
-        setStatus(`Checked in ${ticketToFinalize.holder_name} (local)`);
+        setStatus(`Checked in ${ticketToFinalize.holder_name}`);
         setTimeout(() => setStatus(''), 2000);
 
-        // 3. BACKGROUND SYNC: Call API without blocking the UI
-        fetch('/api/chef/scan', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                password: password || sessionStorage.getItem('chef_pw'),
-                ticketCode: ticketToFinalize.ticket_code,
-                action: 'checkin'
-            })
-        }).then(res => {
-            if (!res.ok) {
-                console.error('Background check-in sync failed');
-                setStatus(`Sync failed for ${ticketToFinalize.holder_name}!`);
-            } else {
-                setStatus(`Checked in ${ticketToFinalize.holder_name} (synced)`);
-                setTimeout(() => setStatus(''), 2000);
-            }
-        }).catch(err => {
-            console.error('Network error during sync', err);
-            setStatus(`Network error syncing ${ticketToFinalize.holder_name}`);
-        });
+        // 3. BACKGROUND SYNC
+        queueSyncAction(ticketToFinalize.ticket_code, true);
     };
 
     const handleManualCheckIn = async (ticket) => {
@@ -264,28 +331,18 @@ export default function ChefPage() {
         const checkedInAt = newStatus ? new Date().toISOString() : null;
         
         // 1. OPTIMISTIC UPDATE
-        setGuestlist(prev => prev.map(t => 
+        const updatedList = guestlist.map(t => 
             t.id === ticket.id 
                 ? { ...t, checked_in: newStatus, checked_in_at: checkedInAt } 
                 : t
-        ));
+        );
+        updateGuestlist(updatedList);
         
         setStatus(newStatus ? `Checked in ${ticket.holder_name}` : `Unchecked ${ticket.holder_name}`);
         setTimeout(() => setStatus(''), 2000);
 
         // 2. BACKGROUND SYNC
-        fetch('/api/chef/scan', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                password: password || sessionStorage.getItem('chef_pw'),
-                ticketCode: ticket.ticket_code,
-                action: 'checkin',
-                checkedIn: newStatus
-            })
-        }).catch(err => {
-            console.error('Manual check-in sync failed', err);
-        });
+        queueSyncAction(ticket.ticket_code, newStatus);
     };
 
     const resetScanner = () => {
@@ -450,6 +507,28 @@ export default function ChefPage() {
                         >
                             Guestlist
                         </button>
+                    </div>
+
+                    <div style={{
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center',
+                        fontSize: '0.8rem',
+                        padding: '12px 16px 0 16px',
+                        color: 'var(--ink-muted)'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <div style={{
+                                width: '8px', height: '8px', borderRadius: '50%',
+                                backgroundColor: isOnline ? '#10b981' : '#ef4444'
+                            }}></div>
+                            {isOnline ? 'Network Online' : 'Network Offline (Local Mode)'}
+                        </div>
+                        {syncQueue.length > 0 && (
+                            <div style={{ color: '#f59e0b', fontWeight: '600' }}>
+                                {syncQueue.length} pending sync(s)
+                            </div>
+                        )}
                     </div>
 
                     <div style={styles.tabContent}>
