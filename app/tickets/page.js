@@ -191,7 +191,7 @@ export default function TicketsPage() {
             appearance: {
                 theme: 'stripe',
                 variables: {
-                    colorPrimary: '#4a6741',
+                    colorPrimary: '#551515',
                     colorBackground: '#ffffff',
                     fontFamily: 'Inter, sans-serif',
                     borderRadius: '8px',

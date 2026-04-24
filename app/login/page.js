@@ -30,11 +30,11 @@ function LoginForm() {
                 window.location.href = '/';
             } else {
                 const data = await res.json();
-                setError(data.error || 'Falsches Passwort.');
+                setError(data.error || 'Incorrect password.');
                 setLoading(false);
             }
         } catch {
-            setError('Verbindungsfehler. Bitte erneut versuchen.');
+            setError('Connection error. Please try again.');
             setLoading(false);
         }
     }
@@ -48,16 +48,16 @@ function LoginForm() {
 
             <div className={styles.card}>
                 <div className={styles.logoArea}>
-                    <Image src="/kodama.png" alt="Kodama" width={70} height={84} />
-                    <h1 className={styles.title}>Kodama</h1>
+                    <Image src="/kodama.png" alt="Sidequest" width={220} height={53} priority />
+                    
                     <p className={styles.subtitle}>22. August 2026 · Kiekebusch See</p>
                 </div>
 
-                <p className={styles.hint}>Bitte gib das Event-Passwort ein.</p>
+                <p className={styles.hint}>Please enter the event password.</p>
 
                 {tokenError === 'invalid_token' && (
                     <div className={styles.errorBox}>
-                        Dein Link ist abgelaufen oder ungültig. Bitte melde dich erneut an.
+                        Your link has expired or is invalid. Please sign in again.
                     </div>
                 )}
 
@@ -65,7 +65,7 @@ function LoginForm() {
                     <input
                         id="password-input"
                         type="password"
-                        placeholder="Passwort"
+                        placeholder="Password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className={styles.input}
@@ -79,7 +79,7 @@ function LoginForm() {
                         className={styles.btn}
                         disabled={loading}
                     >
-                        {loading ? 'Einen Moment…' : 'Weiter →'}
+                        {loading ? 'One moment…' : 'Continue →'}
                     </button>
                 </form>
             </div>

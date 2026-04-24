@@ -35,7 +35,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
             window.URL.revokeObjectURL(url);
         } catch (err) {
             console.error(err);
-            alert('Fehler beim Generieren der PDF.');
+            alert('Error generating the PDF.');
         } finally {
             setIsGeneratingPDF(false);
         }
@@ -52,7 +52,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                 body: JSON.stringify({ name: newsletterName, email: newsletterEmail }),
             });
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Fehler');
+            if (!res.ok) throw new Error(data.error || 'Error');
             setNewsletterState('success');
         } catch (err) {
             setNewsletterError(err.message);
@@ -82,9 +82,16 @@ export default function HomeClient({ buyer, orders, tickets }) {
 
             <div className={styles.content}>
                 {/* ── Hero ── */}
-                <h1 className={styles.title}>Kodama</h1>
+                <Image
+                    src="/kodama.png"
+                    alt="Kodama"
+                    width={420}
+                    height={100}
+                    priority
+                    className={styles.logo}
+                />
                 <p className={styles.details}>
-                    22. August 2026
+                    August 22, 2026
                     <br />
                     Kiekebusch See
                 </p>
@@ -97,11 +104,11 @@ export default function HomeClient({ buyer, orders, tickets }) {
                             <div className={styles.newsletterMinimal}>
                                 {newsletterState === 'success' ? (
                                     <div className={styles.successBox}>
-                                        🌿 Du bist dabei! Wir melden uns.
+                                        🌿 You are in! We will keep you posted.
                                     </div>
                                 ) : (
                                     <form onSubmit={handleNewsletter} className={styles.newsletterForm}>
-                                        <p className={styles.formLabel}>Bleib auf dem Laufenden</p>
+                                        <p className={styles.formLabel}>Stay in the loop</p>
                                         <div className={styles.inputGroup}>
                                             <input
                                                 id="newsletter-name"
@@ -115,7 +122,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                                             <input
                                                 id="newsletter-email"
                                                 type="email"
-                                                placeholder="E-Mail"
+                                                placeholder="Email"
                                                 value={newsletterEmail}
                                                 onChange={(e) => setNewsletterEmail(e.target.value)}
                                                 required
@@ -135,9 +142,20 @@ export default function HomeClient({ buyer, orders, tickets }) {
                                     </form>
                                 )}
 
-                                <Link href="/tickets" className={styles.moreTicketsLink} style={{ marginTop: '0.25rem' }}>
-                                    Ticket kaufen →
-                                </Link>
+                                <div style={{ display: 'flex', gap: '0.9rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                    <Link href="/tickets" className={styles.moreTicketsLink} style={{ marginTop: '0.25rem' }}>
+                                        Buy ticket →
+                                    </Link>
+                                    <a
+                                        href="https://chat.whatsapp.com/FNgs9Xla6tnL9mphP9juxV?mode=gi_t"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={styles.moreTicketsLink}
+                                        style={{ marginTop: '0.25rem' }}
+                                    >
+                                        Join WhatsApp group →
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -147,7 +165,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                 {isBuyer && (
                     <div className={styles.buyerSection}>
                         <p className={styles.welcomeLabel}>
-                            Willkommen zurück, {buyer.name.split(' ')[0]} 🌿
+                            Welcome back, {buyer.name.split(' ')[0]} 🌿
                         </p>
 
                         {/* Event banner removed as requested */}
@@ -155,8 +173,8 @@ export default function HomeClient({ buyer, orders, tickets }) {
                         {/* Ticket cards grouped by order */}
                         {orders.length === 0 && (
                             <div className={styles.emptyTickets}>
-                                <p>Noch keine Tickets.</p>
-                                <Link href="/tickets" className={styles.ticketCTA}>Jetzt kaufen →</Link>
+                                <p>No tickets yet.</p>
+                                <Link href="/tickets" className={styles.ticketCTA}>Buy now →</Link>
                             </div>
                         )}
 
@@ -195,10 +213,10 @@ export default function HomeClient({ buyer, orders, tickets }) {
                                 className={styles.moreTicketsLink} 
                                 style={{ margin: 0, opacity: isGeneratingPDF ? 0.6 : 1, pointerEvents: isGeneratingPDF ? 'none' : 'auto' }}
                             >
-                                {isGeneratingPDF ? '⏳ Generiere...' : '↓ als PDF laden'} 
+                                {isGeneratingPDF ? '⏳ Generating...' : '↓ Download as PDF'} 
                             </a>
                             <Link href="/tickets" className={styles.moreTicketsLink} style={{ margin: 0 }}>
-                                + Weitere Tickets
+                                + More tickets
                             </Link>
                         </div>
                     </div>

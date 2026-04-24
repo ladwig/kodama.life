@@ -5,9 +5,9 @@
   --ink: #1a1a1a;
   --ink-light: #3a3a3a;
   --ink-muted: #7a7a6e;
-  --accent: #4a6741;
-  --accent-light: #6a9260;
-  --accent-bg: #e8f0e5;
+  --accent: #551515;
+  --accent-light: #702020;
+  --accent-bg: #f1dddd;
   --border: rgba(26, 26, 26, 0.12);
   --radius: 12px;
   --shadow: 0 2px 16px rgba(26, 26, 26, 0.08);
@@ -26,12 +26,24 @@ html {
 }
 
 body {
+  position: relative;
+  isolation: isolate;
   min-height: 100%;
   background-color: var(--bg);
   color: var(--ink);
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: url('/bg.png') center/cover no-repeat;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* Shared typography */
