@@ -95,6 +95,27 @@ export default function HomeClient({ buyer, orders, tickets }) {
                     <br />
                     Kiekebusch See
                 </p>
+                <div className={styles.description}>
+                    <p>
+                        Waking Life is a midsummer festival, a landcare project, and a year-round dojo for creation, experimentation and play.
+                    </p>
+                    <p>
+                        A weeklong party is an invitation to participate in a new pedagogy of revelry. An inquiry into what maturing hedonism looks like, or how embodied revolt feels. It can take the shape of a rite-of-passage or a bad trip. It may be an auditory feast or an erotic expansion.
+                    </p>
+                    <p>
+                        It could just be a deep hangout, leading to group exploration of vibey ways of living, learning, loving, listening.
+                    </p>
+                    <p>
+                        We are made up of an emergent, tensional community, converging and reconverging around solstice, building up a temporary autonomous zone that then breaks down and fuels an evolving rural micro-ecosystem in Crato, Portugal.
+                    </p>
+                    <p>
+                        It is a paradoxical space where Alice can feed her head and where a collective body can imagine the worlds we could garden when there is freedom to break from default reality.
+                    </p>
+                    <p>
+                        Squeeze your mula bandha, click and cruise around and keep it groovy.
+                    </p>
+                    <p>Reve on.</p>
+                </div>
 
                 {/* ── Guest view ── */}
                 {!isBuyer && (
