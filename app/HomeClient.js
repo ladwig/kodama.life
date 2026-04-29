@@ -97,24 +97,23 @@ export default function HomeClient({ buyer, orders, tickets }) {
                 </p>
                 <div className={styles.description}>
                     <p>
-                        Waking Life is a midsummer festival, a landcare project, and a year-round dojo for creation, experimentation and play.
+                        Some days follow a plan, and some days open a small, almost invisible door that you didn’t know was there, but step through anyway.
                     </p>
                     <p>
-                        A weeklong party is an invitation to participate in a new pedagogy of revelry. An inquiry into what maturing hedonism looks like, or how embodied revolt feels. It can take the shape of a rite-of-passage or a bad trip. It may be an auditory feast or an erotic expansion.
+                        Sidequest begins exactly there, in that gentle shift, where the light feels a little softer, the air a little curious, and something in the background starts to hum like it’s been waiting for you.
                     </p>
                     <p>
-                        It could just be a deep hangout, leading to group exploration of vibey ways of living, learning, loving, listening.
+                        You drift, not lost but lightly unassigned, past leaves that seem to whisper, past sounds that feel familiar in a way you can’t quite explain, until you realize you’re moving with people who somehow already speak the same rhythm.
                     </p>
                     <p>
-                        We are made up of an emergent, tensional community, converging and reconverging around solstice, building up a temporary autonomous zone that then breaks down and fuels an evolving rural micro-ecosystem in Crato, Portugal.
+                        Time stretches just enough to notice it loosening, and then you stop noticing altogether, because there’s nothing to hold onto and nothing you need to.
                     </p>
                     <p>
-                        It is a paradoxical space where Alice can feed her head and where a collective body can imagine the worlds we could garden when there is freedom to break from default reality.
+                        As the day leans into night, everything becomes slightly stranger and warmer at the same time, like the world is trying something new and you’re part of it.
                     </p>
                     <p>
-                        Squeeze your mula bandha, click and cruise around and keep it groovy.
+                        And later, without really deciding to, you return, carrying something small and unnameable, like a secret you didn’t mean to keep but are glad you did.
                     </p>
-                    <p>Reve on.</p>
                 </div>
 
                 {/* ── Guest view ── */}
