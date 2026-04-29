@@ -72,9 +72,9 @@
 }
 
 .title {
-    font-family: 'Caveat', cursive;
-    font-size: 3rem;
-    font-weight: 700;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 1.35rem;
+    font-weight: 400;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--ink);
@@ -146,9 +146,9 @@
     color: var(--bg);
     border: none;
     border-radius: 0;
-    font-family: 'Caveat', cursive;
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.9rem;
+    font-weight: 400;
     letter-spacing: 0.05em;
     cursor: pointer;
     transition: background 0.2s, transform 0.15s;

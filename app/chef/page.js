@@ -408,8 +408,6 @@ export default function ChefPage() {
     return (
         <main style={styles.main}>
             <style dangerouslySetInnerHTML={{ __html: `
-                @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap');
-                
                 .chef-container {
                     animation: fadeIn 0.4s ease-out;
                 }
@@ -927,7 +925,7 @@ const styles = {
         fontSize: '1.8rem',
         fontWeight: '700',
         color: 'var(--ink)',
-        fontFamily: "'Caveat', cursive",
+        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
     },
     ticketCode: {
         fontSize: '1rem',
@@ -983,7 +981,7 @@ const styles = {
         justifyContent: 'center',
         height: '200px',
         color: 'var(--ink-muted)',
-        fontFamily: "'Caveat', cursive",
+        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
         fontSize: '1.5rem',
     },
     listContainer: {

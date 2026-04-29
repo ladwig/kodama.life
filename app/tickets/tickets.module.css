@@ -42,7 +42,7 @@
 }
 
 .title {
-    font-family: 'Caveat', cursive;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     font-size: 2.5rem;
     font-weight: 700;
     color: var(--ink);
@@ -72,7 +72,7 @@
 }
 
 .sectionTitle {
-    font-family: 'Caveat', cursive;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     font-size: 1.3rem;
     font-weight: 600;
     color: var(--ink);
@@ -160,7 +160,7 @@
 }
 
 .stepperValue {
-    font-family: 'Caveat', cursive;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     font-size: 2rem;
     font-weight: 700;
     color: var(--ink);
@@ -173,7 +173,7 @@
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--accent);
-    font-family: 'Caveat', cursive;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 .priceNote {
@@ -277,7 +277,7 @@
 }
 
 .summaryTotal {
-    font-family: 'Caveat', cursive;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     font-size: 1.6rem;
     font-weight: 700;
     color: var(--accent);
@@ -401,7 +401,7 @@
 }
 
 .orderSummaryTotal {
-    font-family: 'Caveat', cursive;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     font-size: 1.6rem;
     font-weight: 700;
     color: var(--accent);

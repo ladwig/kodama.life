@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function ConfirmationPage() {
     return (
-        <Suspense fallback={<div style={{ padding: '4rem', textAlign: 'center', fontFamily: 'Caveat, cursive', fontSize: '1.5rem', color: '#3a3a3a' }}>Laden…</div>}>
+        <Suspense fallback={<div style={{ padding: '4rem', textAlign: 'center', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace', fontSize: '1.5rem', color: '#3a3a3a' }}>Laden…</div>}>
             <ConfirmationClient />
         </Suspense>
     );

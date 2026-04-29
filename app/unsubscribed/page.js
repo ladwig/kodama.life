@@ -32,7 +32,7 @@ export default function UnsubscribedPage() {
                 <div style={{ fontSize: '3rem' }}>🍃</div>
                 <h1
                     style={{
-                        fontFamily: 'Caveat, cursive',
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
                         fontSize: '2.2rem',
                         fontWeight: 700,
                         color: 'var(--ink)',
@@ -54,7 +54,7 @@ export default function UnsubscribedPage() {
                         color: 'var(--bg)',
                         borderRadius: 'var(--radius)',
                         textDecoration: 'none',
-                        fontFamily: 'Caveat, cursive',
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
                         fontSize: '1.2rem',
                         fontWeight: 600,
                         transition: 'background 0.2s',

@@ -44,7 +44,7 @@
 
 /* ── Hero ── */
 .title {
-  font-family: 'Caveat', cursive;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: clamp(3.5rem, 10vw, 7rem);
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -62,7 +62,7 @@
 }
 
 .details {
-  font-family: 'Caveat', cursive;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: clamp(0.65rem, 1.5vw, 0.9rem);
   font-weight: 500;
   letter-spacing: 0.1em;
@@ -190,7 +190,7 @@
 }
 
 .formLabel {
-  font-family: 'Caveat', cursive;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 1.2rem;
   color: var(--ink-muted);
   text-align: center;
@@ -284,7 +284,7 @@
   border: 1px solid rgba(74, 103, 65, 0.3);
   border-radius: 100px;
   padding: 0.8rem 2rem;
-  font-family: 'Caveat', cursive;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 1.2rem;
   color: var(--accent);
   text-align: center;
@@ -297,7 +297,7 @@
   color: var(--bg);
   border-radius: var(--radius);
   text-decoration: none;
-  font-family: 'Caveat', cursive;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 1.3rem;
   font-weight: 600;
   letter-spacing: 0.05em;
@@ -320,7 +320,7 @@
 }
 
 .welcomeLabel {
-  font-family: 'Caveat', cursive;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 1.3rem;
   color: var(--ink-muted);
   text-align: center;
@@ -402,7 +402,7 @@
 }
 
 .ticketCode {
-  font-family: 'Caveat', cursive;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 1.8rem;
   font-weight: 700;
   color: var(--accent);
