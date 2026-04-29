@@ -49,11 +49,7 @@ function LoginForm() {
             <div className={styles.card}>
                 <div className={styles.logoArea}>
                     <Image src="/kodama.png" alt="Sidequest" width={220} height={53} priority />
-                    
-                    <p className={styles.subtitle}>22. August 2026 · Kiekebusch See</p>
                 </div>
-
-                <p className={styles.hint}>Please enter the event password.</p>
 
                 {tokenError === 'invalid_token' && (
                     <div className={styles.errorBox}>
