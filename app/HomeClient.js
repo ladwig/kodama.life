@@ -68,6 +68,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
     });
 
     const isBuyer = !!buyer;
+    const buyerFirstName = buyer?.name?.trim()?.split(/\s+/)?.[0] || '';
 
     return (
         <main className={`${styles.container} ${isBuyer ? styles.containerBuyer : ''}`}>
@@ -97,7 +98,9 @@ export default function HomeClient({ buyer, orders, tickets }) {
                 </p>
                 <div className={styles.description}>
                     <p>
-                        Some days follow a plan, and some days open a small, almost invisible door that you didn’t know was there, but step through anyway.
+                        {isBuyer && buyerFirstName
+                            ? `Some days follow a plan, ${buyerFirstName}, and some days open a small, almost invisible door that you didn’t know was there, but step through anyway.`
+                            : 'Some days follow a plan, and some days open a small, almost invisible door that you didn’t know was there, but step through anyway.'}
                     </p>
                     <p>
                         Sidequest begins exactly there, in that gentle shift, where the light feels a little softer, the air a little curious, and something in the background starts to hum like it’s been waiting for you.
@@ -184,10 +187,6 @@ export default function HomeClient({ buyer, orders, tickets }) {
                 {/* ── Buyer view: full ticket cards inline ── */}
                 {isBuyer && (
                     <div className={styles.buyerSection}>
-                        <p className={styles.welcomeLabel}>
-                            Welcome back, {buyer.name.split(' ')[0]} 🌿
-                        </p>
-
                         {/* Event banner removed as requested */}
 
                         {/* Ticket cards grouped by order */}
