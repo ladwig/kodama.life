@@ -41,14 +41,9 @@ function LoginForm() {
 
     return (
         <main className={styles.container}>
-            <span className={styles.dot} />
-            <span className={styles.dot} />
-            <span className={styles.dot} />
-            <span className={styles.dot} />
-
-            <div className={styles.card}>
+            <div className={styles.content}>
                 <div className={styles.logoArea}>
-                    <Image src="/kodama.png" alt="Sidequest" width={220} height={53} priority />
+                    <Image src="/sidequest-logo.png" alt="Sidequest" width={400} height={120} priority />
                 </div>
 
                 {tokenError === 'invalid_token' && (
@@ -57,26 +52,32 @@ function LoginForm() {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className={styles.form}>
-                    <input
-                        id="password-input"
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className={styles.input}
-                        autoFocus
-                        required
-                    />
-                    {error && <p className={styles.errorText}>{error}</p>}
-                    <button
-                        type="submit"
-                        id="login-submit"
-                        className={styles.btn}
-                        disabled={loading}
-                    >
-                        {loading ? 'One moment…' : 'Continue →'}
-                    </button>
+                <form onSubmit={handleSubmit} className={styles.form} autoComplete="off">
+                    <div className={styles.inputWrapper}>
+                        <input
+                            id="password-input"
+                            type="text"
+                            autoComplete="off"
+                            data-1p-ignore
+                            data-lpignore="true"
+                            data-form-type="other"
+                            placeholder="Super secret code..?"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className={styles.input}
+                            required
+                        />
+                        <button
+                            type="submit"
+                            id="login-submit"
+                            className={`${styles.arrowBtn} ${password.length > 0 ? styles.visible : ''}`}
+                            disabled={loading}
+                            aria-label="Submit"
+                        >
+                            <img src="/arrow.svg" alt="" width={12} height={11} />
+                        </button>
+                    </div>
+                    {error && <p className={styles.errorText}>something&apos;s wrong.</p>}
                 </form>
             </div>
         </main>
