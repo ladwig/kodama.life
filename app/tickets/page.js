@@ -47,17 +47,6 @@ function PaymentScreen({ total, quantity, pricePerTicket, holderNames, onBack })
 
     return (
         <div className={styles.paymentScreen}>
-            {/* Order summary */}
-            <div className={styles.orderSummaryCard}>
-                {holderNames.length > 0 && (
-                    <div className={styles.holderList}>
-                        {holderNames.map((name, i) => (
-                            <span key={i} className={styles.holderChip}>🌿 {name || 'Ticket ' + (i + 1)}</span>
-                        ))}
-                    </div>
-                )}
-            </div>
-
             {/* Stripe Payment Element */}
             <form onSubmit={handlePay} className={styles.paymentForm}>
                 {!ready && (
@@ -219,6 +208,38 @@ export default function TicketsPage() {
                         fontSize: '0.65rem',
                         letterSpacing: '0.06em',
                         color: 'rgba(0,0,0,0.5)',
+                    },
+                    '.Tab': {
+                        border: '3px solid #000',
+                        boxShadow: 'none',
+                        backgroundColor: 'transparent',
+                        borderRadius: '0',
+                    },
+                    '.Tab:hover': {
+                        backgroundColor: 'transparent',
+                        boxShadow: 'none',
+                    },
+                    '.Tab--selected': {
+                        border: '3px solid #000',
+                        boxShadow: 'none',
+                        backgroundColor: '#000',
+                        color: '#fff',
+                    },
+                    '.Tab--selected:hover': {
+                        backgroundColor: '#000',
+                        boxShadow: 'none',
+                    },
+                    '.TabIcon--selected': {
+                        fill: '#fff',
+                    },
+                    '.TabLabel--selected': {
+                        color: '#fff',
+                    },
+                    '.Block': {
+                        border: '3px solid #000',
+                        boxShadow: 'none',
+                        borderRadius: '0',
+                        backgroundColor: 'transparent',
                     },
                 },
             },
