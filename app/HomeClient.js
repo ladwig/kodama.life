@@ -84,8 +84,8 @@ export default function HomeClient({ buyer, orders, tickets }) {
             <div className={styles.content}>
                 {/* ── Hero ── */}
                 <Image
-                    src="/kodama.png"
-                    alt="Kodama"
+                    src="/sidequest-logo.png"
+                    alt="sidequest"
                     width={420}
                     height={100}
                     priority
