@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import ConfirmationClient from './ConfirmationClient';
 
 export const metadata = {
-    title: 'Bestellung bestätigt – Kodama',
+    title: 'sidequest',
 };
 
 export default function ConfirmationPage() {

@@ -1,5 +1,5 @@
 export const metadata = {
-    title: 'Abgemeldet – Kodama',
+    title: 'sidequest',
 };
 
 export default function UnsubscribedPage() {

@@ -4,11 +4,18 @@ export const metadata = {
   title: "sidequest",
   description: "sidequest is a gathering at Kiekebusch See on 22. August 2026.",
   openGraph: {
-    title: "Kodama — 22. August 2026",
+    title: "sidequest — 22. August 2026",
     description: "sidequest is a gathering at Kiekebusch See on 22. August 2026.",
     url: "https://kodama.life",
     siteName: "sidequest",
     type: "website",
+    images: [{ url: "/sidequest-logo.png" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "sidequest — 22. August 2026",
+    description: "sidequest is a gathering at Kiekebusch See on 22. August 2026.",
+    images: ["/sidequest-logo.png"],
   },
 };
 
