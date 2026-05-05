@@ -23,7 +23,13 @@ export async function GET(req) {
         return NextResponse.json({ ready: false, db_error: true });
     }
 
-    if (!data || data.status !== 'paid') {
+    if (!data) {
+        console.log('[confirmation/status] No order found for payment_intent:', paymentIntentId);
+        return NextResponse.json({ ready: false });
+    }
+
+    if (data.status !== 'paid') {
+        console.log('[confirmation/status] Order found but status is:', data.status);
         return NextResponse.json({ ready: false });
     }
 

@@ -52,7 +52,12 @@ export default function ConfirmationClient() {
                     clearInterval(interval);
 
                     if (data.token) {
-                        window.location.href = `/api/auth/verify?token=${data.token}`;
+                        await fetch('/api/auth/set-cookie', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ token: data.token }),
+                        });
+                        window.location.href = '/';
                         return;
                     }
 
