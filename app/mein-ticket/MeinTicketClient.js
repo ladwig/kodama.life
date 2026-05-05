@@ -5,7 +5,7 @@ import styles from './mein-ticket.module.css';
 
 function formatDate(dateStr) {
     if (!dateStr) return null;
-    return new Date(dateStr).toLocaleDateString('de-DE', {
+    return new Date(dateStr).toLocaleDateString('en-US', {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
@@ -14,7 +14,7 @@ function formatDate(dateStr) {
 }
 
 function formatPrice(cents) {
-    return `${(cents / 100).toFixed(0)} €`;
+    return `€${(cents / 100).toFixed(0)}`;
 }
 
 export default function MeinTicketClient({ buyer, orders, tickets }) {
@@ -29,25 +29,25 @@ export default function MeinTicketClient({ buyer, orders, tickets }) {
 
     return (
         <main className={styles.container}>
-            <Link href="/" className={styles.backLink}>← Startseite</Link>
+            <Link href="/" className={styles.backLink}>← Home</Link>
 
             <div className={styles.inner}>
                 {/* ── Header ── */}
                 <div className={styles.header}>
                     <h1 className={styles.title}>
-                        Willkommen, {buyer.name} <span className={styles.titleAccent}>🌿</span>
+                        Welcome, {buyer.name} <span className={styles.titleAccent}>🌿</span>
                     </h1>
                     <p className={styles.subtitle}>
-                        Hier findest du später alle Infos zur Anreise, Lineup und mehr.
+                        You'll find all the info about directions, lineup and more here soon.
                     </p>
                 </div>
 
                 {/* ── No tickets state ── */}
                 {orders.length === 0 && (
                     <div className={styles.emptyState}>
-                        <p>Du hast noch keine Tickets.</p>
-                        <Link href="/tickets" className={styles.btnPrimary}>
-                            Jetzt Ticket kaufen →
+                        <p>You don't have any tickets yet.</p>
+                        <Link href="/tickets" className="btn-raw">
+                            Buy a Ticket →
                         </Link>
                     </div>
                 )}
@@ -82,7 +82,7 @@ export default function MeinTicketClient({ buyer, orders, tickets }) {
                             </div>
 
                             <p className={styles.orderNote}>
-                                Zeige den Ticket-Code beim Einlass vor.
+                                Show your ticket code at the entrance.
                             </p>
                         </div>
                     );
@@ -90,8 +90,8 @@ export default function MeinTicketClient({ buyer, orders, tickets }) {
 
                 {/* ── Buy more ── */}
                 <div className={styles.buyMore}>
-                    <Link href="/tickets" className={styles.btnSecondary}>
-                        Weitere Tickets kaufen
+                    <Link href="/tickets" className="btn-raw">
+                        Buy More Tickets
                     </Link>
                 </div>
             </div>

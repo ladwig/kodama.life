@@ -9,7 +9,6 @@ export default function ConfirmationClient() {
     const searchParams = useSearchParams();
     const [state, setState] = useState('loading');
     const [message, setMessage] = useState('');
-    const [hasToken, setHasToken] = useState(false);
 
     useEffect(() => {
         const status = searchParams.get('redirect_status');
@@ -17,19 +16,19 @@ export default function ConfirmationClient() {
 
         if (!status) {
             setState('error');
-            setMessage('Kein Zahlungsstatus gefunden.');
+            setMessage('No payment status found.');
             return;
         }
 
         if (status === 'processing') {
             setState('success');
-            setMessage('Deine Zahlung wird verarbeitet. Du erhältst eine Bestätigungs-E-Mail.');
+            setMessage('Your payment is being processed. You will receive a confirmation email.');
             return;
         }
 
         if (status !== 'succeeded') {
             setState('error');
-            setMessage('Die Zahlung wurde nicht abgeschlossen. Bitte versuche es erneut.');
+            setMessage('The payment was not completed. Please try again.');
             return;
         }
 
@@ -43,11 +42,18 @@ export default function ConfirmationClient() {
                 const res = await fetch(`/api/confirmation/status?payment_intent=${paymentIntentId}`);
                 const data = await res.json();
 
+                if (data.db_error) {
+                    clearInterval(interval);
+                    setState('db_error');
+                    return;
+                }
+
                 if (data.ready) {
                     clearInterval(interval);
 
                     if (data.token) {
-                        setHasToken(data.token);
+                        window.location.href = `/api/auth/verify?token=${data.token}`;
+                        return;
                     }
 
                     setState('success');
@@ -59,8 +65,7 @@ export default function ConfirmationClient() {
 
             if (attempts >= maxAttempts) {
                 clearInterval(interval);
-                // Show success anyway
-                setState('success');
+                setState('timeout');
             }
         }, 1000);
 
@@ -69,42 +74,51 @@ export default function ConfirmationClient() {
 
     return (
         <main className={styles.container}>
-            <div className={styles.card}>
+            <div className={styles.content}>
                 {state === 'loading' && (
                     <div className={styles.loading}>
                         <div className={styles.spinner} />
-                        <p>Bestellung wird verarbeitet…</p>
+                        <p>Processing your order…</p>
                     </div>
                 )}
 
                 {state === 'success' && (
                     <>
-                        <div className={styles.successIcon}>🌿</div>
-                        <h1 className={styles.title}>Vielen Dank!</h1>
+                        <h1 className={styles.title}>Thank you!</h1>
                         <p className={styles.body}>
-                            {message || 'Deine Tickets wurden erfolgreich gebucht. Wir haben dir eine Bestätigungs-E-Mail geschickt.'}
+                            {message || "Your tickets have been successfully booked. We've sent you a confirmation email. You can access your tickets at any time, on any device, via the link in the email."}
                         </p>
-                        {!message && (
-                            <p className={styles.hint}>
-                                Über den Link in der E-Mail kannst du deine Tickets jederzeit,
-                                auch auf anderen Geräten, aufrufen.
-                            </p>
-                        )}
                         <div className={styles.actions}>
-                            {hasToken ? (
-                                <button
-                                    onClick={() => window.location.href = `/api/auth/verify?token=${hasToken}`}
-                                    className={styles.btnPrimary}
-                                >
-                                    Meine Tickets ansehen
-                                </button>
-                            ) : (
-                                <Link href="/" className={styles.btnPrimary}>
-                                    Zur Startseite
-                                </Link>
-                            )}
-                            <Link href="/" className={styles.btnSecondary}>
-                                Zurück zur Startseite
+                            <Link href="/" className="btn-raw btn-raw-full">
+                                Back to Home
+                            </Link>
+                        </div>
+                    </>
+                )}
+
+                {state === 'timeout' && (
+                    <>
+                        <h1 className={styles.title}>Payment received</h1>
+                        <p className={styles.body}>
+                            Your payment went through but we're still processing your order. You'll receive a confirmation email with your tickets shortly.
+                        </p>
+                        <div className={styles.actions}>
+                            <Link href="/" className="btn-raw btn-raw-full">
+                                Back to Home
+                            </Link>
+                        </div>
+                    </>
+                )}
+
+                {state === 'db_error' && (
+                    <>
+                        <h1 className={styles.title}>Payment received</h1>
+                        <p className={styles.body}>
+                            Your payment went through but we're having trouble confirming your order right now. You'll receive a confirmation email with your tickets shortly. If you have any issues, please reach out.
+                        </p>
+                        <div className={styles.actions}>
+                            <Link href="/" className="btn-raw btn-raw-full">
+                                Back to Home
                             </Link>
                         </div>
                     </>
@@ -113,14 +127,14 @@ export default function ConfirmationClient() {
                 {state === 'error' && (
                     <>
                         <div className={styles.errorIcon}>⚠️</div>
-                        <h1 className={styles.title}>Etwas ist schiefgelaufen</h1>
+                        <h1 className={styles.title}>Something went wrong</h1>
                         <p className={styles.body}>{message}</p>
                         <div className={styles.actions}>
-                            <Link href="/tickets" className={styles.btnPrimary}>
-                                Erneut versuchen
+                            <Link href="/tickets" className="btn-raw btn-raw-full">
+                                Try Again
                             </Link>
-                            <Link href="/" className={styles.btnSecondary}>
-                                Startseite
+                            <Link href="/" className="btn-raw btn-raw-full">
+                                Home
                             </Link>
                         </div>
                     </>

@@ -29,7 +29,7 @@ body {
   position: relative;
   isolation: isolate;
   min-height: 100%;
-  background-color: var(--bg);
+  background-color: #8CB2AB;
   color: var(--ink);
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -60,6 +60,52 @@ textarea {
 
 /* Focus ring */
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid rgba(0,0,0,0.4);
   outline-offset: 2px;
+}
+
+/* ── Checkout button base ── */
+.btn-raw {
+  -webkit-appearance: none;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 0.75rem;
+  margin: 0;
+  background: transparent;
+  color: #000;
+  border: 3px solid #000;
+  border-radius: 0;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: none;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.btn-raw:hover:not(:disabled) {
+  opacity: 0.6;
+}
+
+.btn-raw:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.btn-raw-full {
+  width: 100%;
+}
+
+.btn-raw-primary {
+  background: #000;
+  color: #fff;
+}
+
+.btn-raw-primary:hover:not(:disabled) {
+  opacity: 0.7;
 }

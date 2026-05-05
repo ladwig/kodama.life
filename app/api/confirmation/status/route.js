@@ -2,36 +2,49 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { signTicketJWT } from '@/lib/jwt';
 
-/**
- * After a successful payment, the confirmation page polls this endpoint
- * to get the buyer's JWT so it can set the ticket_token cookie on the same device.
- * Security: requires knowing the payment_intent ID (only available post-payment in URL).
- */
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const paymentIntentId = searchParams.get('payment_intent');
 
     if (!paymentIntentId) {
-        return NextResponse.json({ ready: false, token: null });
+        return NextResponse.json({ ready: false });
     }
 
     const supabase = getSupabaseAdmin();
-    const { data } = await supabase
+
+    const { data, error } = await supabase
         .from('orders')
         .select('id, status, buyer_email, buyer_name')
         .eq('stripe_payment_id', paymentIntentId)
         .maybeSingle();
 
-    const ready = !!data && data.status === 'paid';
-
-    if (ready) {
-        // Generate the token purely on the fly! No need to save it to the database at all.
-        const token = await signTicketJWT({
-            buyer_email: data.buyer_email,
-            buyer_name: data.buyer_name,
-        });
-        return NextResponse.json({ ready: true, token });
+    if (error) {
+        console.error('[confirmation/status] DB error:', error.message);
+        return NextResponse.json({ ready: false, db_error: true });
     }
 
-    return NextResponse.json({ ready: false, token: null });
+    if (!data || data.status !== 'paid') {
+        return NextResponse.json({ ready: false });
+    }
+
+    const { data: ticketsCheck, error: ticketsError } = await supabase
+        .from('tickets')
+        .select('id')
+        .eq('order_id', data.id)
+        .limit(1);
+
+    if (ticketsError) {
+        console.error('[confirmation/status] Tickets DB error:', ticketsError.message);
+        return NextResponse.json({ ready: false, db_error: true });
+    }
+
+    if (!ticketsCheck?.length) {
+        return NextResponse.json({ ready: false });
+    }
+
+    const token = await signTicketJWT({
+        buyer_email: data.buyer_email,
+        buyer_name: data.buyer_name,
+    });
+    return NextResponse.json({ ready: true, token });
 }
