@@ -81,13 +81,10 @@ function PaymentScreen({ total, quantity, pricePerTicket, holderNames, onBack })
                     className="btn-raw btn-raw-full"
                     disabled={!ready || paying}
                 >
-                    {paying ? 'Processing payment…' : `Pay now · €${total}`}
+                    {paying ? 'One moment…' : `Pay · €${total}`}
                 </button>
             </form>
 
-            <button type="button" className="btn-raw" onClick={onBack}>
-                ← Change details
-            </button>
         </div>
     );
 }
@@ -252,9 +249,12 @@ export default function TicketsPage() {
 
                 {/* ── Header ── */}
                 <div className={styles.header}>
-                    <Link href="/" className={styles.backIcon} aria-label="Back">←</Link>
+                    {step === 'form'
+                        ? <Link href="/" className={styles.backIcon} aria-label="Back">←</Link>
+                        : <button type="button" className={styles.backIcon} onClick={handleBack} aria-label="Back">←</button>
+                    }
                     <h1 className={styles.title}>
-                        {step === 'form' ? 'Buy a Ticket' : 'Payment'}
+                        {step === 'form' ? 'Join the Sidequest' : 'Payment'}
                     </h1>
                 </div>
 
@@ -262,34 +262,23 @@ export default function TicketsPage() {
                 {step === 'form' && (
                     <form onSubmit={handleOrder} className={styles.form}>
                         <section className={styles.section}>
-                            <h2 className={styles.sectionTitle}>Your Info</h2>
+                            <h2 className={styles.sectionTitle}>You</h2>
                             <div className={styles.fieldGroup}>
-                                <div className={styles.field}>
-                                    <label htmlFor="buyer-name" className={styles.label}>Name *</label>
-                                    <input id="buyer-name" type="text" value={buyerName}
-                                        onChange={(e) => setBuyerName(e.target.value)}
-                                        className={styles.input} placeholder="Your full name" required />
-                                </div>
-                                <div className={styles.field}>
-                                    <label htmlFor="buyer-email" className={styles.label}>Email *</label>
-                                    <input id="buyer-email" type="email" value={buyerEmail}
-                                        onChange={(e) => setBuyerEmail(e.target.value)}
-                                        className={styles.input} placeholder="your@email.com" required />
-                                </div>
-                                <div className={styles.field}>
-                                    <label htmlFor="buyer-phone" className={styles.label}>
-                                        Phone <span className={styles.optional}>(optional)</span>
-                                    </label>
-                                    <input id="buyer-phone" type="tel" value={buyerPhone}
-                                        onChange={(e) => setBuyerPhone(e.target.value)}
-                                        className={styles.input} placeholder="+1 ..." />
-                                </div>
+                                <input type="text" value={buyerName}
+                                    onChange={(e) => setBuyerName(e.target.value)}
+                                    className={styles.input} placeholder="Full name" required />
+                                <input type="email" value={buyerEmail}
+                                    onChange={(e) => setBuyerEmail(e.target.value)}
+                                    className={styles.input} placeholder="Email" required />
+                                <input type="tel" value={buyerPhone}
+                                    onChange={(e) => setBuyerPhone(e.target.value)}
+                                    className={styles.input} placeholder="Phone (optional)" />
                             </div>
                         </section>
 
                         <section className={styles.section}>
-                            <h2 className={styles.sectionTitle}>Number of Tickets</h2>
                             <div className={styles.stepper}>
+                                <span className={styles.sectionTitle}>How many</span>
                                 <button type="button" className={styles.stepperBtn}
                                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                                     disabled={quantity <= 1} aria-label="Less">−</button>
@@ -301,31 +290,23 @@ export default function TicketsPage() {
                         </section>
 
                         <section className={styles.section}>
-                            <h2 className={styles.sectionTitle}>
-                                Ticket Holder{quantity > 1 ? 's' : ''}
-                            </h2>
+                            <h2 className={styles.sectionTitle}>Who's coming</h2>
                             <div className={styles.fieldGroup}>
                                 {holderNames.map((name, idx) => (
-                                    <div key={idx} className={styles.field}>
-                                        <label htmlFor={`holder-${idx}`} className={styles.label}>
-                                            Ticket {idx + 1}
-                                        </label>
-                                        <input id={`holder-${idx}`} type="text" value={name}
-                                            onChange={(e) => updateHolder(idx, e.target.value)}
-                                            className={styles.input} placeholder="Holder name" required />
-                                    </div>
+                                    <input key={idx} type="text" value={name}
+                                        onChange={(e) => updateHolder(idx, e.target.value)}
+                                        className={styles.input} placeholder={`Ticket ${idx + 1}`} required />
                                 ))}
                             </div>
                         </section>
 
                         <section className={styles.section}>
                             <h2 className={styles.sectionTitle}>
-                                Price per Ticket
+                                Contribution
                                 <span className={styles.priceDisplay}>€{pricePerTicket}</span>
                             </h2>
                             <p className={styles.priceNote}>
-                                Kodama is a non-commercial event. Choose what it's worth to you.
-                                Minimum price: €{MIN_PRICE}.
+                                Non-commercial. Bring what feels right.
                             </p>
                             <input id="price-slider" type="range" min={MIN_PRICE} max={MAX_PRICE}
                                 step={STEP} value={pricePerTicket}
@@ -346,7 +327,7 @@ export default function TicketsPage() {
                         {formError && <p className={styles.errorText}>{formError}</p>}
 
                         <button type="submit" id="order-btn" className="btn-raw btn-raw-full" disabled={loading}>
-                            {loading ? 'One moment…' : `Continue to Payment · €${total}`}
+                            {loading ? 'One moment…' : `Join · €${total}`}
                         </button>
                     </form>
                 )}
