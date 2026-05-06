@@ -13,7 +13,7 @@ import styles from './tickets.module.css';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
-const MIN_PRICE = 25;
+const MIN_PRICE = 30;
 const MAX_PRICE = 100;
 const STEP = 5;
 const MAX_QUANTITY = 10;
@@ -248,12 +248,11 @@ export default function TicketsPage() {
 
     return (
         <main className={styles.container}>
-            <Link href="/" className={styles.backLink}>← Back</Link>
-
             <div className={styles.content}>
 
                 {/* ── Header ── */}
                 <div className={styles.header}>
+                    <Link href="/" className={styles.backIcon} aria-label="Back">←</Link>
                     <h1 className={styles.title}>
                         {step === 'form' ? 'Buy a Ticket' : 'Payment'}
                     </h1>
@@ -336,7 +335,7 @@ export default function TicketsPage() {
                                 <span>€{MIN_PRICE}</span><span>€{MAX_PRICE}</span>
                             </div>
                             <div className={styles.priceSteps}>
-                                {[25, 35, 50, 75, 100].map((p) => (
+                                {[30, 40, 50, 75, 100].map((p) => (
                                     <button key={p} type="button"
                                         className={`${styles.priceStep} ${pricePerTicket === p ? styles.priceStepActive : ''}`}
                                         onClick={() => setPricePerTicket(p)}>€{p}</button>
