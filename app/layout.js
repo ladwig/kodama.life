@@ -1,6 +1,7 @@
 import "./globals.css";
 
 export const metadata = {
+  icons: { icon: "/favicon.ico" },
   title: "sidequest",
   description: "sidequest is a gathering at Kiekebusch See on 22. August 2026.",
   openGraph: {
