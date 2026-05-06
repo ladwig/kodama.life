@@ -3,7 +3,7 @@ import { stripe } from '@/lib/stripe';
 import { getSupabaseAdmin } from '@/lib/supabase';
 
 // Min price per ticket in cents
-const MIN_PRICE = 2500; // 25 EUR
+const MIN_PRICE = 3000; // 30 EUR
 const STEP = 500; // 5 EUR increments
 const MAX_QUANTITY = 10;
 const EVENT_DATE = '2026-08-22';
