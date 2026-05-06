@@ -64,10 +64,18 @@ export async function POST(req) {
             automatic_payment_methods: { enabled: true },
         });
 
-        return NextResponse.json({
+        const response = NextResponse.json({
             client_secret: paymentIntent.client_secret,
             subscriber_name: subscriberName,
         });
+        response.cookies.set('checkout_pi', paymentIntent.id, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 2, // 2 hours — enough to complete checkout
+            path: '/',
+        });
+        return response;
     } catch (err) {
         console.error('create-intent error:', err);
         return NextResponse.json({ error: 'Fehler beim Erstellen der Zahlung.' }, { status: 500 });

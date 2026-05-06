@@ -10,6 +10,12 @@ export async function GET(req) {
         return NextResponse.json({ ready: false });
     }
 
+    // Verify the requester initiated this checkout (cookie set by create-intent)
+    const checkoutPi = req.cookies.get('checkout_pi')?.value;
+    if (!checkoutPi || checkoutPi !== paymentIntentId) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const supabase = getSupabaseAdmin();
 
     const { data, error } = await supabase
