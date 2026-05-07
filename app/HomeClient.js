@@ -192,28 +192,31 @@ export default function HomeClient({ buyer, orders, tickets }) {
                         ) : (
                             <form onSubmit={handleNewsletter} className={styles.newsletterForm}>
                                 <p className={styles.formLabel}>Stay in the loop</p>
-                                <div className={styles.inputGroup}>
-                                    <input
-                                        id="newsletter-name"
-                                        type="text"
-                                        placeholder="Name"
-                                        value={newsletterName}
-                                        onChange={(e) => setNewsletterName(e.target.value)}
-                                        required
-                                        className={styles.minimalInput}
-                                    />
-                                    <input
-                                        id="newsletter-email"
-                                        type="email"
-                                        placeholder="Email"
-                                        value={newsletterEmail}
-                                        onChange={(e) => setNewsletterEmail(e.target.value)}
-                                        required
-                                        className={styles.minimalInput}
-                                    />
+                                <div className={styles.newsletterBox}>
+                                    <div className={styles.newsletterBoxInner}>
+                                        <input
+                                            id="newsletter-name"
+                                            type="text"
+                                            placeholder="Name"
+                                            value={newsletterName}
+                                            onChange={(e) => setNewsletterName(e.target.value)}
+                                            required
+                                            className={styles.newsletterInput}
+                                        />
+                                        <div className={styles.newsletterDivider} />
+                                        <input
+                                            id="newsletter-email"
+                                            type="email"
+                                            placeholder="Email"
+                                            value={newsletterEmail}
+                                            onChange={(e) => setNewsletterEmail(e.target.value)}
+                                            required
+                                            className={styles.newsletterInput}
+                                        />
+                                    </div>
                                     <button
                                         type="submit"
-                                        className={styles.minimalBtn}
+                                        className={`${styles.newsletterArrow} ${(newsletterName.length > 0 || newsletterEmail.length > 0) ? styles.newsletterArrowVisible : ''}`}
                                         disabled={newsletterState === 'loading'}
                                     >
                                         {newsletterState === 'loading' ? '…' : <img src="/arrow.svg" alt="→" width={16} height={15} />}

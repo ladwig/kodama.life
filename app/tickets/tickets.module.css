@@ -185,7 +185,7 @@
     -webkit-appearance: none;
     width: 16px;
     height: 16px;
-    border-radius: 0;
+    border-radius: 2px;
     background: #000;
     border: none;
     transition: opacity 0.1s;
@@ -198,7 +198,7 @@
 .slider::-moz-range-thumb {
     width: 16px;
     height: 16px;
-    border-radius: 0;
+    border-radius: 2px;
     background: #000;
     border: none;
 }
