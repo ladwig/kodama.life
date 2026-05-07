@@ -7,7 +7,7 @@
     padding: 2rem;
     position: relative;
     overflow: hidden;
-    background: #8CB2AB;
+    background: #8CB2AC;
 }
 
 .content {
@@ -25,12 +25,12 @@
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    margin-left: 12px;
-    transform: translateY(-10vh);
+    margin-left: 0;
+    transform: translate(-2%, -12vh);
 }
 
 .title {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-family: 'Funnel Display', sans-serif;
     font-size: 1.35rem;
     font-weight: 400;
     letter-spacing: 0.08em;
@@ -56,7 +56,7 @@
     border: 1px solid var(--accent);
     border-radius: 0;
     padding: 0.5rem 1rem;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-family: 'Funnel Display', sans-serif;
     font-size: 0.7rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -72,7 +72,7 @@
     align-items: center;
     gap: 0.75rem;
     width: 100%;
-    transform: translateY(-13vh);
+    transform: translateY(-10vh);
     position: relative;
 }
 
@@ -89,13 +89,13 @@
 
 .input {
     width: 342px;
-    height: 24px;
+    height: 32px;
     padding: 0 0.5rem 0 0.25rem;
     padding-right: 2rem;
     border: 3px solid #000;
     border-radius: 2px;
     background: rgba(217, 217, 217, 0);
-    font-family: 'Inter', sans-serif;
+    font-family: 'Funnel Display', sans-serif;
     font-weight: 700;
     font-size: 12px;
     color: #000;
@@ -113,7 +113,7 @@
 .input::placeholder {
     color: #000;
     font-weight: 700;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Funnel Display', sans-serif;
 }
 
 .errorText {
@@ -122,7 +122,7 @@
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-family: 'Funnel Display', sans-serif;
     font-size: 0.72rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -143,7 +143,7 @@
 
 .arrowBtn {
     position: absolute;
-    right: 0.4rem;
+    right: 0.6rem;
     background: transparent;
     border: none;
     cursor: pointer;
@@ -164,6 +164,7 @@
 
 .arrowBtn.visible:hover {
     transform: translateX(3px);
+    filter: invert(67%) sepia(18%) saturate(377%) hue-rotate(127deg) brightness(93%) contrast(87%);
 }
 
 .arrowBtn.visible:active {
