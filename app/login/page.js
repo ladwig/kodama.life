@@ -43,7 +43,7 @@ function LoginForm() {
         <main className={styles.container}>
             <div className={styles.content}>
                 <div className={styles.logoArea}>
-                    <Image src="/sidequest-logo.png" alt="Sidequest" width={400} height={120} priority />
+                    <Image src="/sidequest-logo.svg" alt="Sidequest" width={340} height={102} priority />
                 </div>
 
                 {tokenError === 'invalid_token' && (
@@ -74,7 +74,7 @@ function LoginForm() {
                             disabled={loading}
                             aria-label="Submit"
                         >
-                            <img src="/arrow.svg" alt="" width={12} height={11} />
+                            <img src="/arrow.svg" alt="" width={16} height={15} />
                         </button>
                     </div>
                     {error && <p className={styles.errorText}>something&apos;s wrong.</p>}

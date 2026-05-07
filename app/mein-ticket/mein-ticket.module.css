@@ -14,7 +14,7 @@
     text-decoration: none;
     font-size: 0.75rem;
     font-weight: 700;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Funnel Display', sans-serif;
     transition: opacity 0.15s;
     max-width: 640px;
     width: 100%;
@@ -43,7 +43,7 @@
 }
 
 .title {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Funnel Display', sans-serif;
     font-size: 0.9rem;
     font-weight: 700;
     color: #000;
@@ -59,7 +59,7 @@
 .subtitle {
     font-size: 0.72rem;
     font-weight: 700;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Funnel Display', sans-serif;
     color: #000;
     opacity: 0.5;
 }
@@ -73,7 +73,7 @@
     color: #000;
     font-size: 0.75rem;
     font-weight: 700;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Funnel Display', sans-serif;
     opacity: 0.6;
 }
 
@@ -97,7 +97,7 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     font-weight: 700;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Funnel Display', sans-serif;
     color: #000;
     opacity: 0.5;
 }
@@ -105,7 +105,7 @@
 .orderNote {
     font-size: 0.65rem;
     font-weight: 700;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Funnel Display', sans-serif;
     color: #000;
     opacity: 0.5;
     border-top: 1px solid rgba(0,0,0,0.2);
@@ -141,7 +141,7 @@
 }
 
 .ticketCode {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Funnel Display', sans-serif;
     font-size: 12px;
     font-weight: 700;
     color: #000;
@@ -152,7 +152,7 @@
 .ticketHolder {
     font-size: 12px;
     font-weight: 700;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Funnel Display', sans-serif;
     color: #000;
     opacity: 0.4;
 }
@@ -218,7 +218,7 @@
     text-decoration: none;
     font-weight: 700;
     font-size: 12px;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Funnel Display', sans-serif;
     transition: opacity 0.15s;
 }
 
@@ -237,7 +237,7 @@
     text-decoration: none;
     font-size: 12px;
     font-weight: 700;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Funnel Display', sans-serif;
     background: transparent;
     transition: opacity 0.15s;
 }

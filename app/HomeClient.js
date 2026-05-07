@@ -84,10 +84,10 @@ export default function HomeClient({ buyer, orders, tickets }) {
             <div className={styles.content}>
                 {/* ── Hero ── */}
                 <Image
-                    src="/sidequest-logo.png"
+                    src="/sidequest-logo.svg"
                     alt="sidequest"
-                    width={420}
-                    height={100}
+                    width={340}
+                    height={102}
                     priority
                     className={styles.logo}
                 />
@@ -103,19 +103,13 @@ export default function HomeClient({ buyer, orders, tickets }) {
                             : "Some days follow a plan, and some days open a small, almost invisible door that you didn't know was there, but step through anyway."}
                     </p>
                     <p>
-                        Sidequest begins exactly there, in that gentle shift, where the light feels a little softer, the air a little curious, and something in the background starts to hum like it's been waiting for you.
+                        Sidequest begins exactly there, in that gentle shift, where the light feels a little softer, the air a little curious, and something in the background starts to hum like it&apos;s been waiting for you.
                     </p>
                     <p>
-                        You drift, not lost but lightly unassigned, past leaves that seem to whisper, past sounds that feel familiar in a way you can't quite explain, until you realize you're moving with people who somehow already speak the same rhythm.
+                        You drift, not lost but lightly unassigned, past leaves that seem to whisper, past sounds that feel familiar in a way you can&apos;t quite explain, until you realize you&apos;re moving with people who somehow already speak the same rhythm.
                     </p>
                     <p>
-                        Time stretches just enough to notice it loosening, and then you stop noticing altogether, because there's nothing to hold onto and nothing you need to.
-                    </p>
-                    <p>
-                        As the day leans into night, everything becomes slightly stranger and warmer at the same time, like the world is trying something new and you're part of it.
-                    </p>
-                    <p>
-                        And later, without really deciding to, you return, carrying something small and unnameable, like a secret you didn't mean to keep but are glad you did.
+                        Time stretches just enough to notice it loosening, and then you stop noticing altogether, because there&apos;s nothing to hold onto and nothing you need to.
                     </p>
                 </div>}
 
@@ -168,18 +162,20 @@ export default function HomeClient({ buyer, orders, tickets }) {
                 {!hasTickets && (
                     <div className={styles.guestSection}>
                         <div className={styles.actionContainer}>
-                            <div style={{ display: 'flex', gap: '0.9rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-                                <Link href="/tickets" className={styles.moreTicketsLink} style={{ marginTop: '0.25rem' }}>
-                                    Buy ticket →
+                            <div className={styles.illustratedBtns}>
+                                <Link href="/tickets" className={styles.illustratedBtn}>
+                                    <img src="/fumetto.png" alt="" className={styles.illustratedBtnImgLeft} />
+                                    <span className={styles.illustratedBtnLabel}>BUY TICKET</span>
+                                    <img src="/fumetto2.png" alt="" className={styles.illustratedBtnImgRight} />
                                 </Link>
                                 <a
                                     href="https://chat.whatsapp.com/FNgs9Xla6tnL9mphP9juxV?mode=gi_t"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className={styles.moreTicketsLink}
-                                    style={{ marginTop: '0.25rem' }}
+                                    className={styles.illustratedBtn}
                                 >
-                                    Join WhatsApp group →
+                                    <img src="/cerchio3.png" alt="" className={styles.illustratedBtnCircle} />
+                                    <span className={styles.illustratedBtnLabel}>ENTER WHATSAPP GROUP</span>
                                 </a>
                             </div>
                         </div>
@@ -196,31 +192,34 @@ export default function HomeClient({ buyer, orders, tickets }) {
                         ) : (
                             <form onSubmit={handleNewsletter} className={styles.newsletterForm}>
                                 <p className={styles.formLabel}>Stay in the loop</p>
-                                <div className={styles.inputGroup}>
-                                    <input
-                                        id="newsletter-name"
-                                        type="text"
-                                        placeholder="Name"
-                                        value={newsletterName}
-                                        onChange={(e) => setNewsletterName(e.target.value)}
-                                        required
-                                        className={styles.minimalInput}
-                                    />
-                                    <input
-                                        id="newsletter-email"
-                                        type="email"
-                                        placeholder="Email"
-                                        value={newsletterEmail}
-                                        onChange={(e) => setNewsletterEmail(e.target.value)}
-                                        required
-                                        className={styles.minimalInput}
-                                    />
+                                <div className={styles.newsletterBox}>
+                                    <div className={styles.newsletterBoxInner}>
+                                        <input
+                                            id="newsletter-name"
+                                            type="text"
+                                            placeholder="Name"
+                                            value={newsletterName}
+                                            onChange={(e) => setNewsletterName(e.target.value)}
+                                            required
+                                            className={styles.newsletterInput}
+                                        />
+                                        <div className={styles.newsletterDivider} />
+                                        <input
+                                            id="newsletter-email"
+                                            type="email"
+                                            placeholder="Email"
+                                            value={newsletterEmail}
+                                            onChange={(e) => setNewsletterEmail(e.target.value)}
+                                            required
+                                            className={styles.newsletterInput}
+                                        />
+                                    </div>
                                     <button
                                         type="submit"
-                                        className={styles.minimalBtn}
+                                        className={`${styles.newsletterArrow} ${(newsletterName.length > 0 || newsletterEmail.length > 0) ? styles.newsletterArrowVisible : ''}`}
                                         disabled={newsletterState === 'loading'}
                                     >
-                                        {newsletterState === 'loading' ? '…' : '→'}
+                                        {newsletterState === 'loading' ? '…' : <img src="/arrow.svg" alt="→" width={16} height={15} />}
                                     </button>
                                 </div>
                                 {newsletterState === 'error' && (

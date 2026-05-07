@@ -250,8 +250,8 @@ export default function TicketsPage() {
                 {/* ── Header ── */}
                 <div className={styles.header}>
                     {step === 'form'
-                        ? <Link href="/" className={styles.backIcon} aria-label="Back">←</Link>
-                        : <button type="button" className={styles.backIcon} onClick={handleBack} aria-label="Back">←</button>
+                        ? <Link href="/" className={styles.backIcon} aria-label="Back"><img src="/arrow.svg" alt="←" width={16} height={15} style={{ transform: 'rotate(180deg)' }} /></Link>
+                        : <button type="button" className={styles.backIcon} onClick={handleBack} aria-label="Back"><img src="/arrow.svg" alt="←" width={16} height={15} style={{ transform: 'rotate(180deg)' }} /></button>
                     }
                     <h1 className={styles.title}>
                         {step === 'form' ? 'Join the Sidequest' : 'Payment'}

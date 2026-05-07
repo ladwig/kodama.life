@@ -45,7 +45,10 @@ export default async function Home() {
     const payload = await verifyJWT(ticketToken);
     if (payload?.buyer_email) {
       buyer = { email: payload.buyer_email, name: payload.buyer_name };
-      ({ orders, tickets } = await getBuyerData(payload.buyer_email));
+      // Skip real DB calls in dev when Supabase isn't configured
+      if (process.env.SUPABASE_URL && !process.env.SUPABASE_URL.includes("fake")) {
+        ({ orders, tickets } = await getBuyerData(payload.buyer_email));
+      }
     }
   }
 
