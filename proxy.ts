@@ -18,6 +18,7 @@ const PUBLIC_PATHS = [
     '/api/auth/login',
     '/api/auth/verify',
     '/api/auth/set-cookie',
+    '/api/auth/magic',
     '/api/webhooks/stripe',
     '/api/newsletter/unsubscribe',
     '/api/confirmation/status',
