@@ -199,6 +199,22 @@
     cursor: default;
 }
 
+.inkRipple {
+    position: fixed;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.04) 50%, transparent 70%);
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0);
+    animation: inkSpread 1.1s cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
+    filter: blur(2px);
+}
+
+@keyframes inkSpread {
+    0%   { transform: translate(-50%, -50%) scale(0);    opacity: 1; }
+    60%  { opacity: 0.6; }
+    100% { transform: translate(-50%, -50%) scale(1);    opacity: 0; }
+}
+
 .dustParticle {
     position: fixed;
     border-radius: 50%;
