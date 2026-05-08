@@ -27,6 +27,12 @@
     gap: 0.5rem;
     margin-left: 0;
     transform: translate(-2%, -12vh);
+    animation: logoBreathe 6s ease-in-out infinite;
+}
+
+@keyframes logoBreathe {
+    0%, 100% { transform: translate(-2%, -12vh) scale(1); }
+    50%       { transform: translate(-2%, -12vh) scale(1.01); }
 }
 
 .title {
