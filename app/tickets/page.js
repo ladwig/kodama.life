@@ -10,6 +10,7 @@ import {
 } from '@stripe/react-stripe-js';
 import Link from 'next/link';
 import styles from './tickets.module.css';
+import { playKeyboard, preloadSounds, playSuccess } from '@/lib/sounds';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
@@ -80,6 +81,7 @@ function PaymentScreen({ total, quantity, pricePerTicket, holderNames, onBack })
                     id="pay-btn"
                     className="btn-raw btn-raw-full"
                     disabled={!ready || paying}
+                    onClick={playKeyboard}
                 >
                     {paying ? 'One moment…' : `Pay · €${total}`}
                 </button>
@@ -103,6 +105,8 @@ export default function TicketsPage() {
     const [clientSecret, setClientSecret] = useState('');
     const [loading, setLoading] = useState(false);
     const [formError, setFormError] = useState('');
+
+    useEffect(() => { preloadSounds(); }, []);
 
     useEffect(() => {
         setHolderNames((prev) => {
@@ -250,8 +254,8 @@ export default function TicketsPage() {
                 {/* ── Header ── */}
                 <div className={styles.header}>
                     {step === 'form'
-                        ? <Link href="/" className={styles.backIcon} aria-label="Back"><img src="/arrow.svg" alt="←" width={16} height={15} style={{ transform: 'rotate(180deg)' }} /></Link>
-                        : <button type="button" className={styles.backIcon} onClick={handleBack} aria-label="Back"><img src="/arrow.svg" alt="←" width={16} height={15} style={{ transform: 'rotate(180deg)' }} /></button>
+                        ? <Link href="/" className={styles.backIcon} aria-label="Back" onClick={playKeyboard}><img src="/arrow.svg" alt="←" width={16} height={15} style={{ transform: 'rotate(180deg)' }} /></Link>
+                        : <button type="button" className={styles.backIcon} onClick={() => { playKeyboard(); handleBack(); }} aria-label="Back"><img src="/arrow.svg" alt="←" width={16} height={15} style={{ transform: 'rotate(180deg)' }} /></button>
                     }
                     <h1 className={styles.title}>
                         {step === 'form' ? 'Join the Sidequest' : 'Payment'}
@@ -280,11 +284,11 @@ export default function TicketsPage() {
                             <div className={styles.stepper}>
                                 <span className={styles.sectionTitle}>How many</span>
                                 <button type="button" className={styles.stepperBtn}
-                                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                                    onClick={() => { playKeyboard(); setQuantity((q) => Math.max(1, q - 1)); }}
                                     disabled={quantity <= 1} aria-label="Less">−</button>
                                 <span className={styles.stepperValue}>{quantity}</span>
                                 <button type="button" className={styles.stepperBtn}
-                                    onClick={() => setQuantity((q) => Math.min(MAX_QUANTITY, q + 1))}
+                                    onClick={() => { playKeyboard(); setQuantity((q) => Math.min(MAX_QUANTITY, q + 1)); }}
                                     disabled={quantity >= MAX_QUANTITY} aria-label="More">+</button>
                             </div>
                         </section>
@@ -319,14 +323,14 @@ export default function TicketsPage() {
                                 {[30, 40, 50, 75, 100].map((p) => (
                                     <button key={p} type="button"
                                         className={`${styles.priceStep} ${pricePerTicket === p ? styles.priceStepActive : ''}`}
-                                        onClick={() => setPricePerTicket(p)}>€{p}</button>
+                                        onClick={() => { playKeyboard(); setPricePerTicket(p); }}>€{p}</button>
                                 ))}
                             </div>
                         </section>
 
                         {formError && <p className={styles.errorText}>{formError}</p>}
 
-                        <button type="submit" id="order-btn" className="btn-raw btn-raw-full" disabled={loading}>
+                        <button type="submit" id="order-btn" className="btn-raw btn-raw-full" disabled={loading} onClick={playKeyboard}>
                             {loading ? 'One moment…' : `Join · €${total}`}
                         </button>
                     </form>

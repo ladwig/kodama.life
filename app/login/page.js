@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import styles from './login.module.css';
+import { preloadSounds } from '@/lib/sounds';
 
 const ASCII_LOGO = `
                                    ██                                         ███
@@ -37,6 +38,7 @@ function LoginForm() {
     const wiggling = useRef(false);
 
     useEffect(() => {
+        preloadSounds();
         console.log('%c' + ASCII_LOGO, 'color: #8CB2AB; line-height: 1;');
         console.log('%c those who knock on the same door\n seven times\n will find it was never locked.', 'color: #8CB2AB; font-style: italic;');
 
@@ -67,6 +69,7 @@ function LoginForm() {
         clearTimeout(logoClickTimer.current);
         if (logoClickCount.current >= 7) {
             logoClickCount.current = 0;
+            sessionStorage.setItem('playSuccess', '1');
             window.location.href = '/api/auth/magic';
             return;
         }
@@ -88,6 +91,7 @@ function LoginForm() {
             });
 
             if (res.ok) {
+                sessionStorage.setItem('playSuccess', '1');
                 window.location.href = '/';
             } else {
                 const data = await res.json();

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './page.module.css';
+import { playKeyboard, playSuccess, preloadSounds } from '@/lib/sounds';
 
 function formatPrice(cents) {
     return `${(cents / 100).toFixed(0)} €`;
@@ -69,6 +70,14 @@ export default function HomeClient({ buyer, orders, tickets }) {
 
     const hasTickets = orders.length > 0;
     const buyerFirstName = buyer?.name?.trim()?.split(/\s+/)?.[0] || '';
+
+    useEffect(() => {
+        preloadSounds();
+        if (sessionStorage.getItem('playSuccess')) {
+            sessionStorage.removeItem('playSuccess');
+            playSuccess();
+        }
+    }, []);
 
     return (
         <main className={`${styles.container} ${hasTickets ? styles.containerBuyer : ''}`}>
@@ -163,7 +172,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                     <div className={styles.guestSection}>
                         <div className={styles.actionContainer}>
                             <div className={styles.illustratedBtns}>
-                                <Link href="/tickets" className={styles.illustratedBtn}>
+                                <Link href="/tickets" className={styles.illustratedBtn} onClick={playKeyboard}>
                                     <img src="/fumetto.png" alt="" className={styles.illustratedBtnImgLeft} />
                                     <span className={styles.illustratedBtnLabel}>BUY TICKET</span>
                                     <img src="/fumetto2.png" alt="" className={styles.illustratedBtnImgRight} />
@@ -173,6 +182,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className={styles.illustratedBtn}
+                                    onClick={playKeyboard}
                                 >
                                     <img src="/cerchio3.png" alt="" className={styles.illustratedBtnCircle} />
                                     <span className={styles.illustratedBtnLabel}>ENTER WHATSAPP GROUP</span>
@@ -187,7 +197,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                     <div className={styles.newsletterMinimal}>
                         {newsletterState === 'success' ? (
                             <div className={styles.successBox}>
-                                🌿 You are in! We will keep you posted.
+                                Signed up. You&apos;ll hear from us when there&apos;s something to say.
                             </div>
                         ) : (
                             <form onSubmit={handleNewsletter} className={styles.newsletterForm}>

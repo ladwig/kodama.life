@@ -57,6 +57,7 @@ export default function ConfirmationClient() {
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ token: data.token }),
                         });
+                        sessionStorage.setItem('playSuccess', '1');
                         window.location.href = '/';
                         return;
                     }
