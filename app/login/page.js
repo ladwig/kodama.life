@@ -34,8 +34,6 @@ function LoginForm() {
     const [arrowWiggling, setArrowWiggling] = useState(false);
     const [particles, setParticles] = useState([]);
     const particleIdRef = useRef(0);
-    const [ripples, setRipples] = useState([]);
-    const rippleIdRef = useRef(0);
 
     const tokenError = searchParams.get('error');
     const idleTimer = useRef(null);
@@ -68,17 +66,7 @@ function LoginForm() {
     const logoClickCount = useRef(0);
     const logoClickTimer = useRef(null);
 
-    function handleBackgroundClick(e) {
-        const id = ++rippleIdRef.current;
-        const size = 180 + Math.random() * 120;
-        setRipples(prev => [...prev, { id, x: e.clientX, y: e.clientY, size }]);
-        setTimeout(() => {
-            setRipples(prev => prev.filter(r => r.id !== id));
-        }, 1200);
-    }
-
     function handleLogoClick(e) {
-        e.stopPropagation();
         logoClickCount.current += 1;
         clearTimeout(logoClickTimer.current);
 
@@ -145,19 +133,7 @@ function LoginForm() {
     }
 
     return (
-        <main className={styles.container} onClick={handleBackgroundClick}>
-            {ripples.map(r => (
-                <div
-                    key={r.id}
-                    className={styles.inkRipple}
-                    style={{
-                        left: r.x,
-                        top: r.y,
-                        width: r.size,
-                        height: r.size,
-                    }}
-                />
-            ))}
+        <main className={styles.container}>
             {particles.map(p => (
                 <div
                     key={p.id}
