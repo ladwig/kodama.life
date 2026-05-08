@@ -5,17 +5,59 @@ import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import styles from './login.module.css';
 
+const ASCII_LOGO = `
+                                   ██                                         ███
+                             █████████                                     ███████             █████       ██
+                         ████████████      ██████                       █████████████           ███████    ███
+                      ██████     ███    ██████                        █████       ████              ██████  ██  ██
+                     █████      ██      ██  ██        ████████       ███    ████   ██                       ██████████
+                    █████████████                   ████  ████      ███   ███████  ██  ██  ████              ██   █████
+                     ███████   ██████    ██   ████  █████         ████   ██   ██  ██  ██   ████       █████  ███     ████
+                                ██████   ██   █████  ████  ██    ████   █    ██  ███ ███  ██          █████   ██     ███
+                      ████████  ██████   ██  ██████    ██████    ███  ███   ██  ██  ███████   █████  ██        ███
+                   ██████████   █████    ██  ██ ████   █████    ██   █████ ██  ██  ███████  ███  ██   ██████    ██
+                  █████   ██    ████  ███    █    ███         ███  ██████ █   ███   ██    ████████       ████   ████
+                ██████       ██████  ████  █████████        █████  ███   ██   █████       ██       ████   ███   ██████
+              ██████       ████████   █    ████████        ██████      ███      ████     ████████████████████    ██████
+             ██████      ████████        ██████            ████████ ██████        █████    ██████    ██████        ████
+             █████████████████         █████                  ██████████            ██                ████        ████
+                ████████████                                   ████
+`;
+
 function LoginForm() {
     const searchParams = useSearchParams();
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [logoShaking, setLogoShaking] = useState(false);
+    const [arrowWiggling, setArrowWiggling] = useState(false);
 
     const tokenError = searchParams.get('error');
+    const idleTimer = useRef(null);
+    const wiggling = useRef(false);
 
     useEffect(() => {
+        console.log('%c' + ASCII_LOGO, 'color: #8CB2AB; line-height: 1;');
         console.log('%c those who knock on the same door\n seven times\n will find it was never locked.', 'color: #8CB2AB; font-style: italic;');
+
+        idleTimer.current = setTimeout(() => {
+            if (!wiggling.current) {
+                wiggling.current = true;
+                setArrowWiggling(true);
+            }
+        }, 30000);
+
+        return () => clearTimeout(idleTimer.current);
     }, []);
+
+    function handleInputChange(e) {
+        setPassword(e.target.value);
+        // stop wiggling once they start typing
+        if (arrowWiggling) {
+            setArrowWiggling(false);
+            wiggling.current = false;
+        }
+    }
 
     const logoClickCount = useRef(0);
     const logoClickTimer = useRef(null);
@@ -46,12 +88,13 @@ function LoginForm() {
             });
 
             if (res.ok) {
-                // Full hard-navigation so the fresh cookie is sent with the next request
                 window.location.href = '/';
             } else {
                 const data = await res.json();
                 setError(data.error || 'Incorrect password.');
                 setLoading(false);
+                setLogoShaking(true);
+                setTimeout(() => setLogoShaking(false), 500);
             }
         } catch {
             setError('Connection error. Please try again.');
@@ -63,7 +106,16 @@ function LoginForm() {
         <main className={styles.container}>
             <div className={styles.content}>
                 <div className={styles.logoArea}>
-                    <Image src="/sidequest-logo.svg" alt="Sidequest" width={340} height={102} priority onClick={handleLogoClick} style={{ cursor: 'pointer' }} />
+                    <Image
+                        src="/sidequest-logo.svg"
+                        alt="Sidequest"
+                        width={340}
+                        height={102}
+                        priority
+                        onClick={handleLogoClick}
+                        style={{ cursor: 'pointer' }}
+                        className={logoShaking ? styles.logoShake : ''}
+                    />
                 </div>
 
                 {tokenError === 'invalid_token' && (
@@ -83,14 +135,14 @@ function LoginForm() {
                             data-form-type="other"
                             placeholder="Super secret code..?"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={handleInputChange}
                             className={styles.input}
                             required
                         />
                         <button
                             type="submit"
                             id="login-submit"
-                            className={`${styles.arrowBtn} ${password.length > 0 ? styles.visible : ''}`}
+                            className={`${styles.arrowBtn} ${password.length > 0 ? styles.visible : ''} ${arrowWiggling && password.length > 0 ? styles.wiggle : ''}`}
                             disabled={loading}
                             aria-label="Submit"
                         >
