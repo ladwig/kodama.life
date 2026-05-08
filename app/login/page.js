@@ -149,7 +149,6 @@ function LoginForm() {
                             <img src="/arrow.svg" alt="" width={16} height={15} />
                         </button>
                     </div>
-                    {error && <p className={styles.errorText}>something&apos;s wrong.</p>}
                 </form>
             </div>
         </main>
