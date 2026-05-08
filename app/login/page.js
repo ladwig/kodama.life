@@ -32,6 +32,8 @@ function LoginForm() {
     const [loading, setLoading] = useState(false);
     const [logoShaking, setLogoShaking] = useState(false);
     const [arrowWiggling, setArrowWiggling] = useState(false);
+    const [particles, setParticles] = useState([]);
+    const particleIdRef = useRef(0);
 
     const tokenError = searchParams.get('error');
     const idleTimer = useRef(null);
@@ -64,9 +66,33 @@ function LoginForm() {
     const logoClickCount = useRef(0);
     const logoClickTimer = useRef(null);
 
-    function handleLogoClick() {
+    function handleLogoClick(e) {
         logoClickCount.current += 1;
         clearTimeout(logoClickTimer.current);
+
+        // spawn falling dust particles from logo
+        const logoRect = e.currentTarget.getBoundingClientRect();
+        const count = 22;
+        const newParticles = Array.from({ length: count }, () => {
+            const spreadX = (Math.random() - 0.5) * logoRect.width * 0.9;
+            const startX = logoRect.left + logoRect.width / 2 + spreadX;
+            const startY = logoRect.top + logoRect.height * (0.6 + Math.random() * 0.45);
+            return {
+                id: ++particleIdRef.current,
+                x: startX,
+                y: startY,
+                dx: (Math.random() - 0.5) * 20,
+                dy: 120 + Math.random() * 160, // fall down further
+                size: 0.8 + Math.random() * 1.4,
+                duration: 1800 + Math.random() * 1200,
+                delay: Math.random() * 150,
+            };
+        });
+        setParticles(prev => [...prev, ...newParticles]);
+        setTimeout(() => {
+            setParticles(prev => prev.filter(p => !newParticles.some(np => np.id === p.id)));
+        }, 3200);
+
         if (logoClickCount.current >= 7) {
             logoClickCount.current = 0;
             sessionStorage.setItem('playSuccess', '1');
@@ -108,6 +134,22 @@ function LoginForm() {
 
     return (
         <main className={styles.container}>
+            {particles.map(p => (
+                <div
+                    key={p.id}
+                    className={styles.dustParticle}
+                    style={{
+                        left: p.x,
+                        top: p.y,
+                        width: p.size,
+                        height: p.size,
+                        '--dx': `${p.dx}px`,
+                        '--dy': `${p.dy}px`,
+                        animationDuration: `${p.duration}ms`,
+                        animationDelay: `${p.delay}ms`,
+                    }}
+                />
+            ))}
             <div className={styles.content}>
                 <div className={styles.logoArea}>
                     <Image
