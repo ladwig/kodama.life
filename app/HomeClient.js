@@ -11,7 +11,6 @@ function formatPrice(cents) {
 }
 
 export default function HomeClient({ buyer, orders, tickets }) {
-    const [newsletterName, setNewsletterName] = useState('');
     const [newsletterEmail, setNewsletterEmail] = useState('');
     const [newsletterState, setNewsletterState] = useState('idle');
     const [newsletterError, setNewsletterError] = useState('');
@@ -50,7 +49,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
             const res = await fetch('/api/newsletter/subscribe', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: newsletterName, email: newsletterEmail }),
+                body: JSON.stringify({ email: newsletterEmail }),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Error');
@@ -103,7 +102,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                 <p className={styles.details}>
                     August 22, 2026
                     <br />
-                    Kiekebusch See
+                    outskirts of Berlin
                 </p>
                 {!hasTickets && <div className={styles.description}>
                     <p>
@@ -201,23 +200,12 @@ export default function HomeClient({ buyer, orders, tickets }) {
                             </div>
                         ) : (
                             <form onSubmit={handleNewsletter} className={styles.newsletterForm}>
-                                <p className={styles.formLabel}>Stay in the loop</p>
                                 <div className={styles.newsletterBox}>
                                     <div className={styles.newsletterBoxInner}>
                                         <input
-                                            id="newsletter-name"
-                                            type="text"
-                                            placeholder="Name"
-                                            value={newsletterName}
-                                            onChange={(e) => setNewsletterName(e.target.value)}
-                                            required
-                                            className={styles.newsletterInput}
-                                        />
-                                        <div className={styles.newsletterDivider} />
-                                        <input
                                             id="newsletter-email"
                                             type="email"
-                                            placeholder="Email"
+                                            placeholder="Enter email address for updates"
                                             value={newsletterEmail}
                                             onChange={(e) => setNewsletterEmail(e.target.value)}
                                             required
@@ -226,7 +214,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                                     </div>
                                     <button
                                         type="submit"
-                                        className={`${styles.newsletterArrow} ${(newsletterName.length > 0 || newsletterEmail.length > 0) ? styles.newsletterArrowVisible : ''}`}
+                                        className={`${styles.newsletterArrow} ${newsletterEmail.length > 0 ? styles.newsletterArrowVisible : ''}`}
                                         disabled={newsletterState === 'loading'}
                                     >
                                         {newsletterState === 'loading' ? '…' : <img src="/arrow.svg" alt="→" width={16} height={15} />}

@@ -5,10 +5,10 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req) {
     try {
-        const { email, name } = await req.json();
+        const { email } = await req.json();
 
-        if (!email || !name) {
-            return NextResponse.json({ error: 'E-Mail und Name sind Pflichtfelder.' }, { status: 400 });
+        if (!email) {
+            return NextResponse.json({ error: 'E-Mail ist ein Pflichtfeld.' }, { status: 400 });
         }
         if (!email.includes('@')) {
             return NextResponse.json({ error: 'Ungültige E-Mail-Adresse.' }, { status: 400 });
@@ -19,7 +19,6 @@ export async function POST(req) {
         // 1. Contact anlegen / aktualisieren (idempotent)
         await resend.contacts.create({
             email: email.toLowerCase().trim(),
-            firstName: name.trim(),   // voller Name → in Mails als {{firstName}}
             unsubscribed: false,
         });
 

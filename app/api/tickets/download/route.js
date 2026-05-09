@@ -66,7 +66,7 @@ export async function GET(req) {
             color: rgb(0.1, 0.1, 0.1),
         });
         cursorY -= 20;
-        page.drawText('22. August 2026 · Kiekebusch See', {
+        page.drawText('22. August 2026', {
             x: margin,
             y: cursorY,
             size: 12,
