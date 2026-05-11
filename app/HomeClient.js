@@ -177,14 +177,14 @@ export default function HomeClient({ buyer, orders, tickets }) {
                                     <img src="/fumetto2.png" alt="" className={styles.illustratedBtnImgRight} />
                                 </Link>
                                 <a
-                                    href="https://chat.whatsapp.com/FNgs9Xla6tnL9mphP9juxV?mode=gi_t"
+                                    href="https://t.me/+RjM5ar5Y-Y81MGFi"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className={styles.illustratedBtn}
                                     onClick={playKeyboard}
                                 >
                                     <img src="/cerchio3.png" alt="" className={styles.illustratedBtnCircle} />
-                                    <span className={styles.illustratedBtnLabel}>ENTER WHATSAPP GROUP</span>
+                                    <span className={styles.illustratedBtnLabel}>ENTER TELEGRAM GROUP</span>
                                 </a>
                             </div>
                         </div>
