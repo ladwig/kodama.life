@@ -126,16 +126,24 @@
     align-items: stretch;
     min-height: 90px;
     border: 2px solid #000;
-    /* Scalloped wavy edges left and right using radial-gradient */
-    background:
-        radial-gradient(circle at 0 50%, #8CB2AB 9px, transparent 9px) 0 0 / 18px 18px repeat-y,
-        radial-gradient(circle at 100% 50%, #8CB2AB 9px, transparent 9px) 100% 0 / 18px 18px repeat-y,
-        var(--bg);
+    background: var(--bg);
+    /* CSS mask cuts scalloped semicircles into the left and right edges,
+       shaping the element itself (including its border) into a wavy ticket */
+    -webkit-mask:
+        radial-gradient(circle at 0 50%, transparent 11px, black 11px) 0 0 / 22px 22px repeat-y,
+        radial-gradient(circle at 100% 50%, transparent 11px, black 11px) 100% 0 / 22px 22px repeat-y,
+        linear-gradient(black, black) 22px 0 / calc(100% - 44px) 100% no-repeat;
+    -webkit-mask-composite: destination-over;
+    mask:
+        radial-gradient(circle at 0 50%, transparent 11px, black 11px) 0 0 / 22px 22px repeat-y,
+        radial-gradient(circle at 100% 50%, transparent 11px, black 11px) 100% 0 / 22px 22px repeat-y,
+        linear-gradient(black, black) 22px 0 / calc(100% - 44px) 100% no-repeat;
+    mask-composite: add;
 }
 
 .ticketMain {
     flex: 1;
-    padding: 0.8rem 0.75rem 0.8rem 1.25rem;
+    padding: 0.8rem 0.75rem 0.8rem 1.5rem;
     display: flex;
     flex-direction: column;
     justify-content: center;

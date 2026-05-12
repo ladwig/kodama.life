@@ -354,18 +354,30 @@ export default function HomeClient({ buyer, orders, tickets }) {
                                 <div key={order.id} className={styles.orderBlock}>
                                     <div className={styles.ticketList}>
                                         {orderTickets.map((ticket) => (
-                                            <div key={ticket.id} className={styles.ticketCard}>
-                                                <div className={styles.ticketLeft}>
-                                                    <span className={styles.ticketCode}>{ticket.ticket_code}</span>
-                                                    <span className={styles.ticketHolder}>{ticket.holder_name}</span>
-                                                    <span className={styles.ticketHolder}>{formatPrice(order.price_per_ticket)}</span>
+                                            <div key={ticket.id} style={{ position: 'relative', width: '100%', maxWidth: '380px', margin: '0 auto -6%', aspectRatio: '680 / 340' }}>
+                                                {/* Ticket shape — SVG only, no text */}
+                                                <svg
+                                                    viewBox="0 0 680 340"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                                                >
+                                                    <path
+                                                        d="M 100,40 L 580,40 a 10,10 0 0 1 0,20 a 10,10 0 0 1 0,20 a 10,10 0 0 1 0,20 a 10,10 0 0 1 0,20 a 10,10 0 0 1 0,20 a 30,30 0 0 0 0,60 a 10,10 0 0 1 0,20 a 10,10 0 0 1 0,20 a 10,10 0 0 1 0,20 a 10,10 0 0 1 0,20 a 10,10 0 0 1 0,20 L 100,300 a 10,10 0 0 1 0,-20 a 10,10 0 0 1 0,-20 a 10,10 0 0 1 0,-20 a 10,10 0 0 1 0,-20 a 10,10 0 0 1 0,-20 a 30,30 0 0 0 0,-60 a 10,10 0 0 1 0,-20 a 10,10 0 0 1 0,-20 a 10,10 0 0 1 0,-20 a 10,10 0 0 1 0,-20 a 10,10 0 0 1 0,-20 Z"
+                                                        fill="none" stroke="#000" strokeWidth="3.5"
+                                                    />
+                                                    <rect x="150" y="62" width="380" height="216" fill="none" stroke="#000" strokeWidth="3.5" />
+                                                    <line x1="457" y1="62" x2="457" y2="278" stroke="#000" strokeWidth="3.5" />
+                                                </svg>
+                                                {/* Main area text — positioned as % of ticket */}
+                                                <div style={{ position: 'absolute', left: '26%', top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', gap: '0.2em' }}>
+                                                    <span className={styles.ticketText}>{ticket.holder_name.toUpperCase()}</span>
+                                                    <span className={styles.ticketText}>22. Aug 2026</span>
+                                                    <span className={styles.ticketText}>{formatPrice(order.price_per_ticket)}</span>
                                                 </div>
-                                                <div className={styles.ticketPerfs}>
-                                                    {Array.from({ length: 7 }).map((_, i) => (
-                                                        <span key={i} className={styles.perf} />
-                                                    ))}
+                                                {/* Stub text — rotated, centered in stub area */}
+                                                <div style={{ position: 'absolute', left: '72.5%', top: '50%', transform: 'translate(-50%, -50%) rotate(-90deg)', whiteSpace: 'nowrap' }}>
+                                                    <span className={styles.ticketText}>{ticket.ticket_code}</span>
                                                 </div>
-                                                <div className={styles.ticketRight} />
                                             </div>
                                         ))}
                                     </div>
@@ -373,7 +385,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                             );
                         })}
 
-                        <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'center', marginTop: '-0.25rem', flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem', flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
                             <a
                                 href="#"
                                 onClick={handleDownloadPDF}
