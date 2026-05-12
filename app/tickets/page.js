@@ -195,7 +195,7 @@ export default function TicketsPage() {
                         border: '3px solid #000',
                         boxShadow: 'none',
                         fontWeight: '700',
-                        fontSize: '12px',
+                        fontSize: '16px', /* 16px prevents iOS zoom */
                         backgroundColor: 'transparent',
                     },
                     '.Input:focus': {
