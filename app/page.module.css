@@ -77,6 +77,7 @@
   text-align: center;
   line-height: 1.4;
   transform: rotate(-0.3deg);
+  margin-bottom: 1.8rem;
 }
 
 .description {
@@ -89,6 +90,39 @@
   color: var(--ink-light);
   font-size: 0.9rem;
   line-height: 1.55;
+  position: relative;
+}
+
+.monster {
+  position: absolute;
+  top: -26px;
+  left: 0;
+  width: 36px;
+  height: auto;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 2.5s ease;
+}
+
+.monsterIdle {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.monsterWalking {
+  opacity: 1;
+  pointer-events: none;
+  cursor: default;
+  transition: none;
+  animation: monsterWalk 22s linear forwards;
+}
+
+@keyframes monsterWalk {
+  0%   { left: 0;    opacity: 1; }
+  60%  { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
 }
 
 .illustration {
