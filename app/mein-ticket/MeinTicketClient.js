@@ -66,17 +66,18 @@ export default function MeinTicketClient({ buyer, orders, tickets }) {
                             <div className={styles.ticketList}>
                                 {orderTickets.map((ticket) => (
                                     <div key={ticket.id} className={styles.ticketCard}>
-                                        <div className={styles.ticketCardLeft}>
+                                        <div className={styles.ticketMain}>
+                                            <p className={styles.ticketEvent}>SIDEQUEST</p>
+                                            <p className={styles.ticketName}>{ticket.holder_name}</p>
+                                            <div className={styles.ticketMeta}>
+                                                <span>22. Aug 2026</span>
+                                                <span>{formatPrice(order.price_per_ticket)}</span>
+                                            </div>
+                                        </div>
+                                        <div className={styles.ticketDivider} />
+                                        <div className={styles.ticketStub}>
                                             <span className={styles.ticketCode}>{ticket.ticket_code}</span>
-                                            <span className={styles.ticketHolder}>{ticket.holder_name}</span>
-                                            <span className={styles.ticketHolder}>{formatPrice(order.price_per_ticket)}</span>
                                         </div>
-                                        <div className={styles.ticketPerforations}>
-                                            {Array.from({ length: 8 }).map((_, i) => (
-                                                <span key={i} className={styles.perforation} />
-                                            ))}
-                                        </div>
-                                        <div className={styles.ticketCardRight} />
                                     </div>
                                 ))}
                             </div>

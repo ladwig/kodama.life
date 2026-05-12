@@ -118,86 +118,90 @@
 .ticketList {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
 }
 
 .ticketCard {
     display: flex;
     align-items: stretch;
-    overflow: hidden;
-    border: 3px solid #000;
-    background: transparent;
-    min-height: 72px;
+    min-height: 90px;
+    border: 2px solid #000;
+    /* Scalloped wavy edges left and right using radial-gradient */
+    background:
+        radial-gradient(circle at 0 50%, #8CB2AB 9px, transparent 9px) 0 0 / 18px 18px repeat-y,
+        radial-gradient(circle at 100% 50%, #8CB2AB 9px, transparent 9px) 100% 0 / 18px 18px repeat-y,
+        var(--bg);
 }
 
-.ticketCardLeft {
+.ticketMain {
     flex: 1;
-    padding: 0.75rem 1rem;
-    background: transparent;
+    padding: 0.8rem 0.75rem 0.8rem 1.25rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 0.2rem;
+    gap: 0;
+}
+
+.ticketEvent {
+    font-family: 'Funnel Display', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #000;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    margin: 0;
+}
+
+.ticketName {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Funnel Display', sans-serif;
+    color: #000;
+    opacity: 0.5;
+    margin: 0.25rem 0 0;
+    line-height: 1;
+}
+
+.ticketMeta {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.35rem;
+}
+
+.ticketMeta span {
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'Funnel Display', sans-serif;
+    color: #000;
+    opacity: 0.45;
+    letter-spacing: 0.04em;
+}
+
+/* Dashed divider between main and stub */
+.ticketDivider {
+    width: 0;
+    border-left: 2px dashed rgba(0, 0, 0, 0.25);
+    margin: 10px 0;
+}
+
+.ticketStub {
+    width: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
 }
 
 .ticketCode {
     font-family: 'Funnel Display', sans-serif;
-    font-size: 12px;
+    font-size: 9px;
     font-weight: 700;
     color: #000;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     line-height: 1;
-}
-
-.ticketHolder {
-    font-size: 12px;
-    font-weight: 700;
-    font-family: 'Funnel Display', sans-serif;
-    color: #000;
-    opacity: 0.4;
-}
-
-/* Perforation divider */
-.ticketPerforations {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 6px 0;
-    background: transparent;
-    position: relative;
-}
-
-.ticketPerforations::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: #000;
-}
-
-.perforation {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--bg);
-    border: 3px solid #000;
-    margin: 0 -5px;
-    position: relative;
-    z-index: 1;
-}
-
-.ticketCardRight {
-    width: 48px;
-    background: transparent;
-    border-left: 3px solid #000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.2rem;
-    padding: 0.75rem;
+    opacity: 0.6;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
 }
 
 /* ── Buttons ── */
