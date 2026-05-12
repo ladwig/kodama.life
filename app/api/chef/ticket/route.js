@@ -9,7 +9,7 @@ const resend = (process.env.RESEND_API_KEY && !process.env.RESEND_API_KEY.endsWi
 
 function generateTicketCode() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = 'KOD-';
+    let code = 'SQ-';
     for (let i = 0; i < 4; i++) {
         code += chars[Math.floor(Math.random() * chars.length)];
     }

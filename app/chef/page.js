@@ -6,6 +6,8 @@ import { Html5QrcodeScanner } from 'html5-qrcode';
 export default function ChefPage() {
     const [password, setPassword] = useState('');
     const [authorized, setAuthorized] = useState(false);
+    const [loginError, setLoginError] = useState('');
+    const [loginLoading, setLoginLoading] = useState(false);
     
     // Tabs
     const [activeTab, setActiveTab] = useState('offline');
@@ -134,14 +136,31 @@ export default function ChefPage() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [quantity, setQuantity] = useState(1);
-    const [price, setPrice] = useState(0);
+    const [price, setPrice] = useState(30);
     const [status, setStatus] = useState('');
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        if (password.length > 0) {
-            setAuthorized(true);
-            sessionStorage.setItem('chef_pw', password);
+        setLoginError('');
+        setLoginLoading(true);
+        try {
+            const res = await fetch('/api/chef/guestlist', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+                sessionStorage.setItem('chef_pw', password);
+                setAuthorized(true);
+                updateGuestlist(data.tickets);
+            } else {
+                setLoginError('Wrong password');
+            }
+        } catch {
+            setLoginError('Connection error');
+        } finally {
+            setLoginLoading(false);
         }
     };
 
@@ -238,7 +257,7 @@ export default function ChefPage() {
         let ticketCode = decodedText;
         if (decodedText.includes('ticket_code=')) {
             ticketCode = new URL(decodedText).searchParams.get('ticket_code');
-        } else if (decodedText.startsWith('KOD-')) {
+        } else if (decodedText.startsWith('SQ-') || decodedText.startsWith('KOD-')) {
             ticketCode = decodedText;
         }
 
@@ -399,7 +418,9 @@ export default function ChefPage() {
                         onChange={(e) => setPassword(e.target.value)}
                         style={styles.minimalInput}
                         placeholder="••••••••"
+                        disabled={loginLoading}
                     />
+                    {loginError && <p style={{ color: 'red', margin: '8px 0 0', fontSize: '14px' }}>{loginError}</p>}
                 </form>
             </main>
         );
