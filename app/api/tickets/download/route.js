@@ -58,7 +58,7 @@ export async function GET(req) {
         let cursorY = pageH - margin;
 
         // Draw Header
-        page.drawText('KODAMA', {
+        page.drawText('SIDEQUEST', {
             x: margin,
             y: cursorY,
             size: 24,
@@ -127,7 +127,7 @@ export async function GET(req) {
             status: 200,
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': 'attachment; filename="kodama-tickets.pdf"',
+                'Content-Disposition': 'attachment; filename="sidequest-tickets.pdf"',
             },
         });
 
