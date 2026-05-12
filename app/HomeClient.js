@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './page.module.css';
@@ -17,6 +17,16 @@ export default function HomeClient({ buyer, orders, tickets }) {
 
     const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
     const [monsterState, setMonsterState] = useState('hidden'); // hidden → idle → walking → done
+    const monsterTimers = useRef([]);
+
+    const scheduleMonsterCycle = useCallback(() => {
+        monsterTimers.current.forEach(clearTimeout);
+        monsterTimers.current = [
+            setTimeout(() => setMonsterState('hidden'), 100),
+            setTimeout(() => setMonsterState('idle'), 200),
+            setTimeout(() => setMonsterState(s => s === 'idle' ? 'walking' : s), 10200),
+        ];
+    }, []);
 
     async function handleDownloadPDF(e) {
         e.preventDefault();
@@ -85,6 +95,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
         return () => { clearTimeout(fadeIn); clearTimeout(autoWalk); };
     }, []);
 
+
     return (
         <main className={`${styles.container} ${hasTickets ? styles.containerBuyer : ''}`}>
             {/* Ink splatter dots */}
@@ -118,7 +129,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                             alt=""
                             className={`${styles.monster} ${monsterState === 'idle' ? styles.monsterIdle : ''} ${monsterState === 'walking' ? styles.monsterWalking : ''}`}
                             onClick={() => { if (monsterState === 'idle') setMonsterState('walking'); }}
-                            onAnimationEnd={() => setMonsterState('done')}
+                            onAnimationEnd={() => { setMonsterState('done'); scheduleMonsterCycle(); }}
                         />
                     )}
                     <p>
