@@ -172,9 +172,9 @@ export default function HomeClient({ buyer, orders, tickets }) {
                         <div className={styles.actionContainer}>
                             <div className={styles.illustratedBtns}>
                                 <Link href="/tickets" className={styles.illustratedBtn} onClick={playKeyboard}>
-                                    <img src="/fumetto.png" alt="" className={styles.illustratedBtnImgLeft} />
+                                    <img src="/fire1.png" alt="" className={styles.illustratedBtnImgLeft} />
                                     <span className={styles.illustratedBtnLabel}>BUY TICKET</span>
-                                    <img src="/fumetto2.png" alt="" className={styles.illustratedBtnImgRight} />
+                                    <img src="/fire1.png" alt="" className={styles.illustratedBtnImgRight} />
                                 </Link>
                                 <a
                                     href="https://t.me/+RjM5ar5Y-Y81MGFi"
