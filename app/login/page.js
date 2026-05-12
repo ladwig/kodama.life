@@ -183,6 +183,7 @@ function LoginForm() {
                             value={password}
                             onChange={handleInputChange}
                             className={styles.input}
+                            enterKeyHint="go"
                             required
                         />
                         <button
