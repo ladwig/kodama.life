@@ -326,21 +326,21 @@ export default function HomeClient({ buyer, orders, tickets }) {
                         {buyerFirstName
                             ? `Once a year at the end of August, the monsters set out, ${buyerFirstName}. When the summer starts to tip towards Autumn.`
                             : "Once a year at the end of August, the monsters set out. When the summer starts to tip towards Autumn."}
+                        {' '}They head off on a quest, not entirely sure if or what they are looking for, just a shared thirst for adventure.
                     </p>
                     <p style={{ marginBottom: '1.4rem' }}>
-                        They head off on a quest, not entirely sure if or what they are looking for, just a shared thirst for adventure.
+                        Warmly welcoming other creatures that arrive with kindness and a willingness to share the trail.<br />
+                        No concern for where you came from, what you believe, what you look like, or who you love.
                     </p>
                     <p style={{ marginBottom: '1.4rem' }}>
-                        As they travel, more creatures join along the way. Some arrive loud and fearless, others quiet and uncertain. They never concern themselves with where you came from, what you believe, what you look like, or who you love. They only care that you arrive with kindness and a willingness to share the trail.
-                    </p>
-                    <p style={{ marginBottom: '1.4rem' }}>
-                        The quest develops into strange confessions, big questions, laughter echoing through the trees, moments of unexpected kindness. Someone always falls behind and someone always waits. Pairs and threes wander off to explore side paths and come back with stories.
+                        The quest develops into strange confessions, big questions, laughter echoing through the trees, moments of unexpected kindness. Pairs and threes wander off to explore side paths and come back with stories.
                     </p>
                     <p style={{ marginBottom: '1.4rem' }}>
                         For a little while, the monsters become a village moving, dancing and shaking through the wilderness together.
                     </p>
                     <p>
-                        By the next day the site is quiet again. The paths are empty except for footprints pressed into the dirt and the feeling that something important passed through here together.
+                        By the next day the site is quiet again.<br />
+                        The paths are empty except for footprints pressed into the dirt and the feeling that something important passed through here together.
                     </p>
                 </div>}
 
@@ -402,7 +402,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                                     onMouseLeave={() => setBtnHovered(false)}
                                 >
                                     <FireImg className={styles.illustratedBtnImgLeft} hovered={btnHovered} />
-                                    <span className={styles.illustratedBtnLabel}>BUY TICKET</span>
+                                    <span className={styles.illustratedBtnLabel}>JOIN THE QUEST</span>
                                     <FireImg className={styles.illustratedBtnImgRight} hovered={btnHovered} />
                                 </Link>
                                 <a

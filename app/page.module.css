@@ -169,14 +169,14 @@
 .illustratedBtns {
   display: flex;
   gap: 1rem;
-  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .illustratedBtns {
-    gap: 3rem;
+    flex-direction: column;
+    gap: 2rem;
   }
 }
 
@@ -436,16 +436,10 @@
 }
 
 .successBox {
-  border: 3px solid #000;
-  border-radius: 0;
-  padding: 0 0.75rem;
-  height: 32px;
-  font-family: 'Funnel Display', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  color: #000;
-  display: flex;
-  align-items: center;
+  color: var(--ink-light);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  text-align: center;
 }
 
 .ticketCTA {
