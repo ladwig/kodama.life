@@ -40,7 +40,7 @@ function FireImg({ className, hovered }) {
 
 const COLLISION_IGNORE = new Set(['html', 'body', 'main', 'div', 'section', 'header', 'footer', 'nav']);
 
-function MiniMonster({ startX, startY, direction, onDone }) {
+function MiniMonster({ startX, startY, direction, mobile, onDone }) {
     const wrapRef = useRef(null);
     const imgRef = useRef(null);
     const canvasRef = useRef(null);
@@ -64,11 +64,10 @@ function MiniMonster({ startX, startY, direction, onDone }) {
         let hoverPaused = false;
         let x = startX;
         let y = startY;
-        // More diagonal: 25–55° off horizontal
-        const angleDeg = (25 + Math.random() * 30) * (Math.PI / 180);
+        const angleDeg = mobile ? 0 : (25 + Math.random() * 30) * (Math.PI / 180);
         const speed = 0.38;
         const vx = direction * speed * Math.cos(angleDeg);
-        const vy = (Math.random() < 0.5 ? 1 : -1) * speed * Math.sin(angleDeg);
+        const vy = mobile ? 0 : (Math.random() < 0.5 ? 1 : -1) * speed * Math.sin(angleDeg);
 
         const wrap = wrapRef.current;
         const img = imgRef.current;
@@ -126,7 +125,8 @@ function MiniMonster({ startX, startY, direction, onDone }) {
             if (vy > 0 && rect.bottom >= window.innerHeight) { die(); return; }
             const frontX = vx > 0 ? rect.right + 1 : rect.left - 1;
 
-            // Multi-point collision along leading edge and vertical direction
+            // Multi-point collision along leading edge and vertical direction (desktop only)
+            if (mobile) { raf = requestAnimationFrame(tick); return; }
             const points = [
                 [frontX, rect.top + rect.height * 0.25],
                 [frontX, rect.top + rect.height * 0.55],
@@ -144,11 +144,17 @@ function MiniMonster({ startX, startY, direction, onDone }) {
         wrap?.addEventListener('mouseenter', onMouseEnter);
         wrap?.addEventListener('mouseleave', onMouseLeave);
 
+        if (mobile) setRestMode(true);
         setTimeout(() => { if (alive && wrap) { wrap.style.transition = 'opacity 1.5s ease'; wrap.style.opacity = '1'; } }, 50);
-        raf = requestAnimationFrame(tick);
+        const walkTimer = setTimeout(() => {
+            if (!alive) return;
+            if (mobile) setRestMode(false);
+            raf = requestAnimationFrame(tick);
+        }, mobile ? 5000 : 0);
 
         return () => {
             alive = false;
+            clearTimeout(walkTimer);
             cancelAnimationFrame(raf);
             wrap?.removeEventListener('mouseenter', onMouseEnter);
             wrap?.removeEventListener('mouseleave', onMouseLeave);
@@ -159,7 +165,7 @@ function MiniMonster({ startX, startY, direction, onDone }) {
         <div
             ref={wrapRef}
             style={{
-                position: 'fixed',
+                position: mobile ? 'absolute' : 'fixed',
                 left: startX,
                 top: startY,
                 width: 34,
@@ -176,6 +182,18 @@ function MiniMonster({ startX, startY, direction, onDone }) {
 }
 
 function spawnData(existing = []) {
+    const isMobile = window.innerWidth < 768;
+
+    if (isMobile) {
+        const descEl = document.querySelector('[data-description]');
+        const mainEl = descEl?.closest('main');
+        const descRect = descEl?.getBoundingClientRect();
+        const mainRect = mainEl?.getBoundingClientRect();
+        const startX = descRect && mainRect ? descRect.left - mainRect.left : 0;
+        const startY = descRect && mainRect ? descRect.top - mainRect.top - 22 : window.innerHeight * 0.35;
+        return { id: Math.random(), startX, startY: startY + existing.length * 10, direction: 1, mobile: true };
+    }
+
     const direction = Math.random() < 0.5 ? 1 : -1;
     const W = window.innerWidth;
     const H = window.innerHeight;
@@ -188,10 +206,10 @@ function spawnData(existing = []) {
         if (tooClose) continue;
         const hit = document.elementFromPoint(x + 17, y + 17);
         if (!hit || COLLISION_IGNORE.has(hit.tagName.toLowerCase())) {
-            return { id: Math.random(), startX: x, startY: y, direction };
+            return { id: Math.random(), startX: x, startY: y, direction, mobile: false };
         }
     }
-    return { id: Math.random(), startX: Math.random() * (W - 60) + 10, startY: Math.random() * (H - 60) + 10, direction };
+    return { id: Math.random(), startX: Math.random() * (W - 60) + 10, startY: Math.random() * (H - 60) + 10, direction, mobile: false };
 }
 
 export default function HomeClient({ buyer, orders, tickets }) {
@@ -265,11 +283,14 @@ export default function HomeClient({ buyer, orders, tickets }) {
     }, []);
 
     useEffect(() => {
-        const timers = [
-            setTimeout(() => setMonsters(p => [...p, spawnData(p)]), 600),
-            setTimeout(() => setMonsters(p => [...p, spawnData(p)]), 2200),
-            setTimeout(() => setMonsters(p => [...p, spawnData(p)]), 4000),
-        ];
+        const isMobile = window.innerWidth < 768;
+        const timers = isMobile
+            ? [setTimeout(() => setMonsters(p => [...p, spawnData(p)]), 600)]
+            : [
+                setTimeout(() => setMonsters(p => [...p, spawnData(p)]), 600),
+                setTimeout(() => setMonsters(p => [...p, spawnData(p)]), 2200),
+                setTimeout(() => setMonsters(p => [...p, spawnData(p)]), 4000),
+            ];
         return () => timers.forEach(clearTimeout);
     }, []);
 
@@ -300,20 +321,26 @@ export default function HomeClient({ buyer, orders, tickets }) {
                     <br />
                     outskirts of Berlin
                 </p>
-                {!hasTickets && <div className={styles.description}>
-                    <p>
+                {!hasTickets && <div className={styles.description} data-description="true">
+                    <p style={{ marginBottom: '1.4rem' }}>
                         {buyerFirstName
-                            ? `Some days follow a plan, ${buyerFirstName}, and some days open a small, almost invisible door that you didn't know was there, but step through anyway.`
-                            : "Some days follow a plan, and some days open a small, almost invisible door that you didn't know was there, but step through anyway."}
+                            ? `Once a year at the end of August, the monsters set out, ${buyerFirstName}. When the summer starts to tip towards Autumn.`
+                            : "Once a year at the end of August, the monsters set out. When the summer starts to tip towards Autumn."}
+                    </p>
+                    <p style={{ marginBottom: '1.4rem' }}>
+                        They head off on a quest, not entirely sure if or what they are looking for, just a shared thirst for adventure.
+                    </p>
+                    <p style={{ marginBottom: '1.4rem' }}>
+                        As they travel, more creatures join along the way. Some arrive loud and fearless, others quiet and uncertain. They never concern themselves with where you came from, what you believe, what you look like, or who you love. They only care that you arrive with kindness and a willingness to share the trail.
+                    </p>
+                    <p style={{ marginBottom: '1.4rem' }}>
+                        The quest develops into strange confessions, big questions, laughter echoing through the trees, moments of unexpected kindness. Someone always falls behind and someone always waits. Pairs and threes wander off to explore side paths and come back with stories.
+                    </p>
+                    <p style={{ marginBottom: '1.4rem' }}>
+                        For a little while, the monsters become a village moving, dancing and shaking through the wilderness together.
                     </p>
                     <p>
-                        Sidequest begins exactly there, in that gentle shift, where the light feels a little softer, the air a little curious, and something in the background starts to hum like it&apos;s been waiting for you.
-                    </p>
-                    <p>
-                        You drift, not lost but lightly unassigned, past leaves that seem to whisper, past sounds that feel familiar in a way you can&apos;t quite explain, until you realize you&apos;re moving with people who somehow already speak the same rhythm.
-                    </p>
-                    <p>
-                        Time stretches just enough to notice it loosening, and then you stop noticing altogether, because there&apos;s nothing to hold onto and nothing you need to.
+                        By the next day the site is quiet again. The paths are empty except for footprints pressed into the dirt and the feeling that something important passed through here together.
                     </p>
                 </div>}
 
@@ -437,9 +464,11 @@ export default function HomeClient({ buyer, orders, tickets }) {
                     startX={m.startX}
                     startY={m.startY}
                     direction={m.direction}
+                    mobile={m.mobile}
                     onDone={() => {
                         setMonsters(prev => prev.filter(x => x.id !== m.id));
-                        setTimeout(() => setMonsters(prev => [...prev, spawnData(prev)]), 1500 + Math.random() * 2000);
+                        const delay = m.mobile ? 800 : 1500 + Math.random() * 2000;
+                        setTimeout(() => setMonsters(prev => [...prev, spawnData(prev)]), delay);
                     }}
                 />
             ))}
