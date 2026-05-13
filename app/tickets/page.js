@@ -10,7 +10,7 @@ import {
 } from '@stripe/react-stripe-js';
 import Link from 'next/link';
 import styles from './tickets.module.css';
-import { playKeyboard, preloadSounds, playSuccess } from '@/lib/sounds';
+import { playKeyboard, preloadSounds } from '@/lib/sounds';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 

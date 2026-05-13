@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './page.module.css';
-import { playKeyboard, playSuccess, preloadSounds } from '@/lib/sounds';
+import { playKeyboard, preloadSounds } from '@/lib/sounds';
 
 function formatPrice(cents) {
     return `${(cents / 100).toFixed(0)} €`;
@@ -276,10 +276,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
 
     useEffect(() => {
         preloadSounds();
-        if (sessionStorage.getItem('playSuccess')) {
-            sessionStorage.removeItem('playSuccess');
-            playSuccess();
-        }
+        sessionStorage.removeItem('playSuccess');
     }, []);
 
     useEffect(() => {
