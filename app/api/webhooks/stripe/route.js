@@ -150,13 +150,14 @@ export async function POST(req) {
                 const resendResponse = await resend.emails.send({
                     from: process.env.RESEND_FROM_ADDRESS,
                     to: meta.buyer_email,
-                    subject: '🌿 Dein Kodama-Ticket', // Resend templates sometimes still require a subject param
+                    subject: 'Your sidequest ticket',
                     template: {
                         id: process.env.RESEND_TEMPLATE_TICKET_PURCHASE_CONFIRMATION_ID,
                         variables: {
                             firstName: meta.buyer_name,
                             magicLink,
                             pdfLink,
+                            UNSUBSCRIBE_URL: process.env.RESEND_UNSUBSCRIBE_URL || 'https://kodama.life/unsubscribed',
                             tickets: tickets.map((t) => ({
                                 code: t.ticket_code,
                                 holderName: t.holder_name,
