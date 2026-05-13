@@ -9,13 +9,15 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Password required' }, { status: 400 });
         }
 
-        if (password !== process.env.SITE_PASSWORD) {
+        const validPasswords = (process.env.SITE_PASSWORD || '').split(',').map(p => p.trim()).filter(Boolean);
+        const matched = validPasswords.find(p => p === password);
+        if (!matched) {
             return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
         }
 
-        // Create a hash of the password to store in cookie
+        // Store hash of the matched password in cookie
         const pwHash = createHash('sha256')
-            .update(process.env.SITE_PASSWORD)
+            .update(matched)
             .digest('hex');
 
         const response = NextResponse.json({ success: true });

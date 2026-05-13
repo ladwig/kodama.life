@@ -31,10 +31,10 @@ export default async function Home() {
   const cookieStore = await cookies();
 
   const pwSession = cookieStore.get("pw_session")?.value;
-  const expectedHash = createHash("sha256")
-    .update(process.env.SITE_PASSWORD)
-    .digest("hex");
-  const isLoggedIn = pwSession === expectedHash;
+  const validPasswords = (process.env.SITE_PASSWORD || '').split(',').map(p => p.trim()).filter(Boolean);
+  const isLoggedIn = validPasswords.some(p =>
+    createHash("sha256").update(p).digest("hex") === pwSession
+  );
 
   let buyer = null;
   let orders = [];

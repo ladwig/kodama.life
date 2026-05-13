@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import { createHash } from 'crypto';
 
 export async function GET(req) {
+    const firstPassword = (process.env.SITE_PASSWORD || '').split(',')[0].trim();
     const pwHash = createHash('sha256')
-        .update(process.env.SITE_PASSWORD)
+        .update(firstPassword)
         .digest('hex');
 
     const response = NextResponse.redirect(new URL('/', req.url));
