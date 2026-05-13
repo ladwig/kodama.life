@@ -402,6 +402,39 @@ export default function HomeClient({ buyer, orders, tickets }) {
                 {!hasTickets && (
                     <div className={styles.guestSection}>
                         <div className={styles.actionContainer}>
+                            <div className={styles.newsletterMinimal}>
+                                {newsletterState === 'success' ? (
+                                    <div className={styles.successBox}>
+                                        Signed up. You&apos;ll hear from us when there&apos;s something to say.
+                                    </div>
+                                ) : (
+                                    <form onSubmit={handleNewsletter} className={styles.newsletterForm}>
+                                        <div className={styles.newsletterBox}>
+                                            <div className={styles.newsletterBoxInner}>
+                                                <input
+                                                    id="newsletter-email"
+                                                    type="email"
+                                                    placeholder="Enter email address for updates"
+                                                    value={newsletterEmail}
+                                                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                                                    required
+                                                    className={styles.newsletterInput}
+                                                />
+                                            </div>
+                                            <button
+                                                type="submit"
+                                                className={`${styles.newsletterArrow} ${newsletterEmail.length > 0 ? styles.newsletterArrowVisible : ''}`}
+                                                disabled={newsletterState === 'loading'}
+                                            >
+                                                {newsletterState === 'loading' ? '…' : <img src="/arrow.svg" alt="→" width={16} height={15} />}
+                                            </button>
+                                        </div>
+                                        {newsletterState === 'error' && (
+                                            <p className={styles.errorText}>{newsletterError}</p>
+                                        )}
+                                    </form>
+                                )}
+                            </div>
                             <div className={styles.illustratedBtns}>
                                 <Link
                                     href="/tickets"
@@ -428,43 +461,6 @@ export default function HomeClient({ buyer, orders, tickets }) {
                         </div>
                     </div>
                 )}
-
-                {/* ── Newsletter (always shown) ── */}
-                <div className={styles.actionContainer}>
-                    <div className={styles.newsletterMinimal}>
-                        {newsletterState === 'success' ? (
-                            <div className={styles.successBox}>
-                                Signed up. You&apos;ll hear from us when there&apos;s something to say.
-                            </div>
-                        ) : (
-                            <form onSubmit={handleNewsletter} className={styles.newsletterForm}>
-                                <div className={styles.newsletterBox}>
-                                    <div className={styles.newsletterBoxInner}>
-                                        <input
-                                            id="newsletter-email"
-                                            type="email"
-                                            placeholder="Enter email address for updates"
-                                            value={newsletterEmail}
-                                            onChange={(e) => setNewsletterEmail(e.target.value)}
-                                            required
-                                            className={styles.newsletterInput}
-                                        />
-                                    </div>
-                                    <button
-                                        type="submit"
-                                        className={`${styles.newsletterArrow} ${newsletterEmail.length > 0 ? styles.newsletterArrowVisible : ''}`}
-                                        disabled={newsletterState === 'loading'}
-                                    >
-                                        {newsletterState === 'loading' ? '…' : <img src="/arrow.svg" alt="→" width={16} height={15} />}
-                                    </button>
-                                </div>
-                                {newsletterState === 'error' && (
-                                    <p className={styles.errorText}>{newsletterError}</p>
-                                )}
-                            </form>
-                        )}
-                    </div>
-                </div>
             </div>
 
             {monsters.map(m => (

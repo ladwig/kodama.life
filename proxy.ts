@@ -50,10 +50,12 @@ export async function proxy(req) {
         if (payload?.buyer_email) return NextResponse.next();
     }
 
-    // Check password cookie (compare against sha256 of SITE_PASSWORD)
+    // Check password cookie (compare against sha256 of any valid password)
     if (pwSession && process.env.SITE_PASSWORD) {
-        const pwHash = await sha256Hex(process.env.SITE_PASSWORD);
-        if (pwSession === pwHash) return NextResponse.next();
+        const passwords = process.env.SITE_PASSWORD.split(',').map(p => p.trim()).filter(Boolean);
+        for (const p of passwords) {
+            if (pwSession === await sha256Hex(p)) return NextResponse.next();
+        }
     }
 
     // Redirect to login
