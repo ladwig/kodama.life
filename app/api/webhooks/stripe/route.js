@@ -132,9 +132,7 @@ export async function POST(req) {
         try {
             if (resend) {
                 // 6a. Contact anlegen / aktualisieren (idempotent)
-                // audienceId is required for Resend to auto-inject UNSUBSCRIBE_URL in templates
                 await resend.contacts.create({
-                    audienceId: process.env.RESEND_AUDIENCE_ID,
                     email: meta.buyer_email,
                     firstName: meta.buyer_name,
                     unsubscribed: false,
