@@ -40,7 +40,7 @@ function FireImg({ className, hovered }) {
 
 const COLLISION_IGNORE = new Set(['html', 'body', 'main', 'div', 'section', 'header', 'footer', 'nav']);
 
-function MiniMonster({ startX, startY, direction, mobile, onDone }) {
+function MiniMonster({ startX, startY, direction, mobile, onDone, src: monsterSrc }) {
     const wrapRef = useRef(null);
     const imgRef = useRef(null);
     const canvasRef = useRef(null);
@@ -55,7 +55,7 @@ function MiniMonster({ startX, startY, direction, mobile, onDone }) {
             canvas.height = src.naturalHeight;
             canvas.getContext('2d').drawImage(src, 0, 0);
         };
-        src.src = '/mini-monster1.png';
+        src.src = monsterSrc;
     }, []);
 
     useEffect(() => {
@@ -176,7 +176,7 @@ function MiniMonster({ startX, startY, direction, mobile, onDone }) {
             }}
         >
             <canvas ref={canvasRef} style={{ width: '100%', height: 'auto', display: 'none' }} />
-            <img ref={imgRef} src="/mini-monster1.png" data-monster="true" alt="" style={{ width: '100%', height: 'auto', display: 'block' }} />
+            <img ref={imgRef} src={monsterSrc} data-monster="true" alt="" style={{ width: '100%', height: 'auto', display: 'block' }} />
         </div>
     );
 }
@@ -191,10 +191,11 @@ function spawnData(existing = []) {
         const mainRect = mainEl?.getBoundingClientRect();
         const startX = descRect && mainRect ? descRect.left - mainRect.left : 0;
         const startY = descRect && mainRect ? descRect.top - mainRect.top - 22 : window.innerHeight * 0.35;
-        return { id: Math.random(), startX, startY: startY + existing.length * 10, direction: 1, mobile: true };
+        return { id: Math.random(), startX, startY: startY + existing.length * 10, direction: 1, mobile: true, src: Math.random() < 0.5 ? '/mini-monster1.png' : '/mini-monster2.gif' };
     }
 
     const direction = Math.random() < 0.5 ? 1 : -1;
+    const monsterSrc = Math.random() < 0.5 ? '/mini-monster1.png' : '/mini-monster2.gif';
     const W = window.innerWidth;
     const H = window.innerHeight;
     const MIN_DIST = 150;
@@ -206,10 +207,10 @@ function spawnData(existing = []) {
         if (tooClose) continue;
         const hit = document.elementFromPoint(x + 17, y + 17);
         if (!hit || COLLISION_IGNORE.has(hit.tagName.toLowerCase())) {
-            return { id: Math.random(), startX: x, startY: y, direction, mobile: false };
+            return { id: Math.random(), startX: x, startY: y, direction, mobile: false, src: monsterSrc };
         }
     }
-    return { id: Math.random(), startX: Math.random() * (W - 60) + 10, startY: Math.random() * (H - 60) + 10, direction, mobile: false };
+    return { id: Math.random(), startX: Math.random() * (W - 60) + 10, startY: Math.random() * (H - 60) + 10, direction, mobile: false, src: monsterSrc };
 }
 
 export default function HomeClient({ buyer, orders, tickets }) {
@@ -287,6 +288,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                 setTimeout(() => setMonsters(p => [...p, spawnData(p)]), 600),
                 setTimeout(() => setMonsters(p => [...p, spawnData(p)]), 2200),
                 setTimeout(() => setMonsters(p => [...p, spawnData(p)]), 4000),
+                setTimeout(() => setMonsters(p => [...p, spawnData(p)]), 5800),
             ];
         return () => timers.forEach(clearTimeout);
     }, []);
@@ -470,6 +472,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                     startY={m.startY}
                     direction={m.direction}
                     mobile={m.mobile}
+                    src={m.src}
                     onDone={() => {
                         setMonsters(prev => prev.filter(x => x.id !== m.id));
                         const delay = m.mobile ? 800 : 1500 + Math.random() * 2000;
