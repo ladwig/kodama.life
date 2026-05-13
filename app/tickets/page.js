@@ -309,9 +309,6 @@ export default function TicketsPage() {
                                 Contribution
                                 <span className={styles.priceDisplay}>€{pricePerTicket}</span>
                             </h2>
-                            <p className={styles.priceNote}>
-                                Non-commercial. Bring what feels right.
-                            </p>
                             <input id="price-slider" type="range" min={MIN_PRICE} max={MAX_PRICE}
                                 step={STEP} value={pricePerTicket}
                                 onChange={(e) => setPricePerTicket(Number(e.target.value))}

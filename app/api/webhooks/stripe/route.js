@@ -148,7 +148,7 @@ export async function POST(req) {
 
                 // 6c. Confirmation Mail via Resend Template
                 const resendResponse = await resend.emails.send({
-                    from: process.env.RESEND_FROM_ADDRESS,
+                    from: `sidequest <${process.env.RESEND_FROM_ADDRESS}>`,
                     to: meta.buyer_email,
                     subject: 'Your sidequest ticket',
                     template: {
