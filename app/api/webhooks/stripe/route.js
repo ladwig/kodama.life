@@ -132,9 +132,11 @@ export async function POST(req) {
         try {
             if (resend) {
                 // 6a. Contact anlegen / aktualisieren (idempotent)
+                // audienceId is required for Resend to auto-inject UNSUBSCRIBE_URL in templates
                 await resend.contacts.create({
+                    audienceId: process.env.RESEND_AUDIENCE_ID,
                     email: meta.buyer_email,
-                    firstName: meta.buyer_name,  // voller Name z.B. "Daniel Ladwig" → {{firstName}}
+                    firstName: meta.buyer_name,
                     unsubscribed: false,
                 });
 
@@ -157,7 +159,6 @@ export async function POST(req) {
                             firstName: meta.buyer_name,
                             magicLink,
                             pdfLink,
-                            UNSUBSCRIBE_URL: process.env.RESEND_UNSUBSCRIBE_URL || 'https://kodama.life/unsubscribed',
                             tickets: tickets.map((t) => ({
                                 code: t.ticket_code,
                                 holderName: t.holder_name,
