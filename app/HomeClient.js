@@ -181,6 +181,19 @@ function MiniMonster({ startX, startY, direction, mobile, onDone, src: monsterSr
     );
 }
 
+const MONSTER_SRCS = ['/mini-monster1.png', '/mini-monster2.gif'];
+const lastMonsterSrcs = [];
+
+function pickMonsterSrc() {
+    const available = lastMonsterSrcs.length >= 2 && lastMonsterSrcs[lastMonsterSrcs.length - 1] === lastMonsterSrcs[lastMonsterSrcs.length - 2]
+        ? MONSTER_SRCS.filter(s => s !== lastMonsterSrcs[lastMonsterSrcs.length - 1])
+        : MONSTER_SRCS;
+    const src = available[Math.floor(Math.random() * available.length)];
+    lastMonsterSrcs.push(src);
+    if (lastMonsterSrcs.length > 2) lastMonsterSrcs.shift();
+    return src;
+}
+
 function spawnData(existing = []) {
     const isMobile = window.innerWidth < 768;
 
@@ -191,11 +204,11 @@ function spawnData(existing = []) {
         const mainRect = mainEl?.getBoundingClientRect();
         const startX = descRect && mainRect ? descRect.left - mainRect.left : 0;
         const startY = descRect && mainRect ? descRect.top - mainRect.top - 22 : window.innerHeight * 0.35;
-        return { id: Math.random(), startX, startY: startY + existing.length * 10, direction: 1, mobile: true, src: Math.random() < 0.5 ? '/mini-monster1.png' : '/mini-monster2.gif' };
+        return { id: Math.random(), startX, startY: startY + existing.length * 10, direction: 1, mobile: true, src: pickMonsterSrc() };
     }
 
     const direction = Math.random() < 0.5 ? 1 : -1;
-    const monsterSrc = Math.random() < 0.5 ? '/mini-monster1.png' : '/mini-monster2.gif';
+    const monsterSrc = pickMonsterSrc();
     const W = window.innerWidth;
     const H = window.innerHeight;
     const MIN_DIST = 150;

@@ -34,6 +34,8 @@ function LoginForm() {
     const [arrowWiggling, setArrowWiggling] = useState(false);
     const [particles, setParticles] = useState([]);
     const particleIdRef = useRef(0);
+    const [logoGifs, setLogoGifs] = useState([]);
+    const logoGifIdRef = useRef(0);
 
     const tokenError = searchParams.get('error');
     const idleTimer = useRef(null);
@@ -65,6 +67,7 @@ function LoginForm() {
 
     const logoClickCount = useRef(0);
     const logoClickTimer = useRef(null);
+    const lastGifsRef = useRef([]);
 
     function handleLogoClick(e) {
         logoClickCount.current += 1;
@@ -92,6 +95,20 @@ function LoginForm() {
         setTimeout(() => {
             setParticles(prev => prev.filter(p => !newParticles.some(np => np.id === p.id)));
         }, 3200);
+
+        const GIFS = ['/star1.gif', '/star2.gif', '/spiral.gif'];
+        const last = lastGifsRef.current;
+        const available = last.length >= 2 && last[last.length - 1] === last[last.length - 2]
+            ? GIFS.filter(g => g !== last[last.length - 1])
+            : GIFS;
+        const gifSrc = available[Math.floor(Math.random() * available.length)];
+        lastGifsRef.current = [...last.slice(-1), gifSrc];
+        const angle = Math.random() * Math.PI * 2;
+        const extra = Math.random() * 30;
+        const gifX = logoRect.left + logoRect.width / 2 + Math.cos(angle) * (logoRect.width / 2 + 20 + extra);
+        const gifY = logoRect.top + logoRect.height / 2 + Math.sin(angle) * (logoRect.height / 2 + 20 + extra);
+        const gifId = ++logoGifIdRef.current;
+        setLogoGifs(prev => [...prev, { id: gifId, x: gifX, y: gifY, src: gifSrc }]);
 
         if (logoClickCount.current >= 7) {
             logoClickCount.current = 0;
@@ -134,6 +151,23 @@ function LoginForm() {
 
     return (
         <main className={styles.container}>
+            {logoGifs.map(g => (
+                <img
+                    key={g.id}
+                    src={g.src}
+                    alt=""
+                    style={{
+                        position: 'fixed',
+                        left: g.x,
+                        top: g.y,
+                        width: 28,
+                        height: 28,
+                        transform: 'translate(-50%, -50%)',
+                        pointerEvents: 'none',
+                        zIndex: 100,
+                    }}
+                />
+            ))}
             {particles.map(p => (
                 <div
                     key={p.id}
