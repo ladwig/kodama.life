@@ -103,10 +103,21 @@ function LoginForm() {
             : GIFS;
         const gifSrc = available[Math.floor(Math.random() * available.length)];
         lastGifsRef.current = [...last.slice(-1), gifSrc];
-        const angle = Math.random() * Math.PI * 2;
-        const extra = Math.random() * 30;
-        const gifX = logoRect.left + logoRect.width / 2 + Math.cos(angle) * (logoRect.width / 2 + 20 + extra);
-        const gifY = logoRect.top + logoRect.height / 2 + Math.sin(angle) * (logoRect.height / 2 + 20 + extra);
+        const GIF_SIZE = 38;
+        const IGNORE = new Set(['html', 'body', 'main', 'div', 'section']);
+        let gifX, gifY, placed = false;
+        for (let attempt = 0; attempt < 40; attempt++) {
+            const angle = Math.random() * Math.PI * 2;
+            const extra = Math.random() * 60;
+            const cx = logoRect.left + logoRect.width / 2 + Math.cos(angle) * (logoRect.width / 2 + 50 + extra);
+            const cy = logoRect.top + logoRect.height / 2 + Math.sin(angle) * (logoRect.height / 2 + 50 + extra);
+            if (cx < GIF_SIZE || cx > window.innerWidth - GIF_SIZE || cy < GIF_SIZE || cy > window.innerHeight - GIF_SIZE) continue;
+            const el = document.elementFromPoint(cx, cy);
+            if (el && IGNORE.has(el.tagName.toLowerCase())) {
+                gifX = cx; gifY = cy; placed = true; break;
+            }
+        }
+        if (!placed) return;
         const gifId = ++logoGifIdRef.current;
         setLogoGifs(prev => [...prev, { id: gifId, x: gifX, y: gifY, src: gifSrc }]);
 
@@ -160,8 +171,8 @@ function LoginForm() {
                         position: 'fixed',
                         left: g.x,
                         top: g.y,
-                        width: 28,
-                        height: 28,
+                        width: 38,
+                        height: 38,
                         transform: 'translate(-50%, -50%)',
                         pointerEvents: 'none',
                         zIndex: 100,
