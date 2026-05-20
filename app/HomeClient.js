@@ -9,23 +9,7 @@ import { playKeyboard, preloadSounds } from '@/lib/sounds';
 const FAQ_ITEMS = [
     {
         q: 'Where exactly is the location?',
-        a: 'The exact coordinates are shared with ticket holders a week before the event. It\'s within easy reach of Berlin — plan for about an hour by car or a combination of train and walking.',
-    },
-    {
-        q: 'What should I bring?',
-        a: 'Tent, sleeping bag, clothes for warmth and rain, sturdy shoes, a torch, and whatever you need to feel comfortable sleeping outdoors. Food and drink are provided through the night.',
-    },
-    {
-        q: 'Is this a music festival?',
-        a: 'There is music, but that\'s not the point. Think of it more as a moving gathering — a long walk through the night with strangers who become less strange.',
-    },
-    {
-        q: 'Who is this for?',
-        a: 'Anyone who\'s curious, kind, and up for something a little unscripted. No special fitness level required. Children are welcome if they\'re yours and you\'re watching them.',
-    },
-    {
-        q: 'Can I come alone?',
-        a: 'Yes — many people do. You won\'t be for long.',
+        a: 'The exact location is shared with ticket holders closer to the event. It\'s easy to reach by public transport and a short walk, or a quick Uber.',
     },
 ];
 
