@@ -6,6 +6,53 @@ import Link from 'next/link';
 import styles from './page.module.css';
 import { playKeyboard, preloadSounds } from '@/lib/sounds';
 
+const FAQ_ITEMS = [
+    {
+        q: 'Where exactly is the location?',
+        a: 'The exact coordinates are shared with ticket holders a week before the event. It\'s within easy reach of Berlin — plan for about an hour by car or a combination of train and walking.',
+    },
+    {
+        q: 'What should I bring?',
+        a: 'Tent, sleeping bag, clothes for warmth and rain, sturdy shoes, a torch, and whatever you need to feel comfortable sleeping outdoors. Food and drink are provided through the night.',
+    },
+    {
+        q: 'Is this a music festival?',
+        a: 'There is music, but that\'s not the point. Think of it more as a moving gathering — a long walk through the night with strangers who become less strange.',
+    },
+    {
+        q: 'Who is this for?',
+        a: 'Anyone who\'s curious, kind, and up for something a little unscripted. No special fitness level required. Children are welcome if they\'re yours and you\'re watching them.',
+    },
+    {
+        q: 'Can I come alone?',
+        a: 'Yes — many people do. You won\'t be for long.',
+    },
+];
+
+function FAQ() {
+    const [open, setOpen] = useState(null);
+    return (
+        <div className={styles.faq}>
+            {FAQ_ITEMS.map((item, i) => (
+                <div key={i} className={styles.faqItem}>
+                    <button
+                        className={styles.faqTitle}
+                        onClick={() => setOpen(open === i ? null : i)}
+                        aria-expanded={open === i}
+                    >
+                        {item.q}
+                        <span className={styles.faqChevron} aria-hidden="true">{open === i ? '−' : '+'}</span>
+                    </button>
+                    <div className={styles.faqLine} />
+                    {open === i && (
+                        <p className={styles.faqBody}>{item.a}</p>
+                    )}
+                </div>
+            ))}
+        </div>
+    );
+}
+
 function formatPrice(cents) {
     return `${(cents / 100).toFixed(0)} €`;
 }
@@ -333,7 +380,41 @@ export default function HomeClient({ buyer, orders, tickets }) {
                     <br />
                     outskirts of Berlin
                 </p>
-                {!hasTickets && <div className={styles.description} data-description="true">
+                {!hasTickets && <>
+                <div className={styles.newsletterMinimal}>
+                    {newsletterState === 'success' ? (
+                        <div className={styles.successBox}>
+                            Signed up. You&apos;ll hear from us when there&apos;s something to say.
+                        </div>
+                    ) : (
+                        <form onSubmit={handleNewsletter} className={styles.newsletterForm}>
+                            <div className={styles.newsletterBox}>
+                                <div className={styles.newsletterBoxInner}>
+                                    <input
+                                        id="newsletter-email"
+                                        type="email"
+                                        placeholder="Enter email address for updates"
+                                        value={newsletterEmail}
+                                        onChange={(e) => setNewsletterEmail(e.target.value)}
+                                        required
+                                        className={styles.newsletterInput}
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    className={`${styles.newsletterArrow} ${newsletterEmail.length > 0 ? styles.newsletterArrowVisible : ''}`}
+                                    disabled={newsletterState === 'loading'}
+                                >
+                                    {newsletterState === 'loading' ? '…' : <img src="/arrow.svg" alt="→" width={16} height={15} />}
+                                </button>
+                            </div>
+                            {newsletterState === 'error' && (
+                                <p className={styles.errorText}>{newsletterError}</p>
+                            )}
+                        </form>
+                    )}
+                </div>
+                <div className={styles.description} data-description="true">
                     <p style={{ marginBottom: '1.4rem' }}>
                         {buyerFirstName
                             ? `Once a year at the end of August, the monsters set out, ${buyerFirstName}. When the summer starts to tip towards Autumn.`
@@ -354,7 +435,8 @@ export default function HomeClient({ buyer, orders, tickets }) {
                         By the next day the site is quiet again.<br />
                         The paths are empty except for footprints pressed into the dirt and the feeling that something important passed through here together.
                     </p>
-                </div>}
+                </div>
+                </>}
 
                 {/* ── Has tickets ── */}
                 {hasTickets && (
@@ -417,39 +499,6 @@ export default function HomeClient({ buyer, orders, tickets }) {
                 {!hasTickets && (
                     <div className={styles.guestSection}>
                         <div className={styles.actionContainer}>
-                            <div className={styles.newsletterMinimal}>
-                                {newsletterState === 'success' ? (
-                                    <div className={styles.successBox}>
-                                        Signed up. You&apos;ll hear from us when there&apos;s something to say.
-                                    </div>
-                                ) : (
-                                    <form onSubmit={handleNewsletter} className={styles.newsletterForm}>
-                                        <div className={styles.newsletterBox}>
-                                            <div className={styles.newsletterBoxInner}>
-                                                <input
-                                                    id="newsletter-email"
-                                                    type="email"
-                                                    placeholder="Enter email address for updates"
-                                                    value={newsletterEmail}
-                                                    onChange={(e) => setNewsletterEmail(e.target.value)}
-                                                    required
-                                                    className={styles.newsletterInput}
-                                                />
-                                            </div>
-                                            <button
-                                                type="submit"
-                                                className={`${styles.newsletterArrow} ${newsletterEmail.length > 0 ? styles.newsletterArrowVisible : ''}`}
-                                                disabled={newsletterState === 'loading'}
-                                            >
-                                                {newsletterState === 'loading' ? '…' : <img src="/arrow.svg" alt="→" width={16} height={15} />}
-                                            </button>
-                                        </div>
-                                        {newsletterState === 'error' && (
-                                            <p className={styles.errorText}>{newsletterError}</p>
-                                        )}
-                                    </form>
-                                )}
-                            </div>
                             <div className={styles.illustratedBtns}>
                                 <Link
                                     href="/tickets"
@@ -476,6 +525,8 @@ export default function HomeClient({ buyer, orders, tickets }) {
                         </div>
                     </div>
                 )}
+
+                {!hasTickets && <FAQ />}
             </div>
 
             {monsters.map(m => (
