@@ -31,6 +31,26 @@ const PUBLIC_PATHS = [
 export async function proxy(req) {
     const { pathname } = req.nextUrl;
 
+    // Handle /secret=<password> URLs — set session cookie and redirect to /
+    if (pathname.startsWith('/secret=')) {
+        const pw = pathname.slice('/secret='.length);
+        const validPasswords = (process.env.SITE_PASSWORD || '').split(',').map(p => p.trim()).filter(Boolean);
+        const matched = validPasswords.find(p => p === pw);
+        if (matched) {
+            const pwHash = await sha256Hex(matched);
+            const response = NextResponse.redirect(new URL('/', req.url));
+            response.cookies.set('pw_session', pwHash, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'lax',
+                maxAge: 60 * 60 * 24 * 30,
+                path: '/',
+            });
+            return response;
+        }
+        return NextResponse.redirect(new URL('/login', req.url));
+    }
+
     // Allow public routes and static assets
     if (
         PUBLIC_PATHS.some((p) => pathname.startsWith(p)) ||
