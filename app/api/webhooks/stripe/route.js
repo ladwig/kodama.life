@@ -132,18 +132,26 @@ export async function POST(req) {
         try {
             if (resend) {
                 // 6a. Contact anlegen / aktualisieren (idempotent)
-                await resend.contacts.create({
-                    email: meta.buyer_email,
-                    firstName: meta.buyer_name,
-                    unsubscribed: false,
-                });
+                try {
+                    await resend.contacts.create({
+                        email: meta.buyer_email,
+                        firstName: meta.buyer_name,
+                        unsubscribed: false,
+                    });
+                } catch (contactErr) {
+                    console.warn('[webhook] Contact create failed (non-fatal):', contactErr.message);
+                }
 
                 // 6b. In "Ticket Holders" Segment eintragen
                 if (process.env.RESEND_SEGMENT_TICKET_HOLDERS_ID) {
-                    await resend.contacts.segments.add({
-                        email: meta.buyer_email,
-                        segmentId: process.env.RESEND_SEGMENT_TICKET_HOLDERS_ID,
-                    });
+                    try {
+                        await resend.contacts.segments.add({
+                            email: meta.buyer_email,
+                            segmentId: process.env.RESEND_SEGMENT_TICKET_HOLDERS_ID,
+                        });
+                    } catch (segErr) {
+                        console.warn('[webhook] Segment add failed (non-fatal):', segErr.message);
+                    }
                 }
 
                 // 6c. Confirmation Mail via Resend Template
@@ -159,7 +167,7 @@ export async function POST(req) {
                             pdfLink,
                             tickets: tickets.map((t) => ({
                                 code: t.ticket_code,
-                                holderName: t.holder_name,
+                                holderName: t.holder_name || meta.buyer_name,
                                 qrUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${t.ticket_code}`,
                             })),
                         },
@@ -167,7 +175,7 @@ export async function POST(req) {
                 });
 
                 if (resendResponse.error) {
-                    console.error('[webhook] Resend email failed:', resendResponse.error);
+                    console.error('[webhook] Resend email failed:', JSON.stringify(resendResponse.error));
                 } else {
                     console.log('[webhook] Confirmation email sent to', meta.buyer_email, '| ID:', resendResponse.data?.id);
                 }
