@@ -15,8 +15,6 @@ import { playKeyboard, preloadSounds } from '@/lib/sounds';
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 const MIN_PRICE = 30;
-const MAX_PRICE = 100;
-const STEP = 5;
 const MAX_QUANTITY = 10;
 
 // ─── Payment Screen ───────────────────────────────────────────────────────
@@ -97,7 +95,8 @@ export default function TicketsPage() {
     const [buyerEmail, setBuyerEmail] = useState('');
     const [buyerPhone, setBuyerPhone] = useState('');
     const [quantity, setQuantity] = useState(1);
-    const [pricePerTicket, setPricePerTicket] = useState(MIN_PRICE);
+    const [donation, setDonation] = useState(0);
+    const pricePerTicket = MIN_PRICE + donation;
     const [holderNames, setHolderNames] = useState(['']);
     const [holder0Touched, setHolder0Touched] = useState(false);
 
@@ -306,21 +305,19 @@ export default function TicketsPage() {
 
                         <section className={styles.section}>
                             <h2 className={styles.sectionTitle}>
-                                Contribution
+                                Ticket Price
                                 <span className={styles.priceDisplay}>€{pricePerTicket}</span>
                             </h2>
-                            <input id="price-slider" type="range" min={MIN_PRICE} max={MAX_PRICE}
-                                step={STEP} value={pricePerTicket}
-                                onChange={(e) => setPricePerTicket(Number(e.target.value))}
-                                className={styles.slider} />
-                            <div className={styles.sliderLabels}>
-                                <span>€{MIN_PRICE}</span><span>€{MAX_PRICE}</span>
-                            </div>
+                            <p className={styles.selfFundedNote}>
+                                Kodama is a self-funded, community-driven project. It only happens through donations and volunteering — there are no sponsors, no investors, just people who care.
+                            </p>
                             <div className={styles.priceSteps}>
-                                {[30, 40, 50, 75, 100].map((p) => (
-                                    <button key={p} type="button"
-                                        className={`${styles.priceStep} ${pricePerTicket === p ? styles.priceStepActive : ''}`}
-                                        onClick={() => { playKeyboard(); setPricePerTicket(p); }}>€{p}</button>
+                                {[0, 5, 10, 15, 20, 25, 30].map((d) => (
+                                    <button key={d} type="button"
+                                        className={`${styles.priceStep} ${donation === d ? styles.priceStepActive : ''}`}
+                                        onClick={() => { playKeyboard(); setDonation(d); }}>
+                                        {d === 0 ? '€30' : `€${MIN_PRICE + d}`}
+                                    </button>
                                 ))}
                             </div>
                         </section>
