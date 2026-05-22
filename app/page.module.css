@@ -287,6 +287,19 @@
   opacity: 0.15;
 }
 
+.faqImages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.faqImage {
+  width: calc(33.333% - 0.27rem);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
 .faqBody {
   font-family: 'Funnel Display', sans-serif;
   font-size: 0.9rem;

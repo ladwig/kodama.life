@@ -10,6 +10,7 @@ const FAQ_ITEMS = [
     {
         q: 'Where exactly is the location?',
         a: 'The exact location is shared with ticket holders closer to the event. It\'s easy to reach by public transport and a short walk, or a shared Uber. Expect lots of trees, nature, and a little lake nearby.',
+        images: ['/location/location-1.webp', '/location/location-2.webp', '/location/location-3.webp', '/location/location-4.webp', '/location/location-5.webp', '/location/location-6.webp'],
     },
     {
         q: 'What\'s the idea behind this?',
@@ -26,6 +27,10 @@ const FAQ_ITEMS = [
     {
         q: 'Is there food and drinks?',
         a: 'Alcoholic and non-alcoholic drinks are available throughout the whole event, plus snacks and food to keep you going. The bar is also how we partly finance the whole thing, so grab a drink. And if you want to bring your own meal prep, go for it.',
+    },
+    {
+        q: 'Cash or card?',
+        a: 'Card, Apple Pay and Google Pay only. No cash.',
     },
     {
         q: 'Can I camp?',
@@ -49,7 +54,16 @@ function FAQ() {
                     </button>
                     <div className={styles.faqLine} />
                     {open === i && (
-                        <p className={styles.faqBody}>{item.a}</p>
+                        <div className={styles.faqBody}>
+                            <p style={{ margin: 0 }}>{item.a}</p>
+                            {item.images && (
+                                <div className={styles.faqImages}>
+                                    {item.images.map((src, j) => (
+                                        <img key={j} src={src} alt="" className={styles.faqImage} />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     )}
                 </div>
             ))}
