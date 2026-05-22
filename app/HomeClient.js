@@ -33,6 +33,10 @@ const FAQ_ITEMS = [
         a: 'Card, Apple Pay and Google Pay only. No cash.',
     },
     {
+        q: 'Can I volunteer?',
+        a: 'Yes! We need a few people to help us run things. In return you get a free ticket and the good feeling of supporting a cool project. If you are interested, get in touch.',
+    },
+    {
         q: 'Can I camp?',
         a: 'No camping, but you are welcome to stay as long as you want. Bring a hammock or use our chill areas if you need a rest.',
     },
