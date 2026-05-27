@@ -3,6 +3,7 @@ import { NEWSLETTERS } from '@/lib/newsletters';
 import NewsletterFAQ from './NewsletterFAQ';
 import IllustratedButtons from '@/app/components/IllustratedButtons';
 import MiniMonsters from '@/app/components/MiniMonsters';
+import NewsletterSignup from '@/app/components/NewsletterSignup';
 import styles from './newsletter.module.css';
 
 export default async function NewsletterPage({ params }) {
@@ -46,6 +47,8 @@ export default async function NewsletterPage({ params }) {
                     }
                     return null;
                 })}
+
+                <NewsletterSignup />
 
                 <div className={styles.ctaWrap}>
                     <IllustratedButtons ticketHref="/api/auth/magic?redirect=/tickets" />
