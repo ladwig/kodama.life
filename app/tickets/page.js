@@ -327,7 +327,7 @@ export default function TicketsPage() {
                                 <span className={styles.priceDisplay}>€{pricePerTicket}</span>
                             </h2>
                             <p className={styles.selfFundedNote}>
-                                Sidequest is a self-funded, community-driven project. It only happens through donations and volunteering — there are no sponsors, no investors, just people who care.
+                                sidequest is a self-funded, community-driven project. It only happens through donations and volunteering.
                             </p>
                             <div className={styles.priceSteps}>
                                 {[0, 5, 10, 15, 20, 25, 30].map((d) => (
