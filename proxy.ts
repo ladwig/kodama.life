@@ -24,6 +24,7 @@ const PUBLIC_PATHS = [
     '/api/confirmation/status',
     '/unsubscribed',
     '/confirmation',
+    '/newsletters',
 ];
 
 
