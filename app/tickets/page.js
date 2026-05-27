@@ -100,6 +100,7 @@ export default function TicketsPage() {
     const [holderNames, setHolderNames] = useState(['']);
     const [holder0Touched, setHolder0Touched] = useState(false);
 
+    const [groupDeal, setGroupDeal] = useState(false);
     const [step, setStep] = useState('form'); // 'form' | 'payment'
     const [clientSecret, setClientSecret] = useState('');
     const [loading, setLoading] = useState(false);
@@ -125,7 +126,14 @@ export default function TicketsPage() {
         }
     }, [buyerName, holder0Touched]);
 
-    const total = quantity * pricePerTicket;
+    const billedQuantity = groupDeal ? quantity - 1 : quantity;
+    const total = billedQuantity * pricePerTicket;
+
+    function handleGroupDeal(checked) {
+        setGroupDeal(checked);
+        if (checked) setQuantity(5);
+        else setQuantity(1);
+    }
 
     function updateHolder(idx, val) {
         if (idx === 0) setHolder0Touched(true);
@@ -152,6 +160,7 @@ export default function TicketsPage() {
                     quantity,
                     price_per_ticket: pricePerTicket * 100,
                     ticket_holders: holderNames,
+                    group_deal: groupDeal,
                 }),
             });
 
@@ -284,12 +293,21 @@ export default function TicketsPage() {
                                 <span className={styles.sectionTitle}>How many</span>
                                 <button type="button" className={styles.stepperBtn}
                                     onClick={() => { playKeyboard(); setQuantity((q) => Math.max(1, q - 1)); }}
-                                    disabled={quantity <= 1} aria-label="Less">−</button>
+                                    disabled={quantity <= 1 || groupDeal} aria-label="Less">−</button>
                                 <span className={styles.stepperValue}>{quantity}</span>
                                 <button type="button" className={styles.stepperBtn}
                                     onClick={() => { playKeyboard(); setQuantity((q) => Math.min(MAX_QUANTITY, q + 1)); }}
-                                    disabled={quantity >= MAX_QUANTITY} aria-label="More">+</button>
+                                    disabled={quantity >= MAX_QUANTITY || groupDeal} aria-label="More">+</button>
                             </div>
+                            <label className={styles.groupDealRow}>
+                                <input
+                                    type="checkbox"
+                                    checked={groupDeal}
+                                    onChange={(e) => { playKeyboard(); handleGroupDeal(e.target.checked); }}
+                                    className={styles.groupDealCheck}
+                                />
+                                <span>Group · 5 persons · 1 free</span>
+                            </label>
                         </section>
 
                         <section className={styles.section}>
@@ -325,7 +343,11 @@ export default function TicketsPage() {
                         {formError && <p className={styles.errorText}>{formError}</p>}
 
                         <button type="submit" id="order-btn" className="btn-raw btn-raw-full" disabled={loading} onClick={playKeyboard}>
-                            {loading ? 'One moment…' : `Join · €${total}`}
+                            {loading ? 'One moment…' : (
+                                groupDeal
+                                    ? <>Join · <s>€{quantity * pricePerTicket}</s>{' '}€{total}</>
+                                    : `Join · €${total}`
+                            )}
                         </button>
                     </form>
                 )}

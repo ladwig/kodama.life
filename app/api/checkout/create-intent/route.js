@@ -11,7 +11,7 @@ const EVENT_DATE = '2026-08-22';
 export async function POST(req) {
     try {
         const body = await req.json();
-        const { buyer_name, buyer_email, buyer_phone, quantity, price_per_ticket, ticket_holders } = body;
+        const { buyer_name, buyer_email, buyer_phone, quantity, price_per_ticket, ticket_holders, group_deal } = body;
 
         // Validation
         if (!buyer_name || !buyer_email) {
@@ -35,8 +35,11 @@ export async function POST(req) {
         if (ticket_holders.some((name) => !name?.trim())) {
             return NextResponse.json({ error: 'Alle Ticket-Inhaber müssen einen Namen haben.' }, { status: 400 });
         }
+        if (group_deal && quantity !== 5) {
+            return NextResponse.json({ error: 'Gruppenticket ist nur für genau 5 Personen.' }, { status: 400 });
+        }
 
-        const total = quantity * price_per_ticket;
+        const total = group_deal ? (quantity - 1) * price_per_ticket : quantity * price_per_ticket;
 
         // Check if buyer is a newsletter subscriber (for pre-fill info)
         const supabase = getSupabaseAdmin();
@@ -59,6 +62,7 @@ export async function POST(req) {
                 quantity: String(quantity),
                 price_per_ticket: String(price_per_ticket),
                 event_date: EVENT_DATE,
+                group_deal: group_deal ? 'true' : 'false',
                 ticket_holders: JSON.stringify(ticket_holders.map((h) => h.trim())),
             },
             automatic_payment_methods: { enabled: true },

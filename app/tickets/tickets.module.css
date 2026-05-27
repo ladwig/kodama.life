@@ -161,6 +161,52 @@
     text-align: center;
 }
 
+/* ── Group Deal ── */
+.groupDealRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-family: 'Funnel Display', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #000;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 0.25rem;
+    user-select: none;
+}
+
+.groupDealCheck {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border: 3px solid #000;
+    border-radius: 2px;
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.groupDealCheck:checked {
+    background: #000;
+}
+
+.groupDealCheck:checked::after {
+    content: '';
+    position: absolute;
+    top: 0px;
+    left: 2px;
+    width: 4px;
+    height: 7px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg);
+}
+
 /* ── Pricing ── */
 .priceDisplay {
     font-size: 12px;
