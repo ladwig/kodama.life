@@ -48,7 +48,7 @@ export default async function NewsletterPage({ params }) {
                 })}
 
                 <div className={styles.ctaWrap}>
-                    <IllustratedButtons />
+                    <IllustratedButtons ticketHref="/api/auth/magic?redirect=/tickets" />
                 </div>
 
                 <NewsletterFAQ />

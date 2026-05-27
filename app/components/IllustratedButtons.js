@@ -6,13 +6,13 @@ import FireImg from './FireImg';
 import { playKeyboard } from '@/lib/sounds';
 import styles from './IllustratedButtons.module.css';
 
-export default function IllustratedButtons() {
+export default function IllustratedButtons({ ticketHref = '/tickets' }) {
     const [btnHovered, setBtnHovered] = useState(false);
 
     return (
         <div className={styles.illustratedBtns}>
             <Link
-                href="/tickets"
+                href={ticketHref}
                 className={styles.illustratedBtn}
                 onClick={playKeyboard}
                 onMouseEnter={() => setBtnHovered(true)}
