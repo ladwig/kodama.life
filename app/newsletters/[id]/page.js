@@ -23,6 +23,8 @@ export default async function NewsletterPage({ params }) {
                     />
                 </div>
 
+                <NewsletterSignup />
+
                 <p className={styles.date}>{newsletter.date}</p>
 
                 {newsletter.content.map((block, i) => {
@@ -47,8 +49,6 @@ export default async function NewsletterPage({ params }) {
                     }
                     return null;
                 })}
-
-                <NewsletterSignup />
 
                 <div className={styles.ctaWrap}>
                     <IllustratedButtons ticketHref="/api/auth/magic?redirect=/tickets" />
