@@ -42,9 +42,9 @@ export default async function NewsletterPage({ params }) {
                     return null;
                 })}
 
-                <IllustratedButtons />
-
-                <hr className={styles.divider} />
+                <div className={styles.ctaWrap}>
+                    <IllustratedButtons />
+                </div>
 
                 <NewsletterFAQ />
             </div>
