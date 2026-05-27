@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
 import { NEWSLETTERS } from '@/lib/newsletters';
 import NewsletterFAQ from './NewsletterFAQ';
+import IllustratedButtons from '@/app/components/IllustratedButtons';
 import styles from './newsletter.module.css';
 
 export default async function NewsletterPage({ params }) {
@@ -42,19 +42,7 @@ export default async function NewsletterPage({ params }) {
                     return null;
                 })}
 
-                <div className={styles.ctaRow}>
-                    <a
-                        href="https://t.me/+RjM5ar5Y-Y81MGFi"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.ctaBtn}
-                    >
-                        Join Telegram
-                    </a>
-                    <Link href="/tickets" className={`${styles.ctaBtn} ${styles.ctaBtnPrimary}`}>
-                        Get your ticket
-                    </Link>
-                </div>
+                <IllustratedButtons />
 
                 <hr className={styles.divider} />
 
