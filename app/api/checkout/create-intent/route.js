@@ -35,8 +35,8 @@ export async function POST(req) {
         if (ticket_holders.some((name) => !name?.trim())) {
             return NextResponse.json({ error: 'Alle Ticket-Inhaber müssen einen Namen haben.' }, { status: 400 });
         }
-        if (group_deal && quantity !== 5) {
-            return NextResponse.json({ error: 'Gruppenticket ist nur für genau 5 Personen.' }, { status: 400 });
+        if (group_deal && quantity !== 4) {
+            return NextResponse.json({ error: 'Gruppenticket ist nur für genau 4 Personen.' }, { status: 400 });
         }
 
         const total = group_deal ? (quantity - 1) * price_per_ticket : quantity * price_per_ticket;

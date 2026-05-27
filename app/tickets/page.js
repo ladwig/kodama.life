@@ -131,7 +131,7 @@ export default function TicketsPage() {
 
     function handleGroupDeal(checked) {
         setGroupDeal(checked);
-        if (checked) setQuantity(5);
+        if (checked) setQuantity(4);
         else setQuantity(1);
     }
 
@@ -306,7 +306,7 @@ export default function TicketsPage() {
                                     onChange={(e) => { playKeyboard(); handleGroupDeal(e.target.checked); }}
                                     className={styles.groupDealCheck}
                                 />
-                                <span>Group · 5 persons · 1 free</span>
+                                <span>Group · 4 for the price of 3</span>
                             </label>
                         </section>
 
