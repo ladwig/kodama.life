@@ -111,7 +111,7 @@ function MiniMonster({ startX, startY, direction, mobile, onDone, src: monsterSr
             if (!alive) return;
             if (mobile) setRestMode(false);
             raf = requestAnimationFrame(tick);
-        }, mobile ? 5000 : 0);
+        }, mobile ? 2000 : 0);
 
         return () => {
             alive = false;
