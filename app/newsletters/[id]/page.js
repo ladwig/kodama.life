@@ -26,9 +26,12 @@ export default async function NewsletterPage({ params }) {
 
                 {newsletter.content.map((block, i) => {
                     if (block.type === 'text') {
+                        const content = block.segments
+                            ? block.segments.map((s, j) => s.bold ? <strong key={j}>{s.text}</strong> : s.text)
+                            : block.italic ? <em>{block.text}</em> : block.text;
                         return (
                             <p key={i} className={styles.paragraph} {...(i === 0 ? { 'data-description': 'true' } : {})}>
-                                {block.italic ? <em>{block.text}</em> : block.text}
+                                {content}
                             </p>
                         );
                     }
