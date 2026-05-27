@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { NEWSLETTERS } from '@/lib/newsletters';
 import NewsletterFAQ from './NewsletterFAQ';
 import IllustratedButtons from '@/app/components/IllustratedButtons';
+import MiniMonsters from '@/app/components/MiniMonsters';
 import styles from './newsletter.module.css';
 
 export default async function NewsletterPage({ params }) {
@@ -11,6 +12,7 @@ export default async function NewsletterPage({ params }) {
 
     return (
         <main className={styles.page}>
+            <MiniMonsters />
             <div className={styles.content}>
                 <div className={styles.logoWrap}>
                     <img
@@ -25,7 +27,7 @@ export default async function NewsletterPage({ params }) {
                 {newsletter.content.map((block, i) => {
                     if (block.type === 'text') {
                         return (
-                            <p key={i} className={styles.paragraph}>
+                            <p key={i} className={styles.paragraph} {...(i === 0 ? { 'data-description': 'true' } : {})}>
                                 {block.italic ? <em>{block.text}</em> : block.text}
                             </p>
                         );
