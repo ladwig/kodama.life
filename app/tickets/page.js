@@ -18,7 +18,7 @@ const MIN_PRICE = 30;
 const MAX_QUANTITY = 10;
 
 // ─── Payment Screen ───────────────────────────────────────────────────────
-function PaymentScreen({ total, quantity, pricePerTicket, holderNames, onBack }) {
+function PaymentScreen({ total, totalWithFee, quantity, pricePerTicket, holderNames, onBack }) {
     const stripe = useStripe();
     const elements = useElements();
     const [ready, setReady] = useState(false);
@@ -81,8 +81,9 @@ function PaymentScreen({ total, quantity, pricePerTicket, holderNames, onBack })
                     disabled={!ready || paying}
                     onClick={playKeyboard}
                 >
-                    {paying ? 'One moment…' : `Pay · €${total}`}
+                    {paying ? 'One moment…' : `Pay · €${totalWithFee.toFixed(2)}`}
                 </button>
+                <p className={styles.feeNote}>* 1,5 % + 0,25 € Transaktionsgebühren anfallen</p>
             </form>
 
         </div>
@@ -128,6 +129,8 @@ export default function TicketsPage() {
 
     const billedQuantity = groupDeal ? quantity - 1 : quantity;
     const total = billedQuantity * pricePerTicket;
+    // Fee-inclusive amount charged to Stripe: covers 1.5% + €0.25 per transaction
+    const totalWithFee = Math.ceil((total * 100 + 25) / 0.985) / 100;
 
     function handleGroupDeal(checked) {
         setGroupDeal(checked);
@@ -357,6 +360,7 @@ export default function TicketsPage() {
                     <Elements stripe={stripePromise} options={stripeOptions}>
                         <PaymentScreen
                             total={total}
+                            totalWithFee={totalWithFee}
                             quantity={quantity}
                             pricePerTicket={pricePerTicket}
                             holderNames={holderNames.filter(Boolean)}

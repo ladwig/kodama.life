@@ -39,7 +39,9 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Gruppenticket ist nur für genau 4 Personen.' }, { status: 400 });
         }
 
-        const total = group_deal ? (quantity - 1) * price_per_ticket : quantity * price_per_ticket;
+        const baseTotal = group_deal ? (quantity - 1) * price_per_ticket : quantity * price_per_ticket;
+        // Cover Stripe fees (1.5% + €0.25) so we receive the full base amount
+        const total = Math.ceil((baseTotal + 25) / 0.985);
 
         // Check if buyer is a newsletter subscriber (for pre-fill info)
         const supabase = getSupabaseAdmin();
@@ -61,6 +63,7 @@ export async function POST(req) {
                 buyer_phone: buyer_phone || '',
                 quantity: String(quantity),
                 price_per_ticket: String(price_per_ticket),
+                base_total: String(baseTotal),
                 event_date: EVENT_DATE,
                 group_deal: group_deal ? 'true' : 'false',
                 ticket_holders: JSON.stringify(ticket_holders.map((h) => h.trim())),

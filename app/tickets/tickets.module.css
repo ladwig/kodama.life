@@ -316,6 +316,15 @@
     color: #8CB2AB;
 }
 
+.feeNote {
+    font-size: 10px;
+    font-family: 'Funnel Display', sans-serif;
+    color: #000;
+    opacity: 0.4;
+    text-align: center;
+    margin: 0.4rem 0 0;
+}
+
 .errorText {
     font-size: 12px;
     font-weight: 700;
