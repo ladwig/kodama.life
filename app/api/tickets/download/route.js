@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { verifyJWT } from '@/lib/jwt';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib';
+import QRCode from 'qrcode';
 
 // Builds an SVG path for a ticket shape with wavy left and right edges.
 // tx, ty = top-left corner (PDF coords, y-up), tw = width, th = height
@@ -188,9 +189,7 @@ export async function GET(req) {
             const qrX = stubCenterX - qrSize / 2;
             const qrY = tY - (tH - qrSize) / 2 - qrSize;
 
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${ticket.ticket_code}`;
-            const qrRes = await fetch(qrUrl);
-            const qrBuf = await qrRes.arrayBuffer();
+            const qrBuf = await QRCode.toBuffer(ticket.ticket_code, { width: 200, margin: 1 });
             const qrImage = await pdfDoc.embedPng(qrBuf);
             page.drawImage(qrImage, { x: qrX, y: qrY, width: qrSize, height: qrSize });
 
