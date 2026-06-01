@@ -83,7 +83,7 @@ function PaymentScreen({ total, totalWithFee, quantity, pricePerTicket, holderNa
                 >
                     {paying ? 'One moment…' : `Pay · €${totalWithFee.toFixed(2)}`}
                 </button>
-                <p className={styles.feeNote}>* 1,5 % + 0,25 € Transaktionsgebühren anfallen</p>
+                <p className={styles.feeNote}>* includes 1.5% + €0.25 processing fee</p>
             </form>
 
         </div>
