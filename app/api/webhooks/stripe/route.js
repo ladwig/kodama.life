@@ -193,6 +193,7 @@ export async function POST(req) {
                         console.warn('[webhook] Notify email failed (non-fatal):', notifyErr.message);
                     }
                 }
+
             } else if (process.env.MAIL_WEBHOOK_URL && !process.env.MAIL_WEBHOOK_URL.trim().startsWith('#')) {
                 await fetch(process.env.MAIL_WEBHOOK_URL, {
                     method: 'POST',
@@ -204,6 +205,20 @@ export async function POST(req) {
             }
         } catch (mailErr) {
             console.warn('Email sending failed (non-fatal):', mailErr.message);
+        }
+
+        // 7. Telegram group notification
+        if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
+            try {
+                const text = `🎟 *New ticket sold*\n${meta.buyer_name} (${meta.buyer_email}) bought ${quantity} ticket(s) for ${(pi.amount / 100).toFixed(2)} €.`;
+                await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: process.env.TELEGRAM_CHAT_ID, text, parse_mode: 'Markdown' }),
+                });
+            } catch (tgErr) {
+                console.warn('[webhook] Telegram notification failed (non-fatal):', tgErr.message);
+            }
         }
 
         return NextResponse.json({ received: true });
