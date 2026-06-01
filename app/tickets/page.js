@@ -60,6 +60,7 @@ function PaymentScreen({ total, totalWithFee, quantity, pricePerTicket, holderNa
                         onReady={() => setReady(true)}
                         options={{
                             layout: 'tabs',
+                            wallets: { link: 'never' },
                             terms: {
                                 card: 'never',
                                 sepaDebit: 'never',
