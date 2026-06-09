@@ -50,8 +50,9 @@ export async function POST(req) {
 
     const pi = event.data.object;
     const supabase = getSupabaseAdmin();
+    const meta = pi.metadata;
 
-    // Idempotency check
+    // Idempotency check — by stripe_payment_id
     const { data: existingOrder } = await supabase
         .from('orders')
         .select('id')
@@ -63,7 +64,18 @@ export async function POST(req) {
         return NextResponse.json({ received: true });
     }
 
-    const meta = pi.metadata;
+    // Magic link idempotency — guard against race where two intents share same jti
+    if (meta.magic_link_jti) {
+        const { data: jtiOrder } = await supabase
+            .from('orders')
+            .select('id')
+            .eq('magic_link_jti', meta.magic_link_jti)
+            .maybeSingle();
+        if (jtiOrder) {
+            console.log('Magic link already redeemed:', meta.magic_link_jti);
+            return NextResponse.json({ received: true });
+        }
+    }
     const quantity = parseInt(meta.quantity, 10);
     const price_per_ticket = parseInt(meta.price_per_ticket, 10);
     const ticket_holders = JSON.parse(meta.ticket_holders || '[]');
@@ -87,7 +99,8 @@ export async function POST(req) {
                 total_price: pi.amount,
                 status: 'paid',
                 payment_method: paymentSource,
-                source: 'online',
+                source: meta.source || 'online',
+                magic_link_jti: meta.magic_link_jti || null,
             })
             .select()
             .single();

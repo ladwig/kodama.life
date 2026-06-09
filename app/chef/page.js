@@ -132,12 +132,78 @@ export default function ChefPage() {
         }
     };
 
-    // Form data
+    // Offline ticket form
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [quantity, setQuantity] = useState(1);
     const [price, setPrice] = useState(30);
     const [status, setStatus] = useState('');
+
+    // Magic links form
+    const [magicPrice, setMagicPrice] = useState('30');
+    const [magicCount, setMagicCount] = useState('1');
+    const [magicEmail, setMagicEmail] = useState('');
+    const [magicSendEmail, setMagicSendEmail] = useState(false);
+    const [magicLoading, setMagicLoading] = useState(false);
+    const [magicLinks, setMagicLinks] = useState([]);
+    const [magicStatus, setMagicStatus] = useState('');
+    const [magicCopiedIdx, setMagicCopiedIdx] = useState(null);
+    const [magicAllCopied, setMagicAllCopied] = useState(false);
+
+    const handleGenerateLinks = async (e) => {
+        e.preventDefault();
+        setMagicStatus('');
+        setMagicLinks([]);
+        setMagicLoading(true);
+        try {
+            const res = await fetch('/api/chef/magic-link', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    password,
+                    price: parseInt(magicPrice, 10),
+                    count: parseInt(magicCount, 10),
+                    email: magicEmail || undefined,
+                    send_email: magicSendEmail && !!magicEmail,
+                }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setMagicLinks(data.links);
+                const sent = magicSendEmail && magicEmail;
+                setMagicStatus(sent ? `Links created and emailed to ${magicEmail}` : 'Links created');
+                if (data.links.length > 0) {
+                    try {
+                        sessionStorage.setItem('magic_links_last', JSON.stringify(data.links));
+                    } catch {}
+                }
+            } else {
+                setMagicStatus(`Error: ${data.error}`);
+                if (res.status === 401) setAuthorized(false);
+            }
+        } catch (err) {
+            setMagicStatus(`Error: ${err.message}`);
+        } finally {
+            setMagicLoading(false);
+        }
+    };
+
+    const copyMagicLink = async (url, idx) => {
+        try {
+            await navigator.clipboard.writeText(url);
+            setMagicCopiedIdx(idx);
+            setTimeout(() => setMagicCopiedIdx(null), 1500);
+        } catch {}
+    };
+
+    const copyAllLinks = async () => {
+        try {
+            const text = magicLinks.map(l => l.url).join('\n');
+            await navigator.clipboard.writeText(text);
+            setMagicAllCopied(true);
+            setTimeout(() => setMagicAllCopied(false), 1500);
+        } catch {}
+    };
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -539,20 +605,26 @@ export default function ChefPage() {
             <div className="chef-container" style={styles.container}>
                 <div style={styles.tabsCol}>
                     <div style={styles.tabNav}>
-                        <button 
-                            onClick={() => toggleTab('offline')} 
+                        <button
+                            onClick={() => toggleTab('offline')}
                             className={`tab-btn ${activeTab === 'offline' ? 'active' : ''}`}
                         >
                             Offline Ticket
                         </button>
-                        <button 
-                            onClick={() => toggleTab('scanner')} 
+                        <button
+                            onClick={() => toggleTab('magic')}
+                            className={`tab-btn ${activeTab === 'magic' ? 'active' : ''}`}
+                        >
+                            Magic Links
+                        </button>
+                        <button
+                            onClick={() => toggleTab('scanner')}
                             className={`tab-btn ${activeTab === 'scanner' ? 'active' : ''}`}
                         >
                             Scanner
                         </button>
-                        <button 
-                            onClick={() => toggleTab('guestlist')} 
+                        <button
+                            onClick={() => toggleTab('guestlist')}
                             className={`tab-btn ${activeTab === 'guestlist' ? 'active' : ''}`}
                         >
                             Guestlist
@@ -632,6 +704,120 @@ export default function ChefPage() {
                                     </div>
                                 )}
                             </form>
+                        )}
+
+                        {activeTab === 'magic' && (
+                            <div style={styles.form}>
+                                <form onSubmit={handleGenerateLinks} style={styles.form}>
+                                    <div style={styles.row}>
+                                        <div style={{ ...styles.fieldGroup, flex: 1 }}>
+                                            <label style={styles.label}>Min. Price (€)</label>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                required
+                                                value={magicPrice}
+                                                onChange={(e) => setMagicPrice(e.target.value)}
+                                                style={styles.input}
+                                                placeholder="30"
+                                            />
+                                        </div>
+                                        <div style={{ ...styles.fieldGroup, flex: 1 }}>
+                                            <label style={styles.label}>Number of Links</label>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                max="100"
+                                                required
+                                                value={magicCount}
+                                                onChange={(e) => setMagicCount(e.target.value)}
+                                                style={styles.input}
+                                                placeholder="1"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div style={styles.fieldGroup}>
+                                        <label style={styles.label}>Send to Email (optional)</label>
+                                        <input
+                                            type="email"
+                                            value={magicEmail}
+                                            onChange={(e) => setMagicEmail(e.target.value)}
+                                            style={styles.input}
+                                            placeholder="guest@example.com"
+                                        />
+                                    </div>
+
+                                    {magicEmail && (
+                                        <label style={{ ...styles.label, display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={magicSendEmail}
+                                                onChange={(e) => setMagicSendEmail(e.target.checked)}
+                                                style={{ width: '14px', height: '14px' }}
+                                            />
+                                            Send email with all links
+                                        </label>
+                                    )}
+
+                                    <button
+                                        type="submit"
+                                        className="submit-btn"
+                                        style={styles.button}
+                                        disabled={magicLoading}
+                                    >
+                                        {magicLoading ? 'Generating…' : 'Generate Links'}
+                                    </button>
+                                </form>
+
+                                {magicStatus && (
+                                    <div style={{
+                                        ...styles.status,
+                                        backgroundColor: magicStatus.startsWith('Error') ? 'rgba(220, 38, 38, 0.1)' : 'rgba(74, 103, 65, 0.1)',
+                                        color: magicStatus.startsWith('Error') ? '#dc2626' : 'var(--accent)',
+                                        borderColor: magicStatus.startsWith('Error') ? 'rgba(220, 38, 38, 0.2)' : 'rgba(74, 103, 65, 0.2)',
+                                    }}>
+                                        {magicStatus}
+                                    </div>
+                                )}
+
+                                {magicLinks.length > 0 && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--ink-muted)', fontWeight: '600' }}>
+                                            Expires: {new Date(magicLinks[0].expires_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                        </div>
+
+                                        {magicLinks.map((link, idx) => (
+                                            <div key={link.jti} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                                <input
+                                                    type="text"
+                                                    readOnly
+                                                    value={link.url}
+                                                    style={{ ...styles.input, flex: 1, fontSize: '0.75rem', opacity: 0.7, cursor: 'default' }}
+                                                    onFocus={(e) => e.target.select()}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => copyMagicLink(link.url, idx)}
+                                                    style={{ ...styles.button, marginTop: 0, padding: '0 12px', fontSize: '0.75rem', whiteSpace: 'nowrap', flexShrink: 0 }}
+                                                >
+                                                    {magicCopiedIdx === idx ? '✓ Copied' : 'Copy'}
+                                                </button>
+                                            </div>
+                                        ))}
+
+                                        {magicLinks.length > 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={copyAllLinks}
+                                                style={{ ...styles.button, marginTop: '0.25rem', fontSize: '0.85rem' }}
+                                            >
+                                                {magicAllCopied ? '✓ All Copied' : `Copy All ${magicLinks.length} Links`}
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         )}
 
                         {activeTab === 'scanner' && (

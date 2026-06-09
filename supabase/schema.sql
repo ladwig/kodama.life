@@ -53,7 +53,11 @@ grant usage, select on all sequences in schema public to service_role;
 -- Block all anon / authenticated direct access (no public policies)
 -- No insert/select policies for anon → zero public access
 
--- ── 6. Useful indexes ─────────────────────────────────────────
+-- ── 6. Magic link column (run once on existing DBs) ──────────
+-- alter table orders add column if not exists magic_link_jti text unique;
+-- alter table orders add column if not exists source text;
+
+-- ── 7. Useful indexes ─────────────────────────────────────────
 create index if not exists idx_orders_buyer_email       on orders(buyer_email);
 create index if not exists idx_orders_stripe_payment_id on orders(stripe_payment_id);
 create index if not exists idx_orders_status            on orders(status);
