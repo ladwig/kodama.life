@@ -23,6 +23,12 @@ const PUBLIC_PATHS = [
     '/api/newsletter/unsubscribe',
     '/api/confirmation/status',
     '/unsubscribed',
+    // Chef portal — has its own password protection
+    '/chef',
+    '/api/chef/',
+    // Magic ticket links — JWT in the URL is the auth
+    '/magic-ticket',
+    '/api/checkout/create-magic-intent',
     '/confirmation',
     '/newsletters',
 ];
