@@ -252,11 +252,35 @@ export default function ChefPage() {
         }
     };
 
+    // Stats
+    const [stats, setStats] = useState(null);
+    const [statsLoading, setStatsLoading] = useState(false);
+    const [statsError, setStatsError] = useState('');
+
+    const fetchStats = async (providedPw) => {
+        const actualPw = (typeof providedPw === 'string') ? providedPw : (password || sessionStorage.getItem('chef_pw'));
+        setStatsLoading(true);
+        setStatsError('');
+        try {
+            const res = await fetch('/api/chef/stats', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: actualPw }),
+            });
+            const data = await res.json();
+            if (res.ok) setStats(data);
+            else setStatsError(data.error || 'Failed to load stats');
+        } catch {
+            setStatsError('Connection error');
+        } finally {
+            setStatsLoading(false);
+        }
+    };
+
     const toggleTab = (tab) => {
         setActiveTab(tab);
-        if (tab === 'guestlist') {
-            fetchGuestlist();
-        }
+        if (tab === 'guestlist') fetchGuestlist();
+        if (tab === 'stats') fetchStats();
     };
 
     const startScanner = () => {
@@ -629,6 +653,12 @@ export default function ChefPage() {
                         >
                             Guestlist
                         </button>
+                        <button
+                            onClick={() => toggleTab('stats')}
+                            className={`tab-btn ${activeTab === 'stats' ? 'active' : ''}`}
+                        >
+                            Stats
+                        </button>
                     </div>
 
                     <div style={styles.tabContent}>
@@ -942,12 +972,175 @@ export default function ChefPage() {
                                 )}
                             </div>
                         )}
+
+                        {activeTab === 'stats' && (
+                            <div style={styles.listContainer}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                    <span style={styles.countText}>Sales Overview</span>
+                                    <button onClick={() => fetchStats()} disabled={statsLoading} style={styles.refreshBtn}>
+                                        {statsLoading ? '...' : 'Refresh'}
+                                    </button>
+                                </div>
+
+                                {statsError && <div style={{ color: '#dc2626', fontSize: '0.9rem', padding: '1rem 0' }}>{statsError}</div>}
+
+                                {statsLoading && !stats && <div style={styles.placeholderText}>Loading…</div>}
+
+                                {stats && (() => {
+                                    const fmt = (cents) => `€${(cents / 100).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                                    const srcLabel = { online: 'Online', offline: 'Offline', magic_link: 'Magic Link' };
+                                    const methodLabel = (m) => m.replace('stripe_', '').replace('_', ' ');
+                                    const sortedPrices = Object.entries(stats.priceDist).sort(([a], [b]) => Number(a) - Number(b));
+                                    const sortedDates = Object.entries(stats.salesByDate).sort(([a], [b]) => a.localeCompare(b));
+
+                                    return (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+
+                                            {/* Summary */}
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                                                {[
+                                                    ['Tickets Sold', stats.summary.totalTickets],
+                                                    ['Orders', stats.summary.totalOrders],
+                                                    ['Net Revenue', fmt(stats.summary.netRevenue)],
+                                                    ['Avg per Ticket', fmt(stats.summary.avgPricePerTicket)],
+                                                ].map(([label, value]) => (
+                                                    <div key={label} style={statCard}>
+                                                        <div style={{ fontSize: '1.4rem', fontWeight: '700', color: 'var(--ink)' }}>{value}</div>
+                                                        <div style={{ fontSize: '0.7rem', fontWeight: '600', color: 'var(--ink-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '2px' }}>{label}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            {/* Check-ins */}
+                                            <div>
+                                                <div style={sectionHead}>Check-ins</div>
+                                                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                    {[
+                                                        ['Checked in', stats.checkins.checkedIn, '#16a34a'],
+                                                        ['Remaining', stats.checkins.remaining, 'var(--ink-muted)'],
+                                                        ['Total', stats.checkins.total, 'var(--ink)'],
+                                                    ].map(([label, value, color]) => (
+                                                        <div key={label} style={{ ...statPill, color }}>
+                                                            <strong>{value}</strong> {label}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* By Source */}
+                                            <div>
+                                                <div style={sectionHead}>By Source</div>
+                                                <div style={styles.table}>
+                                                    <div style={styles.tableHeader}>
+                                                        <span style={{ flex: 1.5 }}>Source</span>
+                                                        <span style={{ flex: 1, textAlign: 'right' }}>Tickets</span>
+                                                        <span style={{ flex: 1.2, textAlign: 'right' }}>Revenue</span>
+                                                    </div>
+                                                    {Object.entries(stats.bySource).map(([src, d]) => (
+                                                        <div key={src} style={styles.tableRow}>
+                                                            <span style={{ flex: 1.5, fontWeight: 500 }}>{srcLabel[src] || src}</span>
+                                                            <span style={{ flex: 1, textAlign: 'right' }}>{d.tickets}</span>
+                                                            <span style={{ flex: 1.2, textAlign: 'right' }}>{fmt(d.revenue)}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* By Payment Method */}
+                                            <div>
+                                                <div style={sectionHead}>By Payment Method</div>
+                                                <div style={styles.table}>
+                                                    <div style={styles.tableHeader}>
+                                                        <span style={{ flex: 2 }}>Method</span>
+                                                        <span style={{ flex: 1, textAlign: 'right' }}>Orders</span>
+                                                        <span style={{ flex: 1, textAlign: 'right' }}>Tickets</span>
+                                                    </div>
+                                                    {Object.entries(stats.byMethod).map(([m, d]) => (
+                                                        <div key={m} style={styles.tableRow}>
+                                                            <span style={{ flex: 2, fontWeight: 500, textTransform: 'capitalize' }}>{methodLabel(m)}</span>
+                                                            <span style={{ flex: 1, textAlign: 'right' }}>{d.orders}</span>
+                                                            <span style={{ flex: 1, textAlign: 'right' }}>{d.tickets}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* Price Distribution */}
+                                            <div>
+                                                <div style={sectionHead}>Price Distribution</div>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                                                    {sortedPrices.map(([price, count]) => {
+                                                        const max = Math.max(...sortedPrices.map(([,c]) => c));
+                                                        const pct = Math.round((count / max) * 100);
+                                                        return (
+                                                            <div key={price} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                                <span style={{ width: '36px', fontSize: '0.75rem', fontWeight: '700', color: 'var(--ink)', textAlign: 'right', flexShrink: 0 }}>€{price}</span>
+                                                                <div style={{ flex: 1, height: '18px', background: 'rgba(0,0,0,0.06)', borderRadius: '4px', overflow: 'hidden' }}>
+                                                                    <div style={{ width: `${pct}%`, height: '100%', background: 'var(--accent)', borderRadius: '4px', transition: 'width 0.4s' }} />
+                                                                </div>
+                                                                <span style={{ width: '28px', fontSize: '0.75rem', fontWeight: '700', color: 'var(--ink-muted)', flexShrink: 0 }}>{count}×</span>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+
+                                            {/* Sales by Date */}
+                                            {sortedDates.length > 1 && (
+                                                <div>
+                                                    <div style={sectionHead}>Sales by Date</div>
+                                                    <div style={styles.table}>
+                                                        <div style={styles.tableHeader}>
+                                                            <span style={{ flex: 1.5 }}>Date</span>
+                                                            <span style={{ flex: 1, textAlign: 'right' }}>Tickets</span>
+                                                            <span style={{ flex: 1.2, textAlign: 'right' }}>Revenue</span>
+                                                        </div>
+                                                        {sortedDates.map(([date, d]) => (
+                                                            <div key={date} style={styles.tableRow}>
+                                                                <span style={{ flex: 1.5, fontWeight: 500 }}>{new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
+                                                                <span style={{ flex: 1, textAlign: 'right' }}>{d.tickets}</span>
+                                                                <span style={{ flex: 1.2, textAlign: 'right' }}>{fmt(d.revenue)}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })()}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
         </main>
     );
 }
+
+const statCard = {
+    backgroundColor: 'rgba(0,0,0,0.03)',
+    border: '1px solid var(--border)',
+    borderRadius: '12px',
+    padding: '1rem',
+};
+
+const statPill = {
+    fontSize: '0.85rem',
+    fontWeight: '500',
+    padding: '4px 12px',
+    borderRadius: '20px',
+    backgroundColor: 'rgba(0,0,0,0.04)',
+    border: '1px solid var(--border)',
+};
+
+const sectionHead = {
+    fontSize: '0.7rem',
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: '0.06em',
+    color: 'var(--ink-muted)',
+    marginBottom: '0.75rem',
+};
 
 const styles = {
     main: {
