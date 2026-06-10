@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { getSupabaseAdmin } from '@/lib/supabase';
+import { getMinTicketPrice } from '@/lib/config';
 
-// Min price per ticket in cents
-const MIN_PRICE = 3000; // 30 EUR
 const STEP = 500; // 5 EUR increments
 const MAX_QUANTITY = 10;
 const EVENT_DATE = '2026-08-22';
@@ -12,6 +11,8 @@ export async function POST(req) {
     try {
         const body = await req.json();
         const { buyer_name, buyer_email, buyer_phone, quantity, price_per_ticket, ticket_holders, group_deal } = body;
+
+        const MIN_PRICE = (await getMinTicketPrice()) * 100; // euros → cents
 
         // Validation
         if (!buyer_name || !buyer_email) {
@@ -74,6 +75,7 @@ export async function POST(req) {
         const response = NextResponse.json({
             client_secret: paymentIntent.client_secret,
             subscriber_name: subscriberName,
+            min_price: MIN_PRICE / 100,
         });
         response.cookies.set('checkout_pi', paymentIntent.id, {
             httpOnly: true,
