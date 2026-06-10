@@ -338,7 +338,7 @@ export default function TicketsClient({ minPrice = 30 }) {
                                     <button key={d} type="button"
                                         className={`${styles.priceStep} ${donation === d ? styles.priceStepActive : ''}`}
                                         onClick={() => { playKeyboard(); setDonation(d); }}>
-                                        {d === 0 ? '€30' : `€${MIN_PRICE + d}`}
+                                        {`€${MIN_PRICE + d}`}
                                     </button>
                                 ))}
                             </div>
