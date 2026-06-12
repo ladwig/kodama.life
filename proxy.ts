@@ -38,14 +38,20 @@ const PUBLIC_PATHS = [
 export async function proxy(req) {
     const { pathname } = req.nextUrl;
 
-    // Handle /secret=<password> URLs — set session cookie and redirect to /
+    // Handle /secret=<password>[/<dest>] URLs — set session cookie and redirect.
+    // e.g. /secret=22-08-2026 -> /, /secret=22-08-2026/tickets -> /tickets
     if (pathname.startsWith('/secret=')) {
-        const pw = pathname.slice('/secret='.length);
+        const rest = pathname.slice('/secret='.length);
+        const slashIdx = rest.indexOf('/');
+        const pw = slashIdx === -1 ? rest : rest.slice(0, slashIdx);
+        // Only allow internal relative paths (guard against open redirects)
+        const destPath = slashIdx === -1 ? '/' : rest.slice(slashIdx);
+        const dest = destPath.startsWith('/') && !destPath.startsWith('//') ? destPath : '/';
         const validPasswords = (process.env.SITE_PASSWORD || '').split(',').map(p => p.trim()).filter(Boolean);
         const matched = validPasswords.find(p => p === pw);
         if (matched) {
             const pwHash = await sha256Hex(matched);
-            const response = NextResponse.redirect(new URL('/', req.url));
+            const response = NextResponse.redirect(new URL(dest, req.url));
             response.cookies.set('pw_session', pwHash, {
                 httpOnly: true,
                 secure: true,
