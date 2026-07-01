@@ -222,16 +222,37 @@ export async function POST(req) {
 
         // 7. Telegram group notification
         if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
+            let tgError = null;
             try {
                 const text = `🎟 *New ticket sold*\n${meta.buyer_name} (${meta.buyer_email}) bought ${quantity} ticket(s) for ${(pi.amount / 100).toFixed(2)} €.`;
-                await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                const tgRes = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ chat_id: process.env.TELEGRAM_CHAT_ID, text, parse_mode: 'Markdown' }),
                 });
+                if (!tgRes.ok) {
+                    const tgBody = await tgRes.text();
+                    tgError = `HTTP ${tgRes.status}: ${tgBody}`;
+                    console.warn('[webhook] Telegram API error:', tgError);
+                }
             } catch (tgErr) {
-                console.warn('[webhook] Telegram notification failed (non-fatal):', tgErr.message);
+                tgError = tgErr.message;
+                console.warn('[webhook] Telegram notification failed (non-fatal):', tgError);
             }
+            if (tgError && process.env.NOTIFY_EMAIL && resend) {
+                try {
+                    await resend.emails.send({
+                        from: `sidequest <${process.env.RESEND_FROM_ADDRESS}>`,
+                        to: process.env.NOTIFY_EMAIL,
+                        subject: `⚠️ Telegram notification failed`,
+                        text: `Telegram notification failed for the sale to ${meta.buyer_name} (${meta.buyer_email}).\n\nError: ${tgError}`,
+                    });
+                } catch (errMailErr) {
+                    console.warn('[webhook] Telegram error mail failed:', errMailErr.message);
+                }
+            }
+        } else {
+            console.warn('[webhook] Telegram not configured — TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID missing');
         }
 
         return NextResponse.json({ received: true });

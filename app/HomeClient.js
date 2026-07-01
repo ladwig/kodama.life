@@ -513,7 +513,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                     </div>
                 )}
 
-                {!hasTickets && <FAQ />}
+                <FAQ />
             </div>
 
             {monsters.map(m => (
