@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { signTicketJWT } from '@/lib/jwt';
+import { getChefPassword } from '@/lib/config';
 import { Resend } from 'resend';
 
 const resend = (process.env.RESEND_API_KEY && !process.env.RESEND_API_KEY.endsWith('_...'))
@@ -35,7 +36,7 @@ export async function POST(req) {
         const body = await req.json();
         const { password, name, email, quantity = 1, price_per_ticket = 0 } = body;
 
-        if (password !== process.env.CHEF_PASSWORD) {
+        if (password !== await getChefPassword()) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 

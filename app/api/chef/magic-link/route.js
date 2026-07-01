@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { signMagicLinkJWT } from '@/lib/jwt';
 import { Resend } from 'resend';
+import { getChefPassword } from '@/lib/config';
 
 const resend = (process.env.RESEND_API_KEY && !process.env.RESEND_API_KEY.endsWith('_...'))
     ? new Resend(process.env.RESEND_API_KEY)
@@ -21,7 +22,7 @@ export async function POST(req) {
         const body = await req.json();
         const { password, price, count = 1, email, send_email = false } = body;
 
-        if (password !== process.env.CHEF_PASSWORD) {
+        if (password !== await getChefPassword()) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 

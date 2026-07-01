@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
+import { getChefPassword } from '@/lib/config';
 
 export async function POST(req) {
     try {
         const { password } = await req.json();
 
-        if (password !== process.env.CHEF_PASSWORD) {
+        if (password !== await getChefPassword()) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
