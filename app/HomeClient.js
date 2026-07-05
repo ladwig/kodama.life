@@ -268,6 +268,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
     const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
     const [btnHovered, setBtnHovered] = useState(false);
     const [monsters, setMonsters] = useState([]);
+    const [showHome, setShowHome] = useState(false);
 
     async function handleDownloadPDF(e) {
         e.preventDefault();
@@ -361,13 +362,22 @@ export default function HomeClient({ buyer, orders, tickets }) {
                     height={102}
                     priority
                     className={styles.logo}
+                    onClick={hasTickets && !showHome ? () => setShowHome(true) : undefined}
+                    style={hasTickets && !showHome ? { cursor: 'pointer' } : undefined}
                 />
                 <p className={styles.details}>
                     August 22, 2026
                     <br />
                     outskirts of Berlin
                 </p>
-                {!hasTickets && <>
+                {(!hasTickets || showHome) && <>
+                {showHome && (
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+                        <a href="#" onClick={e => { e.preventDefault(); setShowHome(false); }} className={styles.moreTicketsLink} style={{ margin: 0 }}>
+                            ↓ Show my tickets
+                        </a>
+                    </div>
+                )}
                 <div className={styles.newsletterMinimal}>
                     {newsletterState === 'success' ? (
                         <div className={styles.successBox}>
@@ -426,7 +436,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                 </>}
 
                 {/* ── Has tickets ── */}
-                {hasTickets && (
+                {hasTickets && !showHome && (
                     <div className={styles.buyerSection}>
                         {orders.map((order) => {
                             const orderTickets = ticketsByOrder[order.id] || [];
@@ -483,7 +493,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                 )}
 
                 {/* ── No tickets yet ── */}
-                {!hasTickets && (
+                {(!hasTickets || showHome) && (
                     <div className={styles.guestSection}>
                         <div className={styles.actionContainer}>
                             <div className={styles.illustratedBtns}>
