@@ -374,7 +374,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                 {showHome && (
                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
                         <a href="#" onClick={e => { e.preventDefault(); setShowHome(false); }} className={styles.moreTicketsLink} style={{ margin: 0 }}>
-                            ↓ My tickets
+                            My tickets
                         </a>
                     </div>
                 )}
@@ -483,7 +483,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                                 className={styles.moreTicketsLink}
                                 style={{ margin: 0 }}
                             >
-                                ↑ All Info
+                                All Info
                             </a>
                             <a
                                 href="#"
