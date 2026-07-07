@@ -32,12 +32,14 @@ export default async function NewsletterPage({ params }) {
                         return <h3 key={i} className={styles.heading}>{block.text}</h3>;
                     }
                     if (block.type === 'text') {
+                        const renderSegments = (segs) => segs.map((s, j) =>
+                            s.href ? <a key={j} href={s.href} target="_blank" rel="noopener noreferrer" style={{ color: '#0670DB' }}>{s.text}</a>
+                            : s.bold ? <strong key={j}>{s.text}</strong>
+                            : s.br ? <br key={j} />
+                            : s.text
+                        );
                         const content = block.segments
-                            ? block.segments.map((s, j) =>
-                                s.href ? <a key={j} href={s.href} target="_blank" rel="noopener noreferrer" style={{ color: '#0670DB' }}>{s.text}</a>
-                                : s.bold ? <strong key={j}>{s.text}</strong>
-                                : s.text
-                              )
+                            ? (block.italic ? <em>{renderSegments(block.segments)}</em> : renderSegments(block.segments))
                             : block.italic ? <em>{block.text}</em> : block.text;
                         return (
                             <p key={i} className={styles.paragraph} {...(i === 0 ? { 'data-description': 'true' } : {})}>
