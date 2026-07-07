@@ -47,9 +47,9 @@ export default async function NewsletterPage({ params }) {
                     }
                     if (block.type === 'images') {
                         return (
-                            <div key={i} className={styles.imageGrid}>
+                            <div key={i} className={block.srcs.length === 1 ? styles.imageSingle : styles.imageGrid}>
                                 {block.srcs.map((src, j) => (
-                                    <img key={j} src={src} alt="" className={styles.gridImage} />
+                                    <img key={j} src={src} alt="" className={block.srcs.length === 1 ? styles.singleImage : styles.gridImage} />
                                 ))}
                             </div>
                         );

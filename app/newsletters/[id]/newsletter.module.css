@@ -65,6 +65,17 @@
     margin: 8px 0 12px;
 }
 
+/* ── Single image ── */
+.imageSingle {
+    margin: 20px 0;
+}
+
+.singleImage {
+    width: 70%;
+    height: auto;
+    display: block;
+}
+
 /* ── Image grid ── */
 .imageGrid {
     display: grid;
