@@ -28,9 +28,16 @@ export default async function NewsletterPage({ params }) {
                 <p className={styles.date}>{newsletter.date}</p>
 
                 {newsletter.content.map((block, i) => {
+                    if (block.type === 'heading') {
+                        return <h3 key={i} className={styles.heading}>{block.text}</h3>;
+                    }
                     if (block.type === 'text') {
                         const content = block.segments
-                            ? block.segments.map((s, j) => s.bold ? <strong key={j}>{s.text}</strong> : s.text)
+                            ? block.segments.map((s, j) =>
+                                s.href ? <a key={j} href={s.href} target="_blank" rel="noopener noreferrer" style={{ color: '#0670DB' }}>{s.text}</a>
+                                : s.bold ? <strong key={j}>{s.text}</strong>
+                                : s.text
+                              )
                             : block.italic ? <em>{block.text}</em> : block.text;
                         return (
                             <p key={i} className={styles.paragraph} {...(i === 0 ? { 'data-description': 'true' } : {})}>
