@@ -24,7 +24,7 @@ function FAQ() {
                     <div className={styles.faqLine} />
                     {open === i && (
                         <div className={styles.faqBody}>
-                            <p style={{ margin: 0 }}>{item.a}</p>
+                            <p style={{ margin: 0 }}>{item.a}{item.link && <> <a href={item.link.href} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>{item.link.label}</a></>}</p>
                             {item.images && (
                                 <div className={styles.faqImages}>
                                     {item.images.map((src, j) => (
