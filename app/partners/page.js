@@ -7,8 +7,8 @@ import styles from './partners.module.css';
 const CONTENT = {
     en: {
         subtitle: 'August 22, 2026 · Outskirts of Berlin',
-        tagline: 'Partner with Sidequest',
-        intro: 'Sidequest is a fully self-funded, community-driven 21-hour festival pilot. 8 DJs, a LOUD Professional soundsystem, 300–400 guests. An international network of volunteers, collectives, and labels — pooling existing structures and resources to create something real. By the scene, for the scene.',
+        tagline: 'Partner with sidequest',
+        intro: 'sidequest is a fully self-funded, community-driven 21-hour festival pilot. 8 DJs, a LOUD Professional soundsystem, 300–400 guests. An international network of volunteers, collectives, and labels. Pooling existing structures and resources to create something real. By the scene, for the scene.',
         stats: [
             { value: '21h', label: 'Festival' },
             { value: '8', label: 'DJs' },
@@ -17,7 +17,7 @@ const CONTENT = {
         ],
         whyNow: {
             heading: 'Why Partner Now?',
-            body: 'This is year one. Founding partners get priority renewal, better terms as we scale, and the chance to grow with us from the start. We\'re building toward a recurring, funded annual event — with editions planned at Sonnenraum this winter and Portugal in early 2027.',
+            body: 'This is year one. Founding partners get priority renewal, better terms as we scale, and the chance to grow with us from the start. We\'re building toward a recurring, funded annual event. Editions planned at Sonnenraum this winter and Portugal in early 2027.',
         },
         whatYouGet: {
             heading: 'What You Get',
@@ -31,9 +31,9 @@ const CONTENT = {
         asking: {
             heading: "What We're Looking For",
             items: [
-                { category: 'Equipment', detail: 'Loan or demo units — Allen & Heath, Technics' },
+                { category: 'Equipment', detail: 'Loan or demo units: Allen & Heath, Technics' },
                 { category: 'Drinks', detail: 'Sale-or-return or exclusive partner' },
-                { category: 'Infrastructure', detail: 'Toilets, fencing — sponsored or reduced rate' },
+                { category: 'Infrastructure', detail: 'Toilets, fencing. Sponsored or reduced rate.' },
             ],
         },
         bigger: {
@@ -48,8 +48,8 @@ const CONTENT = {
     },
     de: {
         subtitle: '22. August 2026 · Berliner Stadtrand',
-        tagline: 'Partner werden bei Sidequest',
-        intro: 'Sidequest ist ein vollständig selbstfinanziertes, community-getriebenes 21-Stunden-Festival. 8 DJs, ein LOUD-Professional-Soundsystem, 300–400 Gäste. Ein internationales Netzwerk aus Freiwilligen, Kollektiven und Labels — bestehende Strukturen zusammenlegen, um etwas Echtes zu schaffen. Von der Szene, für die Szene.',
+        tagline: 'Partner werden bei sidequest',
+        intro: 'sidequest ist ein vollständig selbstfinanziertes, community-getriebenes 21-Stunden-Festival. 8 DJs, ein LOUD-Professional-Soundsystem, 300–400 Gäste. Ein internationales Netzwerk aus Freiwilligen, Kollektiven und Labels. Bestehende Strukturen zusammenlegen, um etwas Echtes zu schaffen. Von der Szene, für die Szene.',
         stats: [
             { value: '21h', label: 'Festival' },
             { value: '8', label: 'DJs' },
@@ -58,7 +58,7 @@ const CONTENT = {
         ],
         whyNow: {
             heading: 'Warum jetzt?',
-            body: 'Das ist Jahr eins. Gründungspartner erhalten Vorrang bei der Verlängerung, bessere Konditionen im Wachstum und die Chance, von Anfang an dabei zu sein. Wir bauen auf ein jährlich wiederkehrendes Event hin — mit geplanten Editionen im Sonnenraum (Winter) und Portugal (Anfang 2027).',
+            body: 'Das ist Jahr eins. Gründungspartner erhalten Vorrang bei der Verlängerung, bessere Konditionen im Wachstum und die Chance, von Anfang an dabei zu sein. Wir bauen auf ein jährlich wiederkehrendes Event hin. Editionen geplant im Sonnenraum (Winter) und Portugal (Anfang 2027).',
         },
         whatYouGet: {
             heading: 'Was du bekommst',
@@ -72,7 +72,7 @@ const CONTENT = {
         asking: {
             heading: 'Was wir suchen',
             items: [
-                { category: 'Equipment', detail: 'Leihgeräte oder Demo-Units — Allen & Heath, Technics' },
+                { category: 'Equipment', detail: 'Leihgeräte oder Demo-Units: Allen & Heath, Technics' },
                 { category: 'Getränke', detail: 'Sale-or-return oder exklusiver Partner' },
                 { category: 'Infrastruktur', detail: 'Toiletten, Absperrung — gesponsert oder vergünstigt' },
             ],
@@ -83,7 +83,7 @@ const CONTENT = {
         },
         cta: {
             heading: 'Lass uns reden',
-            body: 'Interesse an einer Partnerschaft? Schreib uns — wir finden gemeinsam etwas.',
+            body: 'Interesse an einer Partnerschaft? Schreib uns, wir finden gemeinsam etwas.',
             label: 'Kontakt aufnehmen',
         },
     },
