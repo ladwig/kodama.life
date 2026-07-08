@@ -8,7 +8,7 @@ const CONTENT = {
     en: {
         subtitle: 'August 22, 2026 · Outskirts of Berlin',
         tagline: 'Partner with sidequest',
-        intro: 'sidequest is a fully self-funded, community-driven 21-hour festival pilot. 8 DJs, a LOUD Professional soundsystem, 300–400 guests. An international network of volunteers, collectives, and labels. Pooling existing structures and resources to create something real. By the scene, for the scene.',
+        intro: 'sidequest is a fully self-funded, community-driven festival. Not a commercial event. Not a brand activation. A pilot built by people who care deeply about underground culture and want to do it properly: high-quality sound, intentional programming, a curated crowd of 300–400, and an experience that actually means something. Built with contributions from SOUP.fm, QS1, Clubcommission, Daycare, Waking Life, and Giegling, supported by a team of volunteers working between Berlin and Lisbon.',
         stats: [
             { value: '21h', label: 'Festival' },
             { value: '8', label: 'DJs' },
@@ -17,7 +17,7 @@ const CONTENT = {
         ],
         whyNow: {
             heading: 'Why Partner Now?',
-            body: 'This is year one. Founding partners get priority renewal, better terms as we scale, and the chance to grow with us from the start. We\'re building toward a recurring, funded annual event. Editions planned at Sonnenraum this winter and Portugal in early 2027.',
+            body: 'This is year one of something we intend to keep building. The pilot is self-funded to prove the concept and the audience. Next year we go after proper funding. Early partners come in at ground level, with better terms, priority renewal, and a real say in how the partnership grows. We\'re already planning a winter edition at Sonnenraum and a Portugal date in early 2027.',
         },
         whatYouGet: {
             heading: 'What You Get',
@@ -38,7 +38,7 @@ const CONTENT = {
         },
         bigger: {
             heading: 'The Bigger Picture',
-            body: 'Pilot this year → funding pitch next year → recurring annual event. The scene, the network, the energy is already there. Early partners grow with us.',
+            body: 'This pilot is the proof of concept. Next year we pitch for proper funding and build it bigger. The goal is a recurring annual event with a fixed identity, a growing audience, and real infrastructure behind it. The scene, the network, the energy is already there.',
         },
         cta: {
             heading: "Let's Talk",
@@ -49,7 +49,7 @@ const CONTENT = {
     de: {
         subtitle: '22. August 2026 · Berliner Stadtrand',
         tagline: 'Partner werden bei sidequest',
-        intro: 'sidequest ist ein vollständig selbstfinanziertes, community-getriebenes 21-Stunden-Festival. 8 DJs, ein LOUD-Professional-Soundsystem, 300–400 Gäste. Ein internationales Netzwerk aus Freiwilligen, Kollektiven und Labels. Bestehende Strukturen zusammenlegen, um etwas Echtes zu schaffen. Von der Szene, für die Szene.',
+        intro: 'sidequest ist ein vollständig selbstfinanziertes, community-getriebenes Festival. Kein kommerzielles Event. Keine Markeninszenierung. Ein Pilot gebaut von Menschen, denen Underground-Kultur wirklich am Herzen liegt: hochwertiger Sound, durchdachtes Programm, ein kuratiertes Publikum von 300–400 Gästen. Entstanden mit Beiträgen von SOUP.fm, QS1, Clubcommission, Daycare, Waking Life und Giegling, unterstützt von einem Team aus Freiwilligen zwischen Berlin und Lissabon.',
         stats: [
             { value: '21h', label: 'Festival' },
             { value: '8', label: 'DJs' },
@@ -58,7 +58,7 @@ const CONTENT = {
         ],
         whyNow: {
             heading: 'Warum jetzt?',
-            body: 'Das ist Jahr eins. Gründungspartner erhalten Vorrang bei der Verlängerung, bessere Konditionen im Wachstum und die Chance, von Anfang an dabei zu sein. Wir bauen auf ein jährlich wiederkehrendes Event hin. Editionen geplant im Sonnenraum (Winter) und Portugal (Anfang 2027).',
+            body: 'Das ist Jahr eins von etwas, das wir weiter aufbauen wollen. Der Pilot ist selbstfinanziert, um Konzept und Publikum zu beweisen. Nächstes Jahr gehen wir auf Fördersuche. Frühe Partner steigen zu besseren Konditionen ein, mit Priorität bei der Verlängerung. Eine Winteredition im Sonnenraum und ein Portugal-Termin Anfang 2027 sind bereits in Planung.',
         },
         whatYouGet: {
             heading: 'Was du bekommst',
