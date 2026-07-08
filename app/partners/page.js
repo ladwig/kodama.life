@@ -120,6 +120,12 @@ export default function PartnersPage() {
                 </div>
 
                 <img
+                    src="/partners/collage.png"
+                    alt="Sidequest"
+                    className={styles.artwork}
+                />
+
+                <img
                     src="https://cdn.resend.app/b2e18824-71c0-49fb-aae8-668775eb6475"
                     alt="Sidequest lineup"
                     className={styles.artwork}
