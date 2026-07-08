@@ -156,7 +156,7 @@ export default function PartnersPage() {
                 <div className={styles.cta}>
                     <h2 className={styles.h2}>{t.cta.heading}</h2>
                     <p className={styles.body}>{t.cta.body}</p>
-                    <a href="mailto:hello@loveatfirstside.quest" className={styles.ctaBtn}>{t.cta.label}</a>
+                    <a href="mailto:booking@kodama.life" className={styles.ctaBtn}>{t.cta.label}</a>
                 </div>
             </div>
         </main>
