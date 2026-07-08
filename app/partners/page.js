@@ -110,11 +110,7 @@ export default function PartnersPage() {
                 <h1 className={styles.h1}>{t.tagline}</h1>
                 <p className={styles.intro}>{t.intro}</p>
 
-                <div className={styles.photoGrid}>
-                    {[1, 2, 3, 4].map(n => (
-                        <img key={n} src={`/location/location-${n}.webp`} alt="" className={styles.photo} />
-                    ))}
-                </div>
+                <img src="https://cdn.resend.app/b2e18824-71c0-49fb-aae8-668775eb6475" alt="sidequest lineup" className={styles.artwork} />
 
                 <div className={styles.divider} />
 
@@ -144,8 +140,12 @@ export default function PartnersPage() {
 
                 <div className={styles.section}>
                     <h2 className={styles.h2}>{lang === 'en' ? 'Aesthetics' : 'Ästhetik'}</h2>
-                    <img src="/partners/collage.png" alt="Sidequest" className={styles.artwork} />
-                    <img src="https://cdn.resend.app/b2e18824-71c0-49fb-aae8-668775eb6475" alt="Sidequest lineup" className={styles.artwork} />
+                    <div className={styles.photoGrid}>
+                        {[1, 2, 3, 4].map(n => (
+                            <img key={n} src={`/location/location-${n}.webp`} alt="" className={styles.photo} />
+                        ))}
+                    </div>
+                    <img src="/partners/collage.png" alt="sidequest" className={styles.artwork} />
                 </div>
 
                 <div className={styles.biggerPicture}>
