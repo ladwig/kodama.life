@@ -110,27 +110,6 @@ export default function PartnersPage() {
                 <h1 className={styles.h1}>{t.tagline}</h1>
                 <p className={styles.intro}>{t.intro}</p>
 
-                <div className={styles.statsRow}>
-                    {t.stats.map((s, i) => (
-                        <div key={i} className={styles.statCard}>
-                            <span className={styles.statValue}>{s.value}</span>
-                            <span className={styles.statLabel}>{s.label}</span>
-                        </div>
-                    ))}
-                </div>
-
-                <img
-                    src="/partners/collage.png"
-                    alt="Sidequest"
-                    className={styles.artwork}
-                />
-
-                <img
-                    src="https://cdn.resend.app/b2e18824-71c0-49fb-aae8-668775eb6475"
-                    alt="Sidequest lineup"
-                    className={styles.artwork}
-                />
-
                 <div className={styles.photoGrid}>
                     {[1, 2, 3, 4].map(n => (
                         <img key={n} src={`/location/location-${n}.webp`} alt="" className={styles.photo} />
@@ -161,6 +140,12 @@ export default function PartnersPage() {
                             </div>
                         ))}
                     </div>
+                </div>
+
+                <div className={styles.section}>
+                    <h2 className={styles.h2}>{lang === 'en' ? 'Aesthetics' : 'Ästhetik'}</h2>
+                    <img src="/partners/collage.png" alt="Sidequest" className={styles.artwork} />
+                    <img src="https://cdn.resend.app/b2e18824-71c0-49fb-aae8-668775eb6475" alt="Sidequest lineup" className={styles.artwork} />
                 </div>
 
                 <div className={styles.biggerPicture}>
