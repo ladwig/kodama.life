@@ -24,6 +24,8 @@ const PUBLIC_PATHS = [
     '/api/newsletter/unsubscribe',
     '/api/confirmation/status',
     '/unsubscribed',
+    // Partner pitch page — public, not linked from the main site
+    '/partners',
     // Chef portal — has its own password protection
     '/chef',
     '/api/chef/',

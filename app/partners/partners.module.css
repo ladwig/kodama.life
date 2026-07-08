@@ -1,0 +1,262 @@
+.page {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background-color: #8CB2AB;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 16px 80px;
+    position: relative;
+}
+
+.langSwitch {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.langBtn {
+    background: none;
+    border: none;
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #000;
+    opacity: 0.4;
+    cursor: pointer;
+    padding: 2px 4px;
+    transition: opacity 0.15s;
+}
+
+.langBtn:hover { opacity: 0.7; }
+
+.langActive {
+    opacity: 1;
+}
+
+.langSep {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 11px;
+    color: #000;
+    opacity: 0.4;
+}
+
+.content {
+    width: 100%;
+    max-width: 600px;
+}
+
+/* ── Hero ── */
+.logoWrap {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 28px;
+    padding-top: 8px;
+}
+
+.metaLine {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #000;
+    opacity: 0.5;
+    margin: 0 0 10px;
+}
+
+.h1 {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: clamp(22px, 5vw, 32px);
+    font-weight: 700;
+    line-height: 1.15;
+    color: #000;
+    margin: 0 0 20px;
+}
+
+.intro {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #000;
+    margin: 0 0 28px;
+}
+
+/* ── Stats ── */
+.statsRow {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 28px;
+}
+
+.statCard {
+    background: #000;
+    color: #8CB2AB;
+    padding: 14px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.statValue {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.statLabel {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.6;
+}
+
+/* ── Images ── */
+.artwork {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.photoGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 32px;
+}
+
+.photo {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    display: block;
+}
+
+/* ── Divider ── */
+.divider {
+    border: none;
+    border-top: 3px solid #000;
+    margin: 4px 0 32px;
+}
+
+/* ── Sections ── */
+.section {
+    margin-bottom: 32px;
+}
+
+.h2 {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #000;
+    margin: 0 0 10px;
+}
+
+.body {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #000;
+    margin: 0;
+}
+
+.list {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #000;
+    margin: 0;
+    padding-left: 1.2em;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* ── Ask grid ── */
+.askGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.askCard {
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+    border-top: 1px solid rgba(0,0,0,0.15);
+    padding-top: 10px;
+}
+
+.askCategory {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #000;
+    min-width: 100px;
+    flex-shrink: 0;
+}
+
+.askDetail {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #000;
+}
+
+/* ── Bigger picture ── */
+.biggerPicture {
+    background: #000;
+    color: #8CB2AB;
+    padding: 24px;
+    margin-bottom: 32px;
+}
+
+.biggerPicture .h2 {
+    color: #8CB2AB;
+    margin-bottom: 8px;
+}
+
+.biggerPicture .body {
+    color: #8CB2AB;
+    opacity: 0.85;
+}
+
+/* ── CTA ── */
+.cta {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ctaBtn {
+    display: inline-block;
+    background: #000;
+    color: #fff;
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 14px 24px;
+    align-self: flex-start;
+    transition: opacity 0.15s;
+}
+
+.ctaBtn:hover { opacity: 0.8; }
+
+@media (max-width: 480px) {
+    .statsRow { grid-template-columns: repeat(2, 1fr); }
+    .askCategory { min-width: 80px; }
+}
