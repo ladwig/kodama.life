@@ -17,7 +17,7 @@ const CONTENT = {
         ],
         whyNow: {
             heading: 'Why partner now?',
-            body: 'This is year one of something we intend to keep building. The pilot is fully self-funded to prove the concept, workload, sustainability, and the audience. Next year we go after proper funding (Initiative Musik, Musicboard Berlin, etc.) for more liquidity. We\'re already planning a winter edition and a date abroad in early 2027. If you get how culturally valuable this is — get on board and grow with us.',
+            body: 'This is year one of something we intend to keep building. The pilot is fully self-funded to prove the concept, workload, sustainability, and the audience. Next year we go after proper funding (Initiative Musik, Musicboard Berlin, etc.) for more liquidity. We\'re already planning a winter edition and a date abroad in early 2027. If you get how culturally valuable this is, get on board and grow with us.',
         },
         crowd: {
             heading: 'The crowd',
@@ -69,7 +69,7 @@ const CONTENT = {
         ],
         whyNow: {
             heading: 'Warum jetzt?',
-            body: 'Das ist Jahr eins von etwas, das wir weiter aufbauen wollen. Der Pilot ist vollständig selbstfinanziert, um Konzept, Aufwand, Nachhaltigkeit und Publikum zu beweisen. Nächstes Jahr gehen wir auf Fördersuche (Initiative Musik, Musicboard Berlin etc.) für mehr Liquidität. Eine Winteredition und ein Auslandstermin Anfang 2027 sind bereits in Planung. Wer versteht, wie kulturell wertvoll das ist — macht mit und wächst mit uns.',
+            body: 'Das ist Jahr eins von etwas, das wir weiter aufbauen wollen. Der Pilot ist vollständig selbstfinanziert, um Konzept, Aufwand, Nachhaltigkeit und Publikum zu beweisen. Nächstes Jahr gehen wir auf Fördersuche (Initiative Musik, Musicboard Berlin etc.) für mehr Liquidität. Eine Winteredition und ein Auslandstermin Anfang 2027 sind bereits in Planung. Wer versteht, wie kulturell wertvoll das ist, macht mit und wächst mit uns.',
         },
         crowd: {
             heading: 'Das Publikum',
