@@ -195,13 +195,8 @@
 }
 
 .askCard > * {
-    border-top: 1px solid rgba(0,0,0,0.15);
-    padding-top: 10px;
-    padding-bottom: 10px;
-}
-
-.askCard:last-child > * {
-    border-bottom: 1px solid rgba(0,0,0,0.15);
+    padding-top: 6px;
+    padding-bottom: 6px;
 }
 
 .askCategory {
