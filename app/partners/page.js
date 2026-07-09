@@ -34,7 +34,7 @@ const CONTENT = {
             items: [
                 'Product visibility with real artists and DJs for 21h',
                 'Exclusivity where relevant (e.g. drinks)',
-                'Founding partner credit on the website',
+                'The good feeling of actively supporting independent culture',
                 'Priority presence at future editions as we grow',
             ],
         },
@@ -86,7 +86,7 @@ const CONTENT = {
             items: [
                 'Produktsichtbarkeit bei echten Künstlern und DJs für 21h',
                 'Exklusivität wo relevant (z.B. Getränke)',
-                'Gründungspartner-Nennung auf der Website',
+                'Das gute Gefühl, unabhängige Kulturprojekte aktiv zu unterstützen',
                 'Priorität bei zukünftigen Editionen',
             ],
         },
