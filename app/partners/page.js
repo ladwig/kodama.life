@@ -19,6 +19,16 @@ const CONTENT = {
             heading: 'Why partner now?',
             body: 'This is year one of something we intend to keep building. The pilot is fully self-funded to prove the concept, workload, sustainability, and the audience. Next year we go after proper funding (Initiative Musik, Musicboard Berlin, etc.) for more liquidity. We\'re already planning a winter edition and a date abroad in early 2027. If you get how culturally valuable this is — get on board and grow with us.',
         },
+        crowd: {
+            heading: 'The crowd',
+            intro: 'Curated through invitation and word of mouth, not mass marketing.',
+            items: [
+                'Primarily Berlin-based, with guests from other major urban centres',
+                'Ages 25–35, working professionals with disposable income',
+                'An audience that actively invests in experiences, art, and culture',
+                'Mixed, international, and genuinely curious',
+            ],
+        },
         whatYouGet: {
             heading: 'Benefits',
             items: [
@@ -60,6 +70,16 @@ const CONTENT = {
         whyNow: {
             heading: 'Warum jetzt?',
             body: 'Das ist Jahr eins von etwas, das wir weiter aufbauen wollen. Der Pilot ist vollständig selbstfinanziert, um Konzept, Aufwand, Nachhaltigkeit und Publikum zu beweisen. Nächstes Jahr gehen wir auf Fördersuche (Initiative Musik, Musicboard Berlin etc.) für mehr Liquidität. Eine Winteredition und ein Auslandstermin Anfang 2027 sind bereits in Planung. Wer versteht, wie kulturell wertvoll das ist — macht mit und wächst mit uns.',
+        },
+        crowd: {
+            heading: 'Das Publikum',
+            intro: 'Kuratiert durch Einladung und Mundpropaganda, kein Massenmarketing.',
+            items: [
+                'Hauptsächlich Berlin, mit Gästen aus anderen Großstädten',
+                '25–35 Jahre, Berufstätige mit Kaufkraft',
+                'Ein Publikum, das aktiv in Erlebnisse, Kunst und Kultur investiert',
+                'Gemischt, international, neugierig',
+            ],
         },
         whatYouGet: {
             heading: 'Benefits',
@@ -119,6 +139,14 @@ export default function PartnersPage() {
                 <div className={styles.section}>
                     <h2 className={styles.h2}>{t.whyNow.heading}</h2>
                     <p className={styles.body}>{t.whyNow.body}</p>
+                </div>
+
+                <div className={styles.section}>
+                    <h2 className={styles.h2}>{t.crowd.heading}</h2>
+                    <p className={styles.body} style={{ marginBottom: '12px', fontStyle: 'italic' }}>{t.crowd.intro}</p>
+                    <ul className={styles.list}>
+                        {t.crowd.items.map((item, i) => <li key={i}>{item}</li>)}
+                    </ul>
                 </div>
 
                 <div className={styles.section}>
