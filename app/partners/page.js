@@ -33,8 +33,8 @@ const CONTENT = {
             items: [
                 { category: 'DJ gear', detail: 'Loan or demo units' },
                 { category: 'Gadgets', detail: 'Health shots, supplements, anything fun and useful on site' },
-                { category: 'Drinks', detail: 'Sale-or-return or exclusive partner' },
-                { category: 'Infrastructure', detail: 'Toilets, fencing. Sponsored or reduced rate.' },
+                { category: 'Drinks', detail: 'Sale-or-return or exclusive partner. We\'re open to only selling your brand on site.' },
+                { category: 'Infrastructure', detail: 'Fridges, toilets, fencing. Sponsored or reduced rate.' },
             ],
         },
         bigger: {
@@ -75,8 +75,8 @@ const CONTENT = {
             items: [
                 { category: 'DJ-Gear', detail: 'Leihgeräte oder Demo-Units' },
                 { category: 'Gadgets', detail: 'Ingwer-Shots, Supplements, alles Sinnvolle und Nützliche vor Ort' },
-                { category: 'Getränke', detail: 'Sale-or-return oder exklusiver Partner' },
-                { category: 'Infrastruktur', detail: 'Toiletten, Absperrung. Gesponsert oder vergünstigt.' },
+                { category: 'Getränke', detail: 'Sale-or-return oder exklusiver Partner. Wir sind offen dafür, ausschließlich eure Marke vor Ort zu verkaufen.' },
+                { category: 'Infrastruktur', detail: 'Kühlschränke, Toiletten, Absperrung. Gesponsert oder vergünstigt.' },
             ],
         },
         bigger: {
