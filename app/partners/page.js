@@ -16,22 +16,23 @@ const CONTENT = {
             { value: 'LOUD', label: 'Soundsystem' },
         ],
         whyNow: {
-            heading: 'Why Partner Now?',
-            body: 'This is year one of something we intend to keep building. The pilot is self-funded to prove the concept and the audience. Next year we go after proper funding. Early partners come in at ground level, with better terms, priority renewal, and a real say in how the partnership grows. We\'re already planning a winter edition at Sonnenraum and a Portugal date in early 2027.',
+            heading: 'Why partner now?',
+            body: 'This is year one of something we intend to keep building. The pilot is fully self-funded to prove the concept, workload, sustainability, and the audience. Next year we go after proper funding (Initiative Musik, Musicboard Berlin, etc.) for more liquidity. We\'re already planning a winter edition and a date abroad in early 2027. If you get how culturally valuable this is — get on board and grow with us.',
         },
         whatYouGet: {
-            heading: 'What You Get',
+            heading: 'What you get',
             items: [
-                'Product visibility with real artists and DJs for 21 hours',
+                'Product visibility with real artists and DJs for 21h',
                 'Exclusivity where relevant (e.g. drinks)',
-                'Founding partner credit across all materials and channels',
+                'Founding partner credit on the website',
                 'Priority presence at future editions as we grow',
             ],
         },
         asking: {
-            heading: "What We're Looking For",
+            heading: "What we're looking for",
             items: [
-                { category: 'Equipment', detail: 'Loan or demo units: Allen & Heath, Technics' },
+                { category: 'DJ gear', detail: 'Loan or demo units' },
+                { category: 'Gadgets', detail: 'Health shots, supplements, anything fun and useful on site' },
                 { category: 'Drinks', detail: 'Sale-or-return or exclusive partner' },
                 { category: 'Infrastructure', detail: 'Toilets, fencing. Sponsored or reduced rate.' },
             ],
@@ -58,23 +59,24 @@ const CONTENT = {
         ],
         whyNow: {
             heading: 'Warum jetzt?',
-            body: 'Das ist Jahr eins von etwas, das wir weiter aufbauen wollen. Der Pilot ist selbstfinanziert, um Konzept und Publikum zu beweisen. Nächstes Jahr gehen wir auf Fördersuche. Frühe Partner steigen zu besseren Konditionen ein, mit Priorität bei der Verlängerung. Eine Winteredition im Sonnenraum und ein Portugal-Termin Anfang 2027 sind bereits in Planung.',
+            body: 'Das ist Jahr eins von etwas, das wir weiter aufbauen wollen. Der Pilot ist vollständig selbstfinanziert, um Konzept, Aufwand, Nachhaltigkeit und Publikum zu beweisen. Nächstes Jahr gehen wir auf Fördersuche (Initiative Musik, Musicboard Berlin etc.) für mehr Liquidität. Eine Winteredition und ein Auslandstermin Anfang 2027 sind bereits in Planung. Wer versteht, wie kulturell wertvoll das ist — macht mit und wächst mit uns.',
         },
         whatYouGet: {
             heading: 'Was du bekommst',
             items: [
-                'Produktsichtbarkeit bei echten Künstlern und DJs für 21 Stunden',
+                'Produktsichtbarkeit bei echten Künstlern und DJs für 21h',
                 'Exklusivität wo relevant (z.B. Getränke)',
-                'Gründungspartner-Nennung auf allen Materialien und Kanälen',
+                'Gründungspartner-Nennung auf der Website',
                 'Priorität bei zukünftigen Editionen',
             ],
         },
         asking: {
             heading: 'Was wir suchen',
             items: [
-                { category: 'Equipment', detail: 'Leihgeräte oder Demo-Units: Allen & Heath, Technics' },
+                { category: 'DJ-Gear', detail: 'Leihgeräte oder Demo-Units' },
+                { category: 'Gadgets', detail: 'Ingwer-Shots, Supplements, alles Sinnvolle und Nützliche vor Ort' },
                 { category: 'Getränke', detail: 'Sale-or-return oder exklusiver Partner' },
-                { category: 'Infrastruktur', detail: 'Toiletten, Absperrung — gesponsert oder vergünstigt' },
+                { category: 'Infrastruktur', detail: 'Toiletten, Absperrung. Gesponsert oder vergünstigt.' },
             ],
         },
         bigger: {
