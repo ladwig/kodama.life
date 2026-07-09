@@ -20,7 +20,7 @@ const CONTENT = {
             body: 'This is year one of something we intend to keep building. The pilot is fully self-funded to prove the concept, workload, sustainability, and the audience. Next year we go after proper funding (Initiative Musik, Musicboard Berlin, etc.) for more liquidity. We\'re already planning a winter edition and a date abroad in early 2027. If you get how culturally valuable this is — get on board and grow with us.',
         },
         whatYouGet: {
-            heading: 'What you get',
+            heading: 'Benefits',
             items: [
                 'Product visibility with real artists and DJs for 21h',
                 'Exclusivity where relevant (e.g. drinks)',
@@ -62,7 +62,7 @@ const CONTENT = {
             body: 'Das ist Jahr eins von etwas, das wir weiter aufbauen wollen. Der Pilot ist vollständig selbstfinanziert, um Konzept, Aufwand, Nachhaltigkeit und Publikum zu beweisen. Nächstes Jahr gehen wir auf Fördersuche (Initiative Musik, Musicboard Berlin etc.) für mehr Liquidität. Eine Winteredition und ein Auslandstermin Anfang 2027 sind bereits in Planung. Wer versteht, wie kulturell wertvoll das ist — macht mit und wächst mit uns.',
         },
         whatYouGet: {
-            heading: 'Was du bekommst',
+            heading: 'Benefits',
             items: [
                 'Produktsichtbarkeit bei echten Künstlern und DJs für 21h',
                 'Exklusivität wo relevant (z.B. Getränke)',
