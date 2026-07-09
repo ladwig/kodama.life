@@ -8,7 +8,7 @@ const CONTENT = {
     en: {
         subtitle: 'August 22, 2026 · Outskirts of Berlin',
         tagline: 'Partner with sidequest',
-        intro: 'sidequest is a fully self-funded, community-driven festival. Not a commercial event. Not a brand activation. A pilot built by people who care deeply about underground culture and want to do it properly: high-quality sound, intentional programming, a curated crowd of 300–400, and an experience that actually means something. Built with contributions from SOUP.fm, QS1, Clubcommission, Daycare, Waking Life, and Giegling, supported by a team of volunteers working between Berlin and Lisbon.',
+        intro: 'sidequest is a fully self-funded, community-driven festival. Not a commercial event. Not a brand activation. A pilot built by people who care deeply about underground culture and want to do it properly: high-quality sound, intentional programming, a curated crowd of 300 to 400, and an experience that actually means something. Built with contributions from SOUP.fm, QS1, Clubcommission, Daycare, Waking Life, and Giegling, supported by a team of volunteers working between Berlin and Lisbon.',
         stats: [
             { value: '21h', label: 'Festival' },
             { value: '8', label: 'DJs' },
@@ -24,7 +24,7 @@ const CONTENT = {
             intro: 'Curated through invitation and word of mouth, not mass marketing.',
             items: [
                 'Primarily Berlin-based, with guests from other major urban centres',
-                'Ages 25–35, working professionals with disposable income',
+                'Ages 25 to 35, working professionals with disposable income',
                 'An audience that actively invests in experiences, art, and culture',
                 'Mixed, international, and genuinely curious',
             ],
@@ -60,7 +60,7 @@ const CONTENT = {
     de: {
         subtitle: '22. August 2026 · Berliner Stadtrand',
         tagline: 'Partner werden bei sidequest',
-        intro: 'sidequest ist ein vollständig selbstfinanziertes, community-getriebenes Festival. Kein kommerzielles Event. Keine Markeninszenierung. Ein Pilot gebaut von Menschen, denen Underground-Kultur wirklich am Herzen liegt: hochwertiger Sound, durchdachtes Programm, ein kuratiertes Publikum von 300–400 Gästen. Entstanden mit Beiträgen von SOUP.fm, QS1, Clubcommission, Daycare, Waking Life und Giegling, unterstützt von einem Team aus Freiwilligen zwischen Berlin und Lissabon.',
+        intro: 'sidequest ist ein vollständig selbstfinanziertes, community-getriebenes Festival. Kein kommerzielles Event. Keine Markeninszenierung. Ein Pilot gebaut von Menschen, denen Underground-Kultur wirklich am Herzen liegt: hochwertiger Sound, durchdachtes Programm, ein kuratiertes Publikum von 300 bis 400 Gästen. Entstanden mit Beiträgen von SOUP.fm, QS1, Clubcommission, Daycare, Waking Life und Giegling, unterstützt von einem Team aus Freiwilligen zwischen Berlin und Lissabon.',
         stats: [
             { value: '21h', label: 'Festival' },
             { value: '8', label: 'DJs' },
@@ -76,7 +76,7 @@ const CONTENT = {
             intro: 'Kuratiert durch Einladung und Mundpropaganda, kein Massenmarketing.',
             items: [
                 'Hauptsächlich Berlin, mit Gästen aus anderen Großstädten',
-                '25–35 Jahre, Berufstätige mit Kaufkraft',
+                '25 bis 35 Jahre, Berufstätige mit Kaufkraft',
                 'Ein Publikum, das aktiv in Erlebnisse, Kunst und Kultur investiert',
                 'Gemischt, international, neugierig',
             ],
