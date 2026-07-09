@@ -185,17 +185,23 @@
 
 /* ── Ask grid ── */
 .askGrid {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    column-gap: 20px;
 }
 
 .askCard {
-    display: flex;
-    gap: 12px;
-    align-items: baseline;
+    display: contents;
+}
+
+.askCard > * {
     border-top: 1px solid rgba(0,0,0,0.15);
     padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.askCard:last-child > * {
+    border-bottom: 1px solid rgba(0,0,0,0.15);
 }
 
 .askCategory {
@@ -205,8 +211,6 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: #000;
-    min-width: 100px;
-    flex-shrink: 0;
 }
 
 .askDetail {
