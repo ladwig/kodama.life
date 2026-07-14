@@ -41,7 +41,6 @@ export default function GuestlistClient({ token, label, max, initialGuests }) {
                         token={token}
                         onIssued={(g) => setGuests((prev) => [...prev, g])}
                         onUpdate={(g) => setGuests((prev) => prev.map((x) => x.orderId === guest.orderId ? g : x))}
-                        onRemove={() => setGuests((prev) => prev.filter((x) => x.orderId !== guest.orderId))}
                     />
                 ))}
             </div>
@@ -49,7 +48,7 @@ export default function GuestlistClient({ token, label, max, initialGuests }) {
     );
 }
 
-function GuestRow({ guest, index, token, onIssued, onUpdate, onRemove }) {
+function GuestRow({ guest, index, token, onIssued, onUpdate }) {
     const [name, setName] = useState(guest?.name || '');
     const [email, setEmail] = useState(guest?.email || '');
     const [busy, setBusy] = useState(false);
@@ -93,18 +92,6 @@ function GuestRow({ guest, index, token, onIssued, onUpdate, onRemove }) {
         }
     }
 
-    async function remove() {
-        if (!confirm(`Remove ${guest.name}? This frees the slot and invalidates their ticket.`)) return;
-        setBusy(true);
-        try {
-            await call(token, { action: 'remove', orderId: guest.orderId });
-            onRemove();
-        } catch (err) {
-            setError(err.message);
-            setBusy(false);
-        }
-    }
-
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', padding: '0.6rem 0', borderTop: '1px solid rgba(0,0,0,0.1)' }}>
             <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
@@ -122,12 +109,6 @@ function GuestRow({ guest, index, token, onIssued, onUpdate, onRemove }) {
                         title="Download ticket" style={{ flexShrink: 0, padding: '0 0.6rem', textDecoration: 'none' }}>
                         ↓
                     </a>
-                )}
-                {issued && (
-                    <button type="button" onClick={remove} disabled={busy} className="btn-raw"
-                        title="Remove" style={{ flexShrink: 0, padding: '0 0.6rem' }}>
-                        ✕
-                    </button>
                 )}
             </div>
             {issued && <div style={{ paddingLeft: '1.8rem', fontSize: '0.72rem', opacity: 0.6, fontFamily: "'Funnel Display', sans-serif", letterSpacing: '0.04em' }}>{guest.code}</div>}
