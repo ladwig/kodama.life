@@ -151,6 +151,61 @@ export default function ChefPage() {
     const [magicCopiedIdx, setMagicCopiedIdx] = useState(null);
     const [magicAllCopied, setMagicAllCopied] = useState(false);
 
+    // Guestlist links (free-ticket links, listed under the magic links form)
+    const [glLabel, setGlLabel] = useState('');
+    const [glCount, setGlCount] = useState('5');
+    const [glLoading, setGlLoading] = useState(false);
+    const [glStatus, setGlStatus] = useState('');
+    const [glList, setGlList] = useState([]);
+    const [glCopiedJti, setGlCopiedJti] = useState(null);
+
+    const fetchGuestlistLinks = async (providedPw) => {
+        const pw = (typeof providedPw === 'string') ? providedPw : (password || sessionStorage.getItem('chef_pw'));
+        try {
+            const res = await fetch('/api/chef/guestlists', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: pw }),
+            });
+            const data = await res.json();
+            if (res.ok) setGlList(data.guestlists || []);
+        } catch {}
+    };
+
+    const handleCreateGuestlist = async (e) => {
+        e.preventDefault();
+        setGlStatus('');
+        setGlLoading(true);
+        try {
+            const res = await fetch('/api/chef/guestlist-link', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password, label: glLabel, count: parseInt(glCount, 10) }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setGlStatus(`Created guestlist for ${data.label}`);
+                setGlLabel('');
+                fetchGuestlistLinks();
+            } else {
+                setGlStatus(`Error: ${data.error}`);
+                if (res.status === 401) setAuthorized(false);
+            }
+        } catch (err) {
+            setGlStatus(`Error: ${err.message}`);
+        } finally {
+            setGlLoading(false);
+        }
+    };
+
+    const copyGuestlistLink = async (url, jti) => {
+        try {
+            await navigator.clipboard.writeText(url);
+            setGlCopiedJti(jti);
+            setTimeout(() => setGlCopiedJti(null), 1500);
+        } catch {}
+    };
+
     const handleGenerateLinks = async (e) => {
         e.preventDefault();
         setMagicStatus('');
@@ -282,6 +337,7 @@ export default function ChefPage() {
     const toggleTab = (tab) => {
         setActiveTab(tab);
         if (tab === 'guestlist') fetchGuestlist();
+        if (tab === 'magic') fetchGuestlistLinks();
         if (tab === 'stats') fetchStats();
     };
 
@@ -863,6 +919,76 @@ export default function ChefPage() {
                                         )}
                                     </div>
                                 )}
+
+                                {/* ── Guestlist links (free tickets, no checkout) ── */}
+                                <div style={{ borderTop: '2px solid var(--ink, #000)', marginTop: '1.5rem', paddingTop: '1.25rem' }}>
+                                    <h3 style={{ margin: '0 0 0.75rem', fontSize: '0.95rem', fontWeight: 700 }}>Guestlist links</h3>
+                                    <p style={{ margin: '0 0 1rem', fontSize: '0.75rem', color: 'var(--ink-muted)' }}>
+                                        Free tickets. Share the link; the recipient enters names up to the limit — no payment.
+                                    </p>
+                                    <form onSubmit={handleCreateGuestlist} style={styles.form}>
+                                        <div style={styles.row}>
+                                            <div style={{ ...styles.fieldGroup, flex: 2 }}>
+                                                <label style={styles.label}>For (label)</label>
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    value={glLabel}
+                                                    onChange={(e) => setGlLabel(e.target.value)}
+                                                    style={styles.input}
+                                                    placeholder="e.g. Artist A"
+                                                />
+                                            </div>
+                                            <div style={{ ...styles.fieldGroup, flex: 1 }}>
+                                                <label style={styles.label}>Free tickets</label>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max="1000"
+                                                    required
+                                                    value={glCount}
+                                                    onChange={(e) => setGlCount(e.target.value)}
+                                                    style={styles.input}
+                                                    placeholder="5"
+                                                />
+                                            </div>
+                                        </div>
+                                        <button type="submit" className="submit-btn" style={styles.button} disabled={glLoading}>
+                                            {glLoading ? 'Creating…' : 'Create Guestlist Link'}
+                                        </button>
+                                    </form>
+
+                                    {glStatus && (
+                                        <div style={{
+                                            ...styles.status,
+                                            backgroundColor: glStatus.startsWith('Error') ? 'rgba(220, 38, 38, 0.1)' : 'rgba(74, 103, 65, 0.1)',
+                                            color: glStatus.startsWith('Error') ? '#dc2626' : 'var(--accent)',
+                                            borderColor: glStatus.startsWith('Error') ? 'rgba(220, 38, 38, 0.2)' : 'rgba(74, 103, 65, 0.2)',
+                                        }}>
+                                            {glStatus}
+                                        </div>
+                                    )}
+
+                                    {glList.length > 0 && (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginTop: '1rem' }}>
+                                            {glList.map((gl) => (
+                                                <div key={gl.jti} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                                        <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>{gl.label || 'Unnamed'}</div>
+                                                        <div style={{ fontSize: '0.72rem', color: 'var(--ink-muted)' }}>{gl.used} of {gl.max} used</div>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => copyGuestlistLink(gl.url, gl.jti)}
+                                                        style={{ ...styles.button, marginTop: 0, padding: '0 12px', fontSize: '0.75rem', whiteSpace: 'nowrap', flexShrink: 0 }}
+                                                    >
+                                                        {glCopiedJti === gl.jti ? '✓ Copied' : 'Copy link'}
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         )}
 
@@ -1019,6 +1145,7 @@ export default function ChefPage() {
                                                     ['Orders', stats.summary.totalOrders],
                                                     ['Net Revenue', fmt(stats.summary.netRevenue)],
                                                     ['Avg per Ticket', fmt(stats.summary.avgPricePerTicket)],
+                                                    ['Guestlist Tickets', stats.summary.guestlistTickets ?? 0],
                                                 ].map(([label, value]) => (
                                                     <div key={label} style={statCard}>
                                                         <div style={{ fontSize: '1.4rem', fontWeight: '700', color: 'var(--ink)' }}>{value}</div>

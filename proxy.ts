@@ -32,6 +32,9 @@ const PUBLIC_PATHS = [
     // Magic ticket links — JWT in the URL is the auth
     '/magic-ticket',
     '/api/checkout/create-magic-intent',
+    // Guestlist links — JWT in the URL is the auth
+    '/guestlist',
+    '/api/guestlist',
     '/confirmation',
     '/newsletters',
 ];

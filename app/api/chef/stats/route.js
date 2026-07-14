@@ -26,13 +26,19 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Failed to load data' }, { status: 500 });
         }
 
-        const totalTickets = orders.reduce((sum, o) => sum + o.quantity, 0);
-        const grossRevenue = orders.reduce((sum, o) => sum + o.total_price, 0);
-        const netRevenue = orders.reduce((sum, o) => sum + (o.price_per_ticket * o.quantity), 0);
+        // Guestlist tickets are free and tracked separately — exclude from all sales KPIs.
+        const salesOrders = orders.filter((o) => o.source !== 'guestlist');
+        const guestlistTickets = orders
+            .filter((o) => o.source === 'guestlist')
+            .reduce((sum, o) => sum + o.quantity, 0);
+
+        const totalTickets = salesOrders.reduce((sum, o) => sum + o.quantity, 0);
+        const grossRevenue = salesOrders.reduce((sum, o) => sum + o.total_price, 0);
+        const netRevenue = salesOrders.reduce((sum, o) => sum + (o.price_per_ticket * o.quantity), 0);
 
         // By source
         const bySource = {};
-        for (const o of orders) {
+        for (const o of salesOrders) {
             const src = o.source || 'online';
             if (!bySource[src]) bySource[src] = { orders: 0, tickets: 0, revenue: 0 };
             bySource[src].orders += 1;
@@ -42,7 +48,7 @@ export async function POST(req) {
 
         // By payment method
         const byMethod = {};
-        for (const o of orders) {
+        for (const o of salesOrders) {
             const m = o.payment_method || 'unknown';
             if (!byMethod[m]) byMethod[m] = { orders: 0, tickets: 0 };
             byMethod[m].orders += 1;
@@ -51,7 +57,7 @@ export async function POST(req) {
 
         // Price distribution (in euros, per ticket)
         const priceDist = {};
-        for (const o of orders) {
+        for (const o of salesOrders) {
             const euros = Math.round(o.price_per_ticket / 100);
             priceDist[euros] = (priceDist[euros] || 0) + o.quantity;
         }
@@ -61,7 +67,7 @@ export async function POST(req) {
 
         // Sales over time — group by date
         const salesByDate = {};
-        for (const o of orders) {
+        for (const o of salesOrders) {
             const date = o.created_at.slice(0, 10);
             if (!salesByDate[date]) salesByDate[date] = { orders: 0, tickets: 0, revenue: 0 };
             salesByDate[date].orders += 1;
@@ -71,11 +77,12 @@ export async function POST(req) {
 
         return NextResponse.json({
             summary: {
-                totalOrders: orders.length,
+                totalOrders: salesOrders.length,
                 totalTickets,
                 grossRevenue,
                 netRevenue,
                 avgPricePerTicket: totalTickets > 0 ? Math.round(netRevenue / totalTickets) : 0,
+                guestlistTickets,
             },
             checkins: {
                 total: tickets.length,
