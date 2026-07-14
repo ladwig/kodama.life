@@ -31,7 +31,7 @@ export default function GuestlistClient({ token, label, max, initialGuests }) {
 
                 <div className={styles.selfFundedNote} style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <span><strong>{used} of {max} issued.</strong> Enter a name and save to issue a free ticket.</span>
-                    <span>You can share the ticket code directly, or add an email to send it to a friend as a QR code.</span>
+                    <span>You can share the ticket code directly, or add an email to send it to a friend as a QR code (tell them to check spam).</span>
                     <span>A ticket is always bound to a name, but the name can be changed anytime. Each ticket code only works once. Changing the email re-issues the ticket and invalidates the old one.</span>
                 </div>
 
