@@ -8,7 +8,7 @@ const EVENT_DATE = '2026-08-22';
 export async function POST(req) {
     try {
         const body = await req.json();
-        const { token, buyer_name, buyer_email, amount, quantity = 1 } = body;
+        const { token, buyer_name, buyer_email, buyer_phone = '', amount, quantity = 1, ticket_holders } = body;
 
         if (!buyer_name?.trim()) {
             return NextResponse.json({ error: 'Name is required.' }, { status: 400 });
@@ -28,6 +28,10 @@ export async function POST(req) {
         }
 
         const qty = Math.max(1, parseInt(quantity, 10) || 1);
+        // Holder names from the buyer; fall back to buyer name to fill any gaps.
+        const holders = Array.from({ length: qty }, (_, i) =>
+            (Array.isArray(ticket_holders) && ticket_holders[i]?.trim()) || buyer_name.trim()
+        );
 
         const supabase = getSupabaseAdmin();
         const uses = payload.uses || 1;
@@ -55,13 +59,13 @@ export async function POST(req) {
             metadata: {
                 buyer_name: buyer_name.trim(),
                 buyer_email: buyer_email.toLowerCase().trim(),
-                buyer_phone: '',
+                buyer_phone: (buyer_phone || '').trim(),
                 quantity: String(qty),
                 price_per_ticket: String(amountInt * 100),
                 base_total: String(baseAmount),
                 event_date: EVENT_DATE,
                 group_deal: 'false',
-                ticket_holders: JSON.stringify(Array(qty).fill(buyer_name.trim())),
+                ticket_holders: JSON.stringify(holders),
                 magic_link_jti: payload.jti,
                 magic_link_uses: String(uses),
                 source: 'magic_link',

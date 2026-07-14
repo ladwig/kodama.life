@@ -88,14 +88,46 @@ function PaymentScreen({ totalWithFee, onBack }) {
 export default function MagicTicketClient({ minPrice, token, remaining = 1 }) {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
     const [amount, setAmount] = useState(String(minPrice));
     const [quantity, setQuantity] = useState(1);
+    const [holderNames, setHolderNames] = useState(['']);
+    const [holder0Touched, setHolder0Touched] = useState(false);
     const [step, setStep] = useState('form');
     const [clientSecret, setClientSecret] = useState('');
     const [loading, setLoading] = useState(false);
     const [formError, setFormError] = useState('');
 
     useEffect(() => { preloadSounds(); }, []);
+
+    // Keep the holder-name inputs in sync with the quantity
+    useEffect(() => {
+        setHolderNames((prev) => {
+            const next = [...prev];
+            while (next.length < quantity) next.push('');
+            return next.slice(0, quantity);
+        });
+    }, [quantity]);
+
+    // First holder defaults to the buyer's name until they edit it
+    useEffect(() => {
+        if (!holder0Touched) {
+            setHolderNames((prev) => {
+                const next = [...prev];
+                next[0] = name;
+                return next;
+            });
+        }
+    }, [name, holder0Touched]);
+
+    function updateHolder(idx, val) {
+        if (idx === 0) setHolder0Touched(true);
+        setHolderNames((prev) => {
+            const next = [...prev];
+            next[idx] = val;
+            return next;
+        });
+    }
 
     const amountNum = parseInt(amount, 10) || 0;
     const totalWithFee = Math.ceil((amountNum * quantity * 100 + 25) / 0.985) / 100;
@@ -107,13 +139,14 @@ export default function MagicTicketClient({ minPrice, token, remaining = 1 }) {
         if (!name.trim()) { setFormError('Please enter your name.'); return; }
         if (!email.includes('@')) { setFormError('Please enter a valid email.'); return; }
         if (amountNum < minPrice) { setFormError(`Minimum price is €${minPrice}.`); return; }
+        if (holderNames.some((h) => !h.trim())) { setFormError('Please name every ticket holder.'); return; }
 
         setLoading(true);
         try {
             const res = await fetch('/api/checkout/create-magic-intent', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token, buyer_name: name, buyer_email: email, amount: amountNum, quantity }),
+                body: JSON.stringify({ token, buyer_name: name, buyer_email: email, buyer_phone: phone, amount: amountNum, quantity, ticket_holders: holderNames }),
             });
 
             const data = await res.json();
@@ -200,6 +233,13 @@ export default function MagicTicketClient({ minPrice, token, remaining = 1 }) {
                                     placeholder="Email"
                                     required
                                 />
+                                <input
+                                    type="tel"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                    className={styles.input}
+                                    placeholder="Phone (optional)"
+                                />
                             </div>
                         </section>
 
@@ -217,6 +257,17 @@ export default function MagicTicketClient({ minPrice, token, remaining = 1 }) {
                                 </div>
                             </section>
                         )}
+
+                        <section className={styles.section}>
+                            <h2 className={styles.sectionTitle}>Who's coming</h2>
+                            <div className={styles.fieldGroup}>
+                                {holderNames.map((holder, idx) => (
+                                    <input key={idx} type="text" value={holder}
+                                        onChange={(e) => updateHolder(idx, e.target.value)}
+                                        className={styles.input} placeholder={`Ticket ${idx + 1}`} required />
+                                ))}
+                            </div>
+                        </section>
 
                         <section className={styles.section}>
                             <h2 className={styles.sectionTitle}>
