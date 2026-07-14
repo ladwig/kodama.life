@@ -517,7 +517,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                                     <FireImg className={styles.illustratedBtnImgRight} hovered={btnHovered} />
                                 </Link>
                                 <a
-                                    href="https://t.me/+RjM5ar5Y-Y81MGFi"
+                                    href="https://telegram.me/+RjM5ar5Y-Y81MGFi"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className={styles.illustratedBtn}
