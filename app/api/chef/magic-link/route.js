@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { signMagicLinkJWT } from '@/lib/jwt';
 import { Resend } from 'resend';
 import { getChefPassword } from '@/lib/config';
+import { getSupabaseAdmin } from '@/lib/supabase';
 
 const resend = (process.env.RESEND_API_KEY && !process.env.RESEND_API_KEY.endsWith('_...'))
     ? new Resend(process.env.RESEND_API_KEY)
@@ -20,7 +21,7 @@ function generateJti() {
 export async function POST(req) {
     try {
         const body = await req.json();
-        const { password, price, count = 1, uses = 1, email, send_email = false } = body;
+        const { password, price, count = 1, uses = 1, label, email, send_email = false } = body;
 
         if (password !== await getChefPassword()) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -37,6 +38,7 @@ export async function POST(req) {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://sidequest.life';
         const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
 
+        const supabase = getSupabaseAdmin();
         const links = [];
         for (let i = 0; i < countInt; i++) {
             const jti = generateJti();
@@ -46,6 +48,14 @@ export async function POST(req) {
                 url: `${baseUrl}/magic-ticket/${token}`,
                 uses: usesInt,
                 expires_at: expiresAt.toISOString(),
+            });
+            // Store so chef can list them later with label + claimed count
+            await supabase.from('magic_links').insert({
+                jti,
+                label: label?.trim() || null,
+                price: priceEuros,
+                uses: usesInt,
+                token,
             });
         }
 

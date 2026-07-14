@@ -150,6 +150,30 @@ export default function ChefPage() {
     const [magicStatus, setMagicStatus] = useState('');
     const [magicCopiedIdx, setMagicCopiedIdx] = useState(null);
     const [magicAllCopied, setMagicAllCopied] = useState(false);
+    const [magicLabel, setMagicLabel] = useState('');
+    const [magicLinksList, setMagicLinksList] = useState([]);
+    const [magicListCopiedJti, setMagicListCopiedJti] = useState(null);
+
+    const fetchMagicLinksList = async (providedPw) => {
+        const pw = (typeof providedPw === 'string') ? providedPw : (password || sessionStorage.getItem('chef_pw'));
+        try {
+            const res = await fetch('/api/chef/magic-links', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: pw }),
+            });
+            const data = await res.json();
+            if (res.ok) setMagicLinksList(data.links || []);
+        } catch {}
+    };
+
+    const copyMagicListLink = async (url, jti) => {
+        try {
+            await navigator.clipboard.writeText(url);
+            setMagicListCopiedJti(jti);
+            setTimeout(() => setMagicListCopiedJti(null), 1500);
+        } catch {}
+    };
 
     // Guestlist links (free-ticket links, listed under the magic links form)
     const [glLabel, setGlLabel] = useState('');
@@ -220,6 +244,7 @@ export default function ChefPage() {
                     price: magicPrice,
                     count: parseInt(magicCount, 10),
                     uses: parseInt(magicUses, 10),
+                    label: magicLabel || undefined,
                     email: magicEmail || undefined,
                     send_email: magicSendEmail && !!magicEmail,
                 }),
@@ -227,6 +252,8 @@ export default function ChefPage() {
             const data = await res.json();
             if (res.ok) {
                 setMagicLinks(data.links);
+                setMagicLabel('');
+                fetchMagicLinksList();
                 const sent = magicSendEmail && magicEmail;
                 setMagicStatus(sent ? `Links created and emailed to ${magicEmail}` : 'Links created');
                 if (data.links.length > 0) {
@@ -337,7 +364,7 @@ export default function ChefPage() {
     const toggleTab = (tab) => {
         setActiveTab(tab);
         if (tab === 'guestlist') fetchGuestlist();
-        if (tab === 'magic') fetchGuestlistLinks();
+        if (tab === 'magic') { fetchGuestlistLinks(); fetchMagicLinksList(); }
         if (tab === 'stats') fetchStats();
     };
 
@@ -839,6 +866,17 @@ export default function ChefPage() {
                                     </div>
 
                                     <div style={styles.fieldGroup}>
+                                        <label style={styles.label}>For / label (optional)</label>
+                                        <input
+                                            type="text"
+                                            value={magicLabel}
+                                            onChange={(e) => setMagicLabel(e.target.value)}
+                                            style={styles.input}
+                                            placeholder="e.g. Partner XY"
+                                        />
+                                    </div>
+
+                                    <div style={styles.fieldGroup}>
                                         <label style={styles.label}>Send to Email (optional)</label>
                                         <input
                                             type="email"
@@ -917,6 +955,32 @@ export default function ChefPage() {
                                                 {magicAllCopied ? '✓ All Copied' : `Copy All ${magicLinks.length} Links`}
                                             </button>
                                         )}
+                                    </div>
+                                )}
+
+                                {/* ── Created magic links (label + claimed count) ── */}
+                                {magicLinksList.length > 0 && (
+                                    <div style={{ borderTop: '2px solid var(--ink, #000)', marginTop: '1.5rem', paddingTop: '1.25rem' }}>
+                                        <h3 style={{ margin: '0 0 0.75rem', fontSize: '0.95rem', fontWeight: 700 }}>Created links</h3>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                                            {magicLinksList.map((l) => (
+                                                <div key={l.jti} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                                        <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>{l.label || 'Unlabeled'}</div>
+                                                        <div style={{ fontSize: '0.72rem', color: 'var(--ink-muted)' }}>
+                                                            {l.claimed} of {l.uses} claimed · min €{l.price}
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => copyMagicListLink(l.url, l.jti)}
+                                                        style={{ ...styles.button, marginTop: 0, padding: '0 12px', fontSize: '0.75rem', whiteSpace: 'nowrap', flexShrink: 0 }}
+                                                    >
+                                                        {magicListCopiedJti === l.jti ? '✓ Copied' : 'Copy link'}
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 )}
 
