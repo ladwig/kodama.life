@@ -28,14 +28,17 @@ export async function POST(req) {
         }
 
         const supabase = getSupabaseAdmin();
-        const { data: existing } = await supabase
+        const uses = payload.uses || 1;
+        // ponytail: one magic claim = one ticket (quantity hardcoded to 1 below),
+        // so counting orders == counting tickets. If magic links ever allow
+        // quantity > 1, switch this to summing orders.quantity.
+        const { count } = await supabase
             .from('orders')
-            .select('id')
-            .eq('magic_link_jti', payload.jti)
-            .maybeSingle();
+            .select('id', { count: 'exact', head: true })
+            .eq('magic_link_jti', payload.jti);
 
-        if (existing) {
-            return NextResponse.json({ error: 'This link has already been used.' }, { status: 409 });
+        if ((count || 0) >= uses) {
+            return NextResponse.json({ error: 'This link has been fully used.' }, { status: 409 });
         }
 
         const baseAmount = amountInt * 100;
@@ -55,6 +58,7 @@ export async function POST(req) {
                 group_deal: 'false',
                 ticket_holders: JSON.stringify([buyer_name.trim()]),
                 magic_link_jti: payload.jti,
+                magic_link_uses: String(uses),
                 source: 'magic_link',
             },
             automatic_payment_methods: { enabled: true },

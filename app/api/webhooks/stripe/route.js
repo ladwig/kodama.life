@@ -64,15 +64,15 @@ export async function POST(req) {
         return NextResponse.json({ received: true });
     }
 
-    // Magic link idempotency — guard against race where two intents share same jti
+    // Magic link overuse guard — reject once the link's total uses are exhausted
     if (meta.magic_link_jti) {
-        const { data: jtiOrder } = await supabase
+        const maxUses = parseInt(meta.magic_link_uses, 10) || 1;
+        const { count } = await supabase
             .from('orders')
-            .select('id')
-            .eq('magic_link_jti', meta.magic_link_jti)
-            .maybeSingle();
-        if (jtiOrder) {
-            console.log('Magic link already redeemed:', meta.magic_link_jti);
+            .select('id', { count: 'exact', head: true })
+            .eq('magic_link_jti', meta.magic_link_jti);
+        if ((count || 0) >= maxUses) {
+            console.log('Magic link fully redeemed:', meta.magic_link_jti);
             return NextResponse.json({ received: true });
         }
     }

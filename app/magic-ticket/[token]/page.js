@@ -11,14 +11,14 @@ export default async function MagicTicketPage({ params }) {
     }
 
     const supabase = getSupabaseAdmin();
-    const { data: existing } = await supabase
+    const uses = payload.uses || 1;
+    const { count } = await supabase
         .from('orders')
-        .select('id')
-        .eq('magic_link_jti', payload.jti)
-        .maybeSingle();
+        .select('id', { count: 'exact', head: true })
+        .eq('magic_link_jti', payload.jti);
 
-    if (existing) {
-        return <ErrorState message="This ticket has already been claimed." />;
+    if ((count || 0) >= uses) {
+        return <ErrorState message="This ticket link has been fully claimed." />;
     }
 
     return <MagicTicketClient minPrice={payload.price} token={token} />;

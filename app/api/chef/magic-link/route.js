@@ -20,7 +20,7 @@ function generateJti() {
 export async function POST(req) {
     try {
         const body = await req.json();
-        const { password, price, count = 1, email, send_email = false } = body;
+        const { password, price, count = 1, uses = 1, email, send_email = false } = body;
 
         if (password !== await getChefPassword()) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -32,16 +32,18 @@ export async function POST(req) {
         }
 
         const countInt = Math.max(1, Math.min(100, parseInt(count, 10) || 1));
+        const usesInt = Math.max(1, Math.min(1000, parseInt(uses, 10) || 1));
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://sidequest.life';
         const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
 
         const links = [];
         for (let i = 0; i < countInt; i++) {
             const jti = generateJti();
-            const token = await signMagicLinkJWT({ jti, price: priceInt });
+            const token = await signMagicLinkJWT({ jti, price: priceInt, uses: usesInt });
             links.push({
                 jti,
                 url: `${baseUrl}/magic-ticket/${token}`,
+                uses: usesInt,
                 expires_at: expiresAt.toISOString(),
             });
         }
@@ -59,9 +61,9 @@ export async function POST(req) {
                 html: `
                     <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:2rem;">
                         <p>Here ${countInt === 1 ? 'is your ticket link' : `are ${countInt} ticket links`} for <strong>sidequest</strong>.</p>
-                        <p>Minimum price: <strong>€${priceInt}</strong> per ticket — ${countInt === 1 ? 'this link expires' : 'each link expires'} on <strong>${expiryStr}</strong> and can only be used once.</p>
+                        <p>Minimum price: <strong>€${priceInt}</strong> per ticket. ${countInt === 1 ? 'This link expires' : 'Each link expires'} on <strong>${expiryStr}</strong> and ${usesInt === 1 ? 'can only be used once' : `can be used up to ${usesInt} times`}.</p>
                         <div style="margin:1.5rem 0;">${linkItems}</div>
-                        ${countInt > 1 ? '<p style="font-size:12px;color:#888;">Each link works for one person only. Share individual links — do not forward this email.</p>' : ''}
+                        ${countInt > 1 ? '<p style="font-size:12px;color:#888;">Share individual links — do not forward this email.</p>' : ''}
                     </div>
                 `,
             });

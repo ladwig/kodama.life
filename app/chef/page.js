@@ -142,6 +142,7 @@ export default function ChefPage() {
     // Magic links form
     const [magicPrice, setMagicPrice] = useState('30');
     const [magicCount, setMagicCount] = useState('1');
+    const [magicUses, setMagicUses] = useState('1');
     const [magicEmail, setMagicEmail] = useState('');
     const [magicSendEmail, setMagicSendEmail] = useState(false);
     const [magicLoading, setMagicLoading] = useState(false);
@@ -163,6 +164,7 @@ export default function ChefPage() {
                     password,
                     price: parseInt(magicPrice, 10),
                     count: parseInt(magicCount, 10),
+                    uses: parseInt(magicUses, 10),
                     email: magicEmail || undefined,
                     send_email: magicSendEmail && !!magicEmail,
                 }),
@@ -765,6 +767,19 @@ export default function ChefPage() {
                                                 placeholder="1"
                                             />
                                         </div>
+                                        <div style={{ ...styles.fieldGroup, flex: 1 }}>
+                                            <label style={styles.label}>Uses per Link</label>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                max="1000"
+                                                required
+                                                value={magicUses}
+                                                onChange={(e) => setMagicUses(e.target.value)}
+                                                style={styles.input}
+                                                placeholder="1"
+                                            />
+                                        </div>
                                     </div>
 
                                     <div style={styles.fieldGroup}>
@@ -815,6 +830,7 @@ export default function ChefPage() {
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
                                         <div style={{ fontSize: '0.75rem', color: 'var(--ink-muted)', fontWeight: '600' }}>
                                             Expires: {new Date(magicLinks[0].expires_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                            {magicLinks[0].uses > 1 && ` · ${magicLinks[0].uses} tickets per link`}
                                         </div>
 
                                         {magicLinks.map((link, idx) => (
