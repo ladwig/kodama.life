@@ -22,8 +22,10 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Invalid or expired link.' }, { status: 400 });
         }
 
-        const amountInt = parseInt(amount, 10);
-        if (!amountInt || amountInt < payload.price) {
+        // Work in cents to avoid float rounding on the money path.
+        const amountCents = Math.round(parseFloat(String(amount).replace(',', '.')) * 100);
+        const minCents = Math.round((payload.price || 0) * 100);
+        if (!amountCents || amountCents < minCents) {
             return NextResponse.json({ error: `Minimum price is €${payload.price}.` }, { status: 400 });
         }
 
@@ -50,7 +52,7 @@ export async function POST(req) {
             return NextResponse.json({ error: `Only ${remaining} ticket${remaining === 1 ? '' : 's'} left on this link.` }, { status: 409 });
         }
 
-        const baseAmount = amountInt * qty * 100;
+        const baseAmount = amountCents * qty;
         const total = Math.ceil((baseAmount + 25) / 0.985);
 
         const paymentIntent = await stripe.paymentIntents.create({
@@ -61,7 +63,7 @@ export async function POST(req) {
                 buyer_email: buyer_email.toLowerCase().trim(),
                 buyer_phone: (buyer_phone || '').trim(),
                 quantity: String(qty),
-                price_per_ticket: String(amountInt * 100),
+                price_per_ticket: String(amountCents),
                 base_total: String(baseAmount),
                 event_date: EVENT_DATE,
                 group_deal: 'false',

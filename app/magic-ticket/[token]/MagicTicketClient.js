@@ -129,8 +129,8 @@ export default function MagicTicketClient({ minPrice, token, remaining = 1 }) {
         });
     }
 
-    const amountNum = parseInt(amount, 10) || 0;
-    const totalWithFee = Math.ceil((amountNum * quantity * 100 + 25) / 0.985) / 100;
+    const amountNum = parseFloat(String(amount).replace(',', '.')) || 0;
+    const totalWithFee = Math.ceil((Math.round(amountNum * 100) * quantity + 25) / 0.985) / 100;
 
     async function handleOrder(e) {
         e.preventDefault();
@@ -278,9 +278,8 @@ export default function MagicTicketClient({ minPrice, token, remaining = 1 }) {
                                 Minimum price is €{minPrice}. Pay more if you'd like to support the project.
                             </p>
                             <input
-                                type="number"
-                                min={minPrice}
-                                step="1"
+                                type="text"
+                                inputMode="decimal"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
                                 className={styles.input}

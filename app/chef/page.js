@@ -217,7 +217,7 @@ export default function ChefPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     password,
-                    price: parseInt(magicPrice, 10),
+                    price: magicPrice,
                     count: parseInt(magicCount, 10),
                     uses: parseInt(magicUses, 10),
                     email: magicEmail || undefined,
@@ -801,13 +801,13 @@ export default function ChefPage() {
                                         <div style={{ ...styles.fieldGroup, flex: 1 }}>
                                             <label style={styles.label}>Min. Price (€)</label>
                                             <input
-                                                type="number"
-                                                min="1"
+                                                type="text"
+                                                inputMode="decimal"
                                                 required
                                                 value={magicPrice}
                                                 onChange={(e) => setMagicPrice(e.target.value)}
                                                 style={styles.input}
-                                                placeholder="30"
+                                                placeholder="30 or 22,5"
                                             />
                                         </div>
                                         <div style={{ ...styles.fieldGroup, flex: 1 }}>

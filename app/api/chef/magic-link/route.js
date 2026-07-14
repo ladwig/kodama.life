@@ -26,8 +26,9 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const priceInt = parseInt(price, 10);
-        if (!priceInt || priceInt < 1) {
+        // Accept decimals with comma or dot (e.g. "22,5"). Round to 2 decimals (euros).
+        const priceEuros = Math.round(parseFloat(String(price).replace(',', '.')) * 100) / 100;
+        if (!priceEuros || priceEuros <= 0) {
             return NextResponse.json({ error: 'Price must be a positive number.' }, { status: 400 });
         }
 
@@ -39,7 +40,7 @@ export async function POST(req) {
         const links = [];
         for (let i = 0; i < countInt; i++) {
             const jti = generateJti();
-            const token = await signMagicLinkJWT({ jti, price: priceInt, uses: usesInt });
+            const token = await signMagicLinkJWT({ jti, price: priceEuros, uses: usesInt });
             links.push({
                 jti,
                 url: `${baseUrl}/magic-ticket/${token}`,
@@ -57,11 +58,11 @@ export async function POST(req) {
             await resend.emails.send({
                 from: `sidequest <${process.env.RESEND_FROM_ADDRESS}>`,
                 to: email,
-                subject: countInt === 1 ? `Your ticket link — min. €${priceInt}` : `${countInt} ticket links — min. €${priceInt} each`,
+                subject: countInt === 1 ? `Your ticket link — min. €${priceEuros}` : `${countInt} ticket links — min. €${priceEuros} each`,
                 html: `
                     <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:2rem;">
                         <p>Here ${countInt === 1 ? 'is your ticket link' : `are ${countInt} ticket links`} for <strong>sidequest</strong>.</p>
-                        <p>Minimum price: <strong>€${priceInt}</strong> per ticket. ${countInt === 1 ? 'This link expires' : 'Each link expires'} on <strong>${expiryStr}</strong> and ${usesInt === 1 ? 'is good for one ticket' : `is good for up to ${usesInt} tickets`}.</p>
+                        <p>Minimum price: <strong>€${priceEuros}</strong> per ticket. ${countInt === 1 ? 'This link expires' : 'Each link expires'} on <strong>${expiryStr}</strong> and ${usesInt === 1 ? 'is good for one ticket' : `is good for up to ${usesInt} tickets`}.</p>
                         <div style="margin:1.5rem 0;">${linkItems}</div>
                         ${countInt > 1 ? '<p style="font-size:12px;color:#888;">Share individual links — do not forward this email.</p>' : ''}
                     </div>
