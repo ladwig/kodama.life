@@ -8,7 +8,7 @@ const EVENT_DATE = '2026-08-22';
 export async function POST(req) {
     try {
         const body = await req.json();
-        const { token, buyer_name, buyer_email, amount } = body;
+        const { token, buyer_name, buyer_email, amount, quantity = 1 } = body;
 
         if (!buyer_name?.trim()) {
             return NextResponse.json({ error: 'Name is required.' }, { status: 400 });
@@ -27,21 +27,26 @@ export async function POST(req) {
             return NextResponse.json({ error: `Minimum price is €${payload.price}.` }, { status: 400 });
         }
 
+        const qty = Math.max(1, parseInt(quantity, 10) || 1);
+
         const supabase = getSupabaseAdmin();
         const uses = payload.uses || 1;
-        // ponytail: one magic claim = one ticket (quantity hardcoded to 1 below),
-        // so counting orders == counting tickets. If magic links ever allow
-        // quantity > 1, switch this to summing orders.quantity.
-        const { count } = await supabase
+        // Remaining = link's total uses minus tickets already sold through it.
+        const { data: soldRows } = await supabase
             .from('orders')
-            .select('id', { count: 'exact', head: true })
+            .select('quantity')
             .eq('magic_link_jti', payload.jti);
+        const sold = (soldRows || []).reduce((s, r) => s + (r.quantity || 0), 0);
+        const remaining = uses - sold;
 
-        if ((count || 0) >= uses) {
+        if (remaining <= 0) {
             return NextResponse.json({ error: 'This link has been fully used.' }, { status: 409 });
         }
+        if (qty > remaining) {
+            return NextResponse.json({ error: `Only ${remaining} ticket${remaining === 1 ? '' : 's'} left on this link.` }, { status: 409 });
+        }
 
-        const baseAmount = amountInt * 100;
+        const baseAmount = amountInt * qty * 100;
         const total = Math.ceil((baseAmount + 25) / 0.985);
 
         const paymentIntent = await stripe.paymentIntents.create({
@@ -51,12 +56,12 @@ export async function POST(req) {
                 buyer_name: buyer_name.trim(),
                 buyer_email: buyer_email.toLowerCase().trim(),
                 buyer_phone: '',
-                quantity: '1',
+                quantity: String(qty),
                 price_per_ticket: String(amountInt * 100),
                 base_total: String(baseAmount),
                 event_date: EVENT_DATE,
                 group_deal: 'false',
-                ticket_holders: JSON.stringify([buyer_name.trim()]),
+                ticket_holders: JSON.stringify(Array(qty).fill(buyer_name.trim())),
                 magic_link_jti: payload.jti,
                 magic_link_uses: String(uses),
                 source: 'magic_link',

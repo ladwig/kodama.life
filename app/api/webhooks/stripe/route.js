@@ -64,14 +64,15 @@ export async function POST(req) {
         return NextResponse.json({ received: true });
     }
 
-    // Magic link overuse guard — reject once the link's total uses are exhausted
+    // Magic link overuse guard — reject once the link's total tickets are exhausted
     if (meta.magic_link_jti) {
         const maxUses = parseInt(meta.magic_link_uses, 10) || 1;
-        const { count } = await supabase
+        const { data: soldRows } = await supabase
             .from('orders')
-            .select('id', { count: 'exact', head: true })
+            .select('quantity')
             .eq('magic_link_jti', meta.magic_link_jti);
-        if ((count || 0) >= maxUses) {
+        const sold = (soldRows || []).reduce((s, r) => s + (r.quantity || 0), 0);
+        if (sold >= maxUses) {
             console.log('Magic link fully redeemed:', meta.magic_link_jti);
             return NextResponse.json({ received: true });
         }

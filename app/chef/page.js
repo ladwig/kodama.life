@@ -768,7 +768,7 @@ export default function ChefPage() {
                                             />
                                         </div>
                                         <div style={{ ...styles.fieldGroup, flex: 1 }}>
-                                            <label style={styles.label}>Uses per Link</label>
+                                            <label style={styles.label}>Tickets per Link</label>
                                             <input
                                                 type="number"
                                                 min="1"

@@ -85,10 +85,11 @@ function PaymentScreen({ totalWithFee, onBack }) {
     );
 }
 
-export default function MagicTicketClient({ minPrice, token }) {
+export default function MagicTicketClient({ minPrice, token, remaining = 1 }) {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [amount, setAmount] = useState(String(minPrice));
+    const [quantity, setQuantity] = useState(1);
     const [step, setStep] = useState('form');
     const [clientSecret, setClientSecret] = useState('');
     const [loading, setLoading] = useState(false);
@@ -97,7 +98,7 @@ export default function MagicTicketClient({ minPrice, token }) {
     useEffect(() => { preloadSounds(); }, []);
 
     const amountNum = parseInt(amount, 10) || 0;
-    const totalWithFee = Math.ceil((amountNum * 100 + 25) / 0.985) / 100;
+    const totalWithFee = Math.ceil((amountNum * quantity * 100 + 25) / 0.985) / 100;
 
     async function handleOrder(e) {
         e.preventDefault();
@@ -112,7 +113,7 @@ export default function MagicTicketClient({ minPrice, token }) {
             const res = await fetch('/api/checkout/create-magic-intent', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token, buyer_name: name, buyer_email: email, amount: amountNum }),
+                body: JSON.stringify({ token, buyer_name: name, buyer_email: email, amount: amountNum, quantity }),
             });
 
             const data = await res.json();
@@ -202,9 +203,24 @@ export default function MagicTicketClient({ minPrice, token }) {
                             </div>
                         </section>
 
+                        {remaining > 1 && (
+                            <section className={styles.section}>
+                                <div className={styles.stepper}>
+                                    <span className={styles.sectionTitle}>How many</span>
+                                    <button type="button" className={styles.stepperBtn}
+                                        onClick={() => { playKeyboard(); setQuantity((q) => Math.max(1, q - 1)); }}
+                                        disabled={quantity <= 1} aria-label="Less">−</button>
+                                    <span className={styles.stepperValue}>{quantity}</span>
+                                    <button type="button" className={styles.stepperBtn}
+                                        onClick={() => { playKeyboard(); setQuantity((q) => Math.min(remaining, q + 1)); }}
+                                        disabled={quantity >= remaining} aria-label="More">+</button>
+                                </div>
+                            </section>
+                        )}
+
                         <section className={styles.section}>
                             <h2 className={styles.sectionTitle}>
-                                Price
+                                Price {quantity > 1 && <span style={{ opacity: 0.5, fontWeight: 400 }}>per ticket</span>}
                                 <span className={styles.priceDisplay}>€{amountNum || minPrice}</span>
                             </h2>
                             <p className={styles.selfFundedNote}>
@@ -230,7 +246,7 @@ export default function MagicTicketClient({ minPrice, token }) {
                             disabled={loading}
                             onClick={playKeyboard}
                         >
-                            {loading ? 'One moment…' : `Continue · €${amountNum || minPrice}`}
+                            {loading ? 'One moment…' : `Continue · €${(amountNum || minPrice) * quantity}`}
                         </button>
                     </form>
                 )}

@@ -61,7 +61,7 @@ export async function POST(req) {
                 html: `
                     <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:2rem;">
                         <p>Here ${countInt === 1 ? 'is your ticket link' : `are ${countInt} ticket links`} for <strong>sidequest</strong>.</p>
-                        <p>Minimum price: <strong>€${priceInt}</strong> per ticket. ${countInt === 1 ? 'This link expires' : 'Each link expires'} on <strong>${expiryStr}</strong> and ${usesInt === 1 ? 'can only be used once' : `can be used up to ${usesInt} times`}.</p>
+                        <p>Minimum price: <strong>€${priceInt}</strong> per ticket. ${countInt === 1 ? 'This link expires' : 'Each link expires'} on <strong>${expiryStr}</strong> and ${usesInt === 1 ? 'is good for one ticket' : `is good for up to ${usesInt} tickets`}.</p>
                         <div style="margin:1.5rem 0;">${linkItems}</div>
                         ${countInt > 1 ? '<p style="font-size:12px;color:#888;">Share individual links — do not forward this email.</p>' : ''}
                     </div>
