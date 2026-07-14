@@ -277,6 +277,18 @@ export default function MagicTicketClient({ minPrice, token, remaining = 1 }) {
                             <p className={styles.selfFundedNote}>
                                 Minimum price is €{minPrice}. Pay more if you'd like to support the project.
                             </p>
+                            <div className={styles.priceSteps}>
+                                {[0, 5, 10, 15, 20, 25, 30].map((d) => {
+                                    const p = minPrice + d;
+                                    return (
+                                        <button key={d} type="button"
+                                            className={`${styles.priceStep} ${amountNum === p ? styles.priceStepActive : ''}`}
+                                            onClick={() => { playKeyboard(); setAmount(String(p)); }}>
+                                            {`€${p}`}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                             <input
                                 type="text"
                                 inputMode="decimal"
@@ -284,6 +296,7 @@ export default function MagicTicketClient({ minPrice, token, remaining = 1 }) {
                                 onChange={(e) => setAmount(e.target.value)}
                                 className={styles.input}
                                 placeholder={`€${minPrice}`}
+                                style={{ marginTop: '0.5rem' }}
                             />
                         </section>
 
