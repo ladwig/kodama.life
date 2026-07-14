@@ -1,5 +1,5 @@
 import "./globals.css";
-import { Analytics } from "@vercel/analytics/next";
+import AnalyticsFiltered from "./components/AnalyticsFiltered";
 
 export const metadata = {
   metadataBase: new URL("https://kodama.life"),
@@ -27,7 +27,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         {children}
-        <Analytics />
+        <AnalyticsFiltered />
       </body>
     </html>
   );
