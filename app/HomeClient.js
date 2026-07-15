@@ -44,6 +44,68 @@ function formatPrice(cents) {
     return `${(cents / 100).toFixed(0)} €`;
 }
 
+function TicketLightbox({ tickets, index, onClose, onNav }) {
+    const touchX = useRef(null);
+    const t = tickets[index];
+
+    useEffect(() => {
+        const onKey = (e) => {
+            if (e.key === 'Escape') onClose();
+            if (e.key === 'ArrowRight') onNav(1);
+            if (e.key === 'ArrowLeft') onNav(-1);
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [onClose, onNav]);
+
+    if (!t) return null;
+    const multi = tickets.length > 1;
+
+    return (
+        <div
+            onClick={onClose}
+            style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}
+        >
+            <div
+                onClick={(e) => e.stopPropagation()}
+                onTouchStart={(e) => { touchX.current = e.touches[0].clientX; }}
+                onTouchEnd={(e) => {
+                    if (touchX.current === null) return;
+                    const dx = e.changedTouches[0].clientX - touchX.current;
+                    if (dx > 50) onNav(-1);
+                    else if (dx < -50) onNav(1);
+                    touchX.current = null;
+                }}
+                style={{ background: '#fff', padding: '1.5rem', width: '100%', maxWidth: '340px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', position: 'relative' }}
+            >
+                <button onClick={onClose} aria-label="Close" style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', background: 'none', border: 'none', fontSize: '1.3rem', cursor: 'pointer', lineHeight: 1, padding: '0.3rem' }}>×</button>
+
+                <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=1&data=${encodeURIComponent(t.code)}`}
+                    alt={t.code}
+                    width={260}
+                    height={260}
+                    style={{ display: 'block' }}
+                />
+                <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontFamily: "'Funnel Display', sans-serif", fontWeight: 700, letterSpacing: '0.06em', fontSize: '1.1rem' }}>{t.code}</div>
+                    <div style={{ fontFamily: "'Funnel Display', sans-serif", textTransform: 'uppercase', fontSize: '0.8rem', opacity: 0.6, marginTop: '0.2rem' }}>{t.name}</div>
+                </div>
+
+                {multi && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                        <button onClick={() => onNav(-1)} disabled={index === 0} aria-label="Previous"
+                            style={{ background: 'none', border: 'none', fontSize: '1.4rem', cursor: index === 0 ? 'default' : 'pointer', opacity: index === 0 ? 0.25 : 1, padding: '0.3rem 0.6rem' }}>‹</button>
+                        <span style={{ fontFamily: "'Funnel Display', sans-serif", fontSize: '0.75rem', opacity: 0.6 }}>{index + 1} / {tickets.length}</span>
+                        <button onClick={() => onNav(1)} disabled={index === tickets.length - 1} aria-label="Next"
+                            style={{ background: 'none', border: 'none', fontSize: '1.4rem', cursor: index === tickets.length - 1 ? 'default' : 'pointer', opacity: index === tickets.length - 1 ? 0.25 : 1, padding: '0.3rem 0.6rem' }}>›</button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
 function FireImg({ className, hovered }) {
     const canvasRef = useRef(null);
     const [imgKey, setImgKey] = useState(0);
@@ -323,6 +385,12 @@ export default function HomeClient({ buyer, orders, tickets }) {
     const hasTickets = orders.length > 0;
     const buyerFirstName = buyer?.name?.trim()?.split(/\s+/)?.[0] || '';
 
+    // Flat list of tickets in render order, for the QR lightbox
+    const flatTickets = orders.flatMap((o) =>
+        (ticketsByOrder[o.id] || []).map((t) => ({ code: t.ticket_code, name: t.holder_name, price: o.price_per_ticket }))
+    );
+    const [lightboxIdx, setLightboxIdx] = useState(null);
+
     useEffect(() => {
         preloadSounds();
         sessionStorage.removeItem('playSuccess');
@@ -445,7 +513,9 @@ export default function HomeClient({ buyer, orders, tickets }) {
                                 <div key={order.id} className={styles.orderBlock}>
                                     <div className={styles.ticketList}>
                                         {orderTickets.map((ticket) => (
-                                            <div key={ticket.id} style={{ position: 'relative', width: '100%', maxWidth: '380px', margin: '0 auto -6%', aspectRatio: '680 / 340' }}>
+                                            <div key={ticket.id}
+                                                onClick={() => setLightboxIdx(flatTickets.findIndex((t) => t.code === ticket.ticket_code))}
+                                                style={{ position: 'relative', width: '100%', maxWidth: '380px', margin: '0 auto -6%', aspectRatio: '680 / 340', cursor: 'pointer' }}>
                                                 {/* Ticket shape — SVG only, no text */}
                                                 <svg
                                                     viewBox="0 0 680 340"
@@ -475,6 +545,10 @@ export default function HomeClient({ buyer, orders, tickets }) {
                                 </div>
                             );
                         })}
+
+                        <p style={{ textAlign: 'center', fontFamily: "'Funnel Display', sans-serif", textTransform: 'uppercase', fontSize: '0.58rem', letterSpacing: '0.08em', opacity: 0.4, marginTop: '1rem' }}>
+                            Tap a ticket to show its QR code
+                        </p>
 
                         <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem', flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
                             <a
@@ -533,6 +607,15 @@ export default function HomeClient({ buyer, orders, tickets }) {
 
                 <FAQ />
             </div>
+
+            {lightboxIdx !== null && (
+                <TicketLightbox
+                    tickets={flatTickets}
+                    index={lightboxIdx}
+                    onClose={() => setLightboxIdx(null)}
+                    onNav={(dir) => setLightboxIdx((i) => Math.max(0, Math.min(flatTickets.length - 1, i + dir)))}
+                />
+            )}
 
             {monsters.map(m => (
                 <MiniMonster
