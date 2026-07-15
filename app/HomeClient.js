@@ -535,16 +535,18 @@ export default function HomeClient({ buyer, orders, tickets }) {
                                                     <span className={styles.ticketText}>22. Aug 2026</span>
                                                     <span className={styles.ticketText}>{formatPrice(order.price_per_ticket)}</span>
                                                 </div>
-                                                {/* Stub text — rotated, upper part of stub */}
-                                                <div style={{ position: 'absolute', left: '72.5%', top: '36%', transform: 'translate(-50%, -50%) rotate(-90deg)', whiteSpace: 'nowrap' }}>
+                                                {/* Stub text — rotated, centered in stub area */}
+                                                <div style={{ position: 'absolute', left: '72.5%', top: '50%', transform: 'translate(-50%, -50%) rotate(-90deg)', whiteSpace: 'nowrap' }}>
                                                     <span className={styles.ticketText}>{ticket.ticket_code}</span>
                                                 </div>
-                                                {/* Small QR in the stub, bottom — tap the ticket to enlarge */}
-                                                <img
-                                                    src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&margin=0&data=${encodeURIComponent(ticket.ticket_code)}`}
-                                                    alt=""
-                                                    style={{ position: 'absolute', left: '72.5%', top: '70%', transform: 'translate(-50%, -50%)', width: '11%', height: 'auto' }}
-                                                />
+                                                {/* Tiny QR glyph in the main area, bottom-right — hints the ticket is tappable */}
+                                                <svg viewBox="0 0 24 24" aria-hidden="true"
+                                                    style={{ position: 'absolute', left: '61%', top: '73%', transform: 'translate(-50%, -50%)', width: '5.5%', height: 'auto', fill: '#000', opacity: 0.85 }}>
+                                                    <path d="M1 1h7v7H1V1zm2 2v3h3V3H3z" />
+                                                    <path d="M16 1h7v7h-7V1zm2 2v3h3V3h-3z" />
+                                                    <path d="M1 16h7v7H1v-7zm2 2v3h3v-3H3z" />
+                                                    <path d="M11 1h2v2h-2V1zm0 4h2v4h-2V5zM1 11h4v2H1v-2zm6 0h2v2H7v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm-8 4h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm-8 4h2v4h-2v-4zm4 0h2v2h-2v-2zm4 0h2v4h-2v-4z" />
+                                                </svg>
                                             </div>
                                         ))}
                                     </div>
