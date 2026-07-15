@@ -535,20 +535,22 @@ export default function HomeClient({ buyer, orders, tickets }) {
                                                     <span className={styles.ticketText}>22. Aug 2026</span>
                                                     <span className={styles.ticketText}>{formatPrice(order.price_per_ticket)}</span>
                                                 </div>
-                                                {/* Stub text — rotated, centered in stub area */}
-                                                <div style={{ position: 'absolute', left: '72.5%', top: '50%', transform: 'translate(-50%, -50%) rotate(-90deg)', whiteSpace: 'nowrap' }}>
+                                                {/* Stub text — rotated, upper part of stub */}
+                                                <div style={{ position: 'absolute', left: '72.5%', top: '36%', transform: 'translate(-50%, -50%) rotate(-90deg)', whiteSpace: 'nowrap' }}>
                                                     <span className={styles.ticketText}>{ticket.ticket_code}</span>
                                                 </div>
+                                                {/* Small QR in the stub, bottom — tap the ticket to enlarge */}
+                                                <img
+                                                    src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&margin=0&data=${encodeURIComponent(ticket.ticket_code)}`}
+                                                    alt=""
+                                                    style={{ position: 'absolute', left: '72.5%', top: '70%', transform: 'translate(-50%, -50%)', width: '11%', height: 'auto' }}
+                                                />
                                             </div>
                                         ))}
                                     </div>
                                 </div>
                             );
                         })}
-
-                        <p style={{ textAlign: 'center', fontFamily: "'Funnel Display', sans-serif", textTransform: 'uppercase', fontSize: '0.58rem', letterSpacing: '0.08em', opacity: 0.4, marginTop: '1rem' }}>
-                            Tap a ticket to show its QR code
-                        </p>
 
                         <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem', flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
                             <a
