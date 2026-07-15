@@ -11,6 +11,15 @@ export default async function GuestlistPage({ params }) {
     }
 
     const supabase = getSupabaseAdmin();
+
+    // Cap comes from the guestlists table (editable in chef), falling back to the token.
+    const { data: glRow } = await supabase
+        .from('guestlists')
+        .select('max_tickets')
+        .eq('jti', payload.jti)
+        .maybeSingle();
+    const max = glRow?.max_tickets || payload.uses || 1;
+
     const { data: orders } = await supabase
         .from('orders')
         .select('id, buyer_name, buyer_email, created_at')
@@ -46,7 +55,7 @@ export default async function GuestlistPage({ params }) {
         <GuestlistClient
             token={token}
             label={payload.label || ''}
-            max={payload.uses || 1}
+            max={max}
             initialGuests={guests}
         />
     );

@@ -72,11 +72,18 @@ export async function POST(req, { params }) {
         }
 
         const jti = payload.jti;
-        const uses = payload.uses || 1;
         const label = payload.label || null;
         const body = await req.json();
         const action = body.action;
         const supabase = getSupabaseAdmin();
+
+        // Cap comes from the guestlists table (editable), falling back to the token.
+        const { data: glRow } = await supabase
+            .from('guestlists')
+            .select('max_tickets')
+            .eq('jti', jti)
+            .maybeSingle();
+        const uses = glRow?.max_tickets || payload.uses || 1;
 
         // Count already-issued tickets on this link
         async function issuedCount() {

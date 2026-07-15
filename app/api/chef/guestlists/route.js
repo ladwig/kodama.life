@@ -5,13 +5,29 @@ import { getChefPassword } from '@/lib/config';
 // Lists all guestlist links with their usage (issued / max).
 export async function POST(req) {
     try {
-        const { password } = await req.json();
+        const { password, action, jti, max } = await req.json();
         if (password !== await getChefPassword()) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const supabase = getSupabaseAdmin();
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://loveatfirstside.quest';
+
+        // ── Change a guestlist's cap (must stay >= already issued) ──
+        if (action === 'setMax') {
+            const newMax = parseInt(max, 10);
+            if (!newMax || newMax < 1) return NextResponse.json({ error: 'Invalid amount.' }, { status: 400 });
+            const { count: issued } = await supabase
+                .from('orders')
+                .select('id', { count: 'exact', head: true })
+                .eq('magic_link_jti', jti);
+            if (newMax < (issued || 0)) {
+                return NextResponse.json({ error: `Already issued ${issued}. Can't set below that.` }, { status: 400 });
+            }
+            const { error } = await supabase.from('guestlists').update({ max_tickets: newMax }).eq('jti', jti);
+            if (error) throw error;
+            return NextResponse.json({ ok: true });
+        }
 
         const { data: lists } = await supabase
             .from('guestlists')

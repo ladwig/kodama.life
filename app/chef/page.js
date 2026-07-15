@@ -230,6 +230,25 @@ export default function ChefPage() {
         } catch {}
     };
 
+    const changeGuestlistMax = async (jti, currentMax) => {
+        const input = prompt('New total number of tickets for this guestlist:', String(currentMax));
+        if (input === null) return;
+        const newMax = parseInt(input, 10);
+        if (!newMax || newMax < 1) return;
+        try {
+            const res = await fetch('/api/chef/guestlists', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password, action: 'setMax', jti, max: newMax }),
+            });
+            const data = await res.json();
+            if (res.ok) fetchGuestlistLinks();
+            else alert(data.error || 'Failed to update.');
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+
     const handleGenerateLinks = async (e) => {
         e.preventDefault();
         setMagicStatus('');
@@ -1041,6 +1060,13 @@ export default function ChefPage() {
                                                         <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>{gl.label || 'Unnamed'}</div>
                                                         <div style={{ fontSize: '0.72rem', color: 'var(--ink-muted)' }}>{gl.used} of {gl.max} used</div>
                                                     </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => changeGuestlistMax(gl.jti, gl.max)}
+                                                        style={{ ...styles.button, marginTop: 0, padding: '0 10px', fontSize: '0.75rem', whiteSpace: 'nowrap', flexShrink: 0 }}
+                                                    >
+                                                        Edit
+                                                    </button>
                                                     <button
                                                         type="button"
                                                         onClick={() => copyGuestlistLink(gl.url, gl.jti)}
