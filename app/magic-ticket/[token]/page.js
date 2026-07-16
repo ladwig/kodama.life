@@ -11,6 +11,17 @@ export default async function MagicTicketPage({ params }) {
     }
 
     const supabase = getSupabaseAdmin();
+
+    // Revoked in chef → treat as invalid
+    const { data: mlRow } = await supabase
+        .from('magic_links')
+        .select('revoked')
+        .eq('jti', payload.jti)
+        .maybeSingle();
+    if (mlRow?.revoked) {
+        return <ErrorState message="This link is no longer valid." />;
+    }
+
     const uses = payload.uses || 1;
     const { data: rows } = await supabase
         .from('orders')

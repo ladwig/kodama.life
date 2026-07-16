@@ -36,6 +36,17 @@ export async function POST(req) {
         );
 
         const supabase = getSupabaseAdmin();
+
+        // Reject if the link was revoked in chef
+        const { data: mlRow } = await supabase
+            .from('magic_links')
+            .select('revoked')
+            .eq('jti', payload.jti)
+            .maybeSingle();
+        if (mlRow?.revoked) {
+            return NextResponse.json({ error: 'This link is no longer valid.' }, { status: 409 });
+        }
+
         const uses = payload.uses || 1;
         // Remaining = link's total uses minus tickets already sold through it.
         const { data: soldRows } = await supabase

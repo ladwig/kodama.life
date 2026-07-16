@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getChefPassword } from '@/lib/config';
+import { signMagicLinkJWT } from '@/lib/jwt';
 
 // Lists all stored magic links with their claimed count (tickets sold / cap).
+// action: 'remove'  → revokes a link (kills it) and hides it from the list.
+// action: 'extend'  → re-signs a fresh 120-day token (same jti/price/uses).
 export async function POST(req) {
     try {
-        const { password } = await req.json();
+        const { password, action, jti } = await req.json();
         if (password !== await getChefPassword()) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -13,12 +16,32 @@ export async function POST(req) {
         const supabase = getSupabaseAdmin();
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://loveatfirstside.quest';
 
-        const { data: links } = await supabase
+        if (action === 'remove') {
+            const { error } = await supabase.from('magic_links').update({ revoked: true }).eq('jti', jti);
+            if (error) throw error;
+            return NextResponse.json({ ok: true });
+        }
+
+        if (action === 'extend') {
+            const { data: row } = await supabase
+                .from('magic_links')
+                .select('jti, price, uses')
+                .eq('jti', jti)
+                .maybeSingle();
+            if (!row) return NextResponse.json({ error: 'Link not found.' }, { status: 404 });
+            const token = await signMagicLinkJWT({ jti: row.jti, price: row.price, uses: row.uses });
+            const { error } = await supabase.from('magic_links').update({ token }).eq('jti', jti);
+            if (error) throw error;
+            return NextResponse.json({ ok: true, url: `${baseUrl}/magic-ticket/${token}` });
+        }
+
+        const { data: allLinks } = await supabase
             .from('magic_links')
-            .select('jti, label, price, uses, token, created_at')
+            .select('jti, label, price, uses, token, created_at, revoked')
             .order('created_at', { ascending: false });
 
-        if (!links || links.length === 0) return NextResponse.json({ links: [] });
+        const links = (allLinks || []).filter((l) => !l.revoked);
+        if (links.length === 0) return NextResponse.json({ links: [] });
 
         // Claimed = sum of ticket quantities across orders for each link
         const { data: orders } = await supabase
