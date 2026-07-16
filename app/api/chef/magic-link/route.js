@@ -36,7 +36,7 @@ export async function POST(req) {
         const countInt = Math.max(1, Math.min(100, parseInt(count, 10) || 1));
         const usesInt = Math.max(1, Math.min(1000, parseInt(uses, 10) || 1));
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://sidequest.life';
-        const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+        const expiresAt = new Date(Date.now() + 120 * 24 * 60 * 60 * 1000);
 
         const supabase = getSupabaseAdmin();
         const links = [];
