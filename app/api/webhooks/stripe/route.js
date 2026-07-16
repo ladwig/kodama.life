@@ -225,11 +225,11 @@ export async function POST(req) {
         if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
             let tgError = null;
             try {
-                const text = `🎟 *New ticket sold*\n${meta.buyer_name} (${meta.buyer_email}) bought ${quantity} ticket(s) for ${(pi.amount / 100).toFixed(2)} €.`;
+                const text = `🎟 New ticket sold\n${meta.buyer_name} (${meta.buyer_email}) bought ${quantity} ticket(s) for ${(pi.amount / 100).toFixed(2)} €.`;
                 const tgRes = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: process.env.TELEGRAM_CHAT_ID, text, parse_mode: 'Markdown' }),
+                    body: JSON.stringify({ chat_id: process.env.TELEGRAM_CHAT_ID, text }),
                 });
                 if (!tgRes.ok) {
                     const tgBody = await tgRes.text();
