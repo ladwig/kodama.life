@@ -153,33 +153,6 @@ export default function ChefPage() {
     const [magicLabel, setMagicLabel] = useState('');
     const [magicLinksList, setMagicLinksList] = useState([]);
     const [magicListCopiedJti, setMagicListCopiedJti] = useState(null);
-    const [magicImportUrl, setMagicImportUrl] = useState('');
-    const [magicImportLabel, setMagicImportLabel] = useState('');
-    const [magicImportStatus, setMagicImportStatus] = useState('');
-
-    const handleImportMagicLink = async (e) => {
-        e.preventDefault();
-        setMagicImportStatus('Working…');
-        try {
-            const res = await fetch('/api/chef/magic-links', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password, action: 'import', url: magicImportUrl, label: magicImportLabel || undefined }),
-            });
-            const data = await res.json();
-            if (res.ok) {
-                setMagicImportStatus('Imported + extended to 120 days. New link copied.');
-                await navigator.clipboard.writeText(data.url).catch(() => {});
-                setMagicImportUrl('');
-                setMagicImportLabel('');
-                fetchMagicLinksList();
-            } else {
-                setMagicImportStatus(`Error: ${data.error}`);
-            }
-        } catch (err) {
-            setMagicImportStatus(`Error: ${err.message}`);
-        }
-    };
 
     const fetchMagicLinksList = async (providedPw) => {
         const pw = (typeof providedPw === 'string') ? providedPw : (password || localStorage.getItem('chef_pw'));
@@ -1005,38 +978,9 @@ export default function ChefPage() {
                                 )}
 
                                 {/* ── Created magic links (label + claimed count) ── */}
-                                <div style={{ borderTop: '2px solid var(--ink, #000)', marginTop: '1.5rem', paddingTop: '1.25rem' }}>
-                                    <h3 style={{ margin: '0 0 0.75rem', fontSize: '0.95rem', fontWeight: 700 }}>Created links</h3>
-
-                                    {/* Import an older link → re-signs a fresh 120-day token, keeps claimed count */}
-                                    <form onSubmit={handleImportMagicLink} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
-                                        <input
-                                            type="text"
-                                            value={magicImportUrl}
-                                            onChange={(e) => setMagicImportUrl(e.target.value)}
-                                            style={styles.input}
-                                            placeholder="Paste an older magic-ticket link to import + extend"
-                                        />
-                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                            <input
-                                                type="text"
-                                                value={magicImportLabel}
-                                                onChange={(e) => setMagicImportLabel(e.target.value)}
-                                                style={{ ...styles.input, flex: 1 }}
-                                                placeholder="Label (e.g. Scheissmücke)"
-                                            />
-                                            <button type="submit" style={{ ...styles.button, marginTop: 0, whiteSpace: 'nowrap' }} disabled={!magicImportUrl}>
-                                                Import + extend
-                                            </button>
-                                        </div>
-                                        {magicImportStatus && (
-                                            <div style={{ fontSize: '0.75rem', color: magicImportStatus.startsWith('Error') ? '#dc2626' : 'var(--accent)' }}>
-                                                {magicImportStatus}
-                                            </div>
-                                        )}
-                                    </form>
-
-                                    {magicLinksList.length > 0 && (
+                                {magicLinksList.length > 0 && (
+                                    <div style={{ borderTop: '2px solid var(--ink, #000)', marginTop: '1.5rem', paddingTop: '1.25rem' }}>
+                                        <h3 style={{ margin: '0 0 0.75rem', fontSize: '0.95rem', fontWeight: 700 }}>Created links</h3>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
                                             {magicLinksList.map((l) => (
                                                 <div key={l.jti} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -1056,8 +1000,8 @@ export default function ChefPage() {
                                                 </div>
                                             ))}
                                         </div>
-                                    )}
-                                </div>
+                                    </div>
+                                )}
 
                                 {/* ── Guestlist links (free tickets, no checkout) ── */}
                                 <div style={{ borderTop: '2px solid var(--ink, #000)', marginTop: '1.5rem', paddingTop: '1.25rem' }}>
