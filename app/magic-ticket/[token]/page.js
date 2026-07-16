@@ -1,11 +1,11 @@
-import { verifyJWT } from '@/lib/jwt';
+import { verifyLinkTokenIgnoreExpiry } from '@/lib/jwt';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import MagicTicketClient from './MagicTicketClient';
 
 export default async function MagicTicketPage({ params }) {
     const { token } = await params;
 
-    const payload = await verifyJWT(token);
+    const payload = await verifyLinkTokenIgnoreExpiry(token);
     if (!payload || payload.type !== 'magic_ticket') {
         return <ErrorState message="This link is invalid or has expired." />;
     }

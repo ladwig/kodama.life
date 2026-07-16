@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { verifyJWT } from '@/lib/jwt';
+import { verifyLinkTokenIgnoreExpiry } from '@/lib/jwt';
 
 const EVENT_DATE = '2026-08-22';
 
@@ -17,9 +17,9 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Valid email is required.' }, { status: 400 });
         }
 
-        const payload = await verifyJWT(token);
+        const payload = await verifyLinkTokenIgnoreExpiry(token);
         if (!payload || payload.type !== 'magic_ticket') {
-            return NextResponse.json({ error: 'Invalid or expired link.' }, { status: 400 });
+            return NextResponse.json({ error: 'Invalid link.' }, { status: 400 });
         }
 
         // Work in cents to avoid float rounding on the money path.

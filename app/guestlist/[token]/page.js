@@ -1,11 +1,11 @@
-import { verifyJWT, signTicketJWT } from '@/lib/jwt';
+import { verifyLinkTokenIgnoreExpiry, signTicketJWT } from '@/lib/jwt';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import GuestlistClient from './GuestlistClient';
 
 export default async function GuestlistPage({ params }) {
     const { token } = await params;
 
-    const payload = await verifyJWT(token);
+    const payload = await verifyLinkTokenIgnoreExpiry(token);
     if (!payload || payload.type !== 'guestlist') {
         return <ErrorState message="This guestlist link is invalid or has expired." />;
     }

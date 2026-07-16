@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { verifyJWT, signTicketJWT } from '@/lib/jwt';
+import { verifyLinkTokenIgnoreExpiry, signTicketJWT } from '@/lib/jwt';
 import { Resend } from 'resend';
 
 const resend = (process.env.RESEND_API_KEY && !process.env.RESEND_API_KEY.endsWith('_...'))
@@ -66,7 +66,7 @@ async function loadOrderForJti(supabase, orderId, jti) {
 export async function POST(req, { params }) {
     try {
         const { token } = await params;
-        const payload = await verifyJWT(token);
+        const payload = await verifyLinkTokenIgnoreExpiry(token);
         if (!payload || payload.type !== 'guestlist') {
             return NextResponse.json({ error: 'Invalid or expired link.' }, { status: 400 });
         }

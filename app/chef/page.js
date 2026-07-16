@@ -176,7 +176,7 @@ export default function ChefPage() {
     };
 
     const removeMagicLink = async (jti, label) => {
-        if (!confirm(`Remove "${label || 'this link'}"? It will stop working immediately.`)) return;
+        if (!confirm(`Really delete "${label || 'this link'}"? It will stop working immediately and can't be undone.`)) return;
         try {
             const res = await fetch('/api/chef/magic-links', {
                 method: 'POST',
