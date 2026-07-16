@@ -1,33 +1,17 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getChefPassword } from '@/lib/config';
-import { signMagicLinkJWT } from '@/lib/jwt';
 
 // Lists all stored magic links with their claimed count (tickets sold / cap).
-// action: 'extend' re-signs a fresh token (same jti/price/uses) with the current
-// expiry, preserving the claimed count. The old URL still expires.
 export async function POST(req) {
     try {
-        const { password, action, jti } = await req.json();
+        const { password } = await req.json();
         if (password !== await getChefPassword()) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const supabase = getSupabaseAdmin();
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://loveatfirstside.quest';
-
-        if (action === 'extend') {
-            const { data: row } = await supabase
-                .from('magic_links')
-                .select('jti, price, uses')
-                .eq('jti', jti)
-                .maybeSingle();
-            if (!row) return NextResponse.json({ error: 'Link not found.' }, { status: 404 });
-            const token = await signMagicLinkJWT({ jti: row.jti, price: row.price, uses: row.uses });
-            const { error } = await supabase.from('magic_links').update({ token }).eq('jti', jti);
-            if (error) throw error;
-            return NextResponse.json({ ok: true, url: `${baseUrl}/magic-ticket/${token}` });
-        }
 
         const { data: links } = await supabase
             .from('magic_links')
