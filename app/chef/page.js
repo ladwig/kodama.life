@@ -175,27 +175,6 @@ export default function ChefPage() {
         } catch {}
     };
 
-    const extendMagicLink = async (jti) => {
-        if (!confirm('Generate a fresh 120-day link (same jti, keeps the claimed count)? The old URL stops working — re-share the new one.')) return;
-        try {
-            const res = await fetch('/api/chef/magic-links', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password, action: 'extend', jti }),
-            });
-            const data = await res.json();
-            if (res.ok) {
-                await navigator.clipboard.writeText(data.url).catch(() => {});
-                fetchMagicLinksList();
-                alert('New 120-day link generated and copied.');
-            } else {
-                alert(data.error || 'Failed to extend.');
-            }
-        } catch (err) {
-            alert(err.message);
-        }
-    };
-
     const removeMagicLink = async (jti, label) => {
         if (!confirm(`Remove "${label || 'this link'}"? It will stop working immediately.`)) return;
         try {
@@ -1027,13 +1006,6 @@ export default function ChefPage() {
                                                             {l.claimed} of {l.uses} claimed · min €{l.price}
                                                         </div>
                                                     </div>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => extendMagicLink(l.jti)}
-                                                        style={{ ...styles.button, marginTop: 0, padding: '0 10px', fontSize: '0.75rem', whiteSpace: 'nowrap', flexShrink: 0 }}
-                                                    >
-                                                        Extend
-                                                    </button>
                                                     <button
                                                         type="button"
                                                         onClick={() => copyMagicListLink(l.url, l.jti)}

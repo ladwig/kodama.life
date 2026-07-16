@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getChefPassword } from '@/lib/config';
-import { signMagicLinkJWT } from '@/lib/jwt';
 
 // Lists all stored magic links with their claimed count (tickets sold / cap).
-// action: 'remove'  → revokes a link (kills it) and hides it from the list.
-// action: 'extend'  → re-signs a fresh 120-day token (same jti/price/uses).
+// action: 'remove' → revokes a link (kills it) and hides it from the list.
 export async function POST(req) {
     try {
         const { password, action, jti } = await req.json();
@@ -20,19 +18,6 @@ export async function POST(req) {
             const { error } = await supabase.from('magic_links').update({ revoked: true }).eq('jti', jti);
             if (error) throw error;
             return NextResponse.json({ ok: true });
-        }
-
-        if (action === 'extend') {
-            const { data: row } = await supabase
-                .from('magic_links')
-                .select('jti, price, uses')
-                .eq('jti', jti)
-                .maybeSingle();
-            if (!row) return NextResponse.json({ error: 'Link not found.' }, { status: 404 });
-            const token = await signMagicLinkJWT({ jti: row.jti, price: row.price, uses: row.uses });
-            const { error } = await supabase.from('magic_links').update({ token }).eq('jti', jti);
-            if (error) throw error;
-            return NextResponse.json({ ok: true, url: `${baseUrl}/magic-ticket/${token}` });
         }
 
         const { data: allLinks } = await supabase
