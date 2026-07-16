@@ -36,7 +36,7 @@ export default function ChefPage() {
 
     // Initial check for session and cached guestlist
     useEffect(() => {
-        const savedPw = sessionStorage.getItem('chef_pw');
+        const savedPw = localStorage.getItem('chef_pw');
         const cachedGuestlist = localStorage.getItem('kodama_guestlist');
         
         if (savedPw) {
@@ -86,7 +86,7 @@ export default function ChefPage() {
         try { currentQueue = JSON.parse(cached); } catch(e) { return; }
         if (currentQueue.length === 0) return;
 
-        const actualPw = sessionStorage.getItem('chef_pw');
+        const actualPw = localStorage.getItem('chef_pw');
         if (!actualPw) return;
 
         const remainingQueue = [];
@@ -155,7 +155,7 @@ export default function ChefPage() {
     const [magicListCopiedJti, setMagicListCopiedJti] = useState(null);
 
     const fetchMagicLinksList = async (providedPw) => {
-        const pw = (typeof providedPw === 'string') ? providedPw : (password || sessionStorage.getItem('chef_pw'));
+        const pw = (typeof providedPw === 'string') ? providedPw : (password || localStorage.getItem('chef_pw'));
         try {
             const res = await fetch('/api/chef/magic-links', {
                 method: 'POST',
@@ -175,6 +175,27 @@ export default function ChefPage() {
         } catch {}
     };
 
+    const extendMagicLink = async (jti) => {
+        if (!confirm('Generate a fresh 120-day link for this? The old URL will stop working — you\'ll need to re-share the new one.')) return;
+        try {
+            const res = await fetch('/api/chef/magic-links', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password, action: 'extend', jti }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+                await navigator.clipboard.writeText(data.url).catch(() => {});
+                fetchMagicLinksList();
+                alert('New 120-day link generated and copied to clipboard.');
+            } else {
+                alert(data.error || 'Failed to extend.');
+            }
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+
     // Guestlist links (free-ticket links, listed under the magic links form)
     const [glLabel, setGlLabel] = useState('');
     const [glCount, setGlCount] = useState('5');
@@ -184,7 +205,7 @@ export default function ChefPage() {
     const [glCopiedJti, setGlCopiedJti] = useState(null);
 
     const fetchGuestlistLinks = async (providedPw) => {
-        const pw = (typeof providedPw === 'string') ? providedPw : (password || sessionStorage.getItem('chef_pw'));
+        const pw = (typeof providedPw === 'string') ? providedPw : (password || localStorage.getItem('chef_pw'));
         try {
             const res = await fetch('/api/chef/guestlists', {
                 method: 'POST',
@@ -320,7 +341,7 @@ export default function ChefPage() {
             });
             const data = await res.json();
             if (res.ok) {
-                sessionStorage.setItem('chef_pw', password);
+                localStorage.setItem('chef_pw', password);
                 setAuthorized(true);
                 updateGuestlist(data.tickets);
             } else {
@@ -335,7 +356,7 @@ export default function ChefPage() {
 
     const fetchGuestlist = async (providedPw) => {
         // Ensure providedPw is a string and not a React event object
-        const actualPw = (typeof providedPw === 'string') ? providedPw : (password || sessionStorage.getItem('chef_pw'));
+        const actualPw = (typeof providedPw === 'string') ? providedPw : (password || localStorage.getItem('chef_pw'));
         
         setLoadingGuestlist(true);
         try {
@@ -361,7 +382,7 @@ export default function ChefPage() {
     const [statsError, setStatsError] = useState('');
 
     const fetchStats = async (providedPw) => {
-        const actualPw = (typeof providedPw === 'string') ? providedPw : (password || sessionStorage.getItem('chef_pw'));
+        const actualPw = (typeof providedPw === 'string') ? providedPw : (password || localStorage.getItem('chef_pw'));
         setStatsLoading(true);
         setStatsError('');
         try {
@@ -477,7 +498,7 @@ export default function ChefPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    password: password || sessionStorage.getItem('chef_pw'),
+                    password: password || localStorage.getItem('chef_pw'),
                     ticketCode,
                     action: 'verify'
                 })
@@ -990,6 +1011,13 @@ export default function ChefPage() {
                                                             {l.claimed} of {l.uses} claimed · min €{l.price}
                                                         </div>
                                                     </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => extendMagicLink(l.jti)}
+                                                        style={{ ...styles.button, marginTop: 0, padding: '0 10px', fontSize: '0.75rem', whiteSpace: 'nowrap', flexShrink: 0 }}
+                                                    >
+                                                        Extend
+                                                    </button>
                                                     <button
                                                         type="button"
                                                         onClick={() => copyMagicListLink(l.url, l.jti)}
