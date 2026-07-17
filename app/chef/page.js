@@ -1257,7 +1257,7 @@ export default function ChefPage() {
                                                 {[
                                                     ['Tickets Sold', stats.summary.totalTickets],
                                                     ['Orders', stats.summary.totalOrders],
-                                                    ['Net Revenue', fmt(stats.summary.netRevenue)],
+                                                    ['Net (after fees)', fmt(stats.summary.netRevenue)],
                                                     ['Avg per Ticket', fmt(stats.summary.avgPricePerTicket)],
                                                     ['Guestlist Tickets', stats.summary.guestlistTickets ?? 0],
                                                 ].map(([label, value]) => (

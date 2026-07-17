@@ -32,9 +32,18 @@ export async function POST(req) {
             .filter((o) => o.source === 'guestlist')
             .reduce((sum, o) => sum + o.quantity, 0);
 
+        // Actual money kept per order: what was really charged (total_price already
+        // reflects group deals) minus estimated Stripe fees (1.5% + €0.25 per charge,
+        // the same model checkout uses). Non-Stripe orders (offline) have no fee.
+        const netOf = (o) => {
+            const gross = o.total_price || 0;
+            const fee = (o.payment_method || '').startsWith('stripe') ? Math.round(gross * 0.015 + 25) : 0;
+            return gross - fee;
+        };
+
         const totalTickets = salesOrders.reduce((sum, o) => sum + o.quantity, 0);
         const grossRevenue = salesOrders.reduce((sum, o) => sum + o.total_price, 0);
-        const netRevenue = salesOrders.reduce((sum, o) => sum + (o.price_per_ticket * o.quantity), 0);
+        const netRevenue = salesOrders.reduce((sum, o) => sum + netOf(o), 0);
 
         // By source
         const bySource = {};
@@ -43,7 +52,7 @@ export async function POST(req) {
             if (!bySource[src]) bySource[src] = { orders: 0, tickets: 0, revenue: 0 };
             bySource[src].orders += 1;
             bySource[src].tickets += o.quantity;
-            bySource[src].revenue += o.price_per_ticket * o.quantity;
+            bySource[src].revenue += netOf(o);
         }
 
         // By payment method
@@ -72,7 +81,7 @@ export async function POST(req) {
             if (!salesByDate[date]) salesByDate[date] = { orders: 0, tickets: 0, revenue: 0 };
             salesByDate[date].orders += 1;
             salesByDate[date].tickets += o.quantity;
-            salesByDate[date].revenue += o.price_per_ticket * o.quantity;
+            salesByDate[date].revenue += netOf(o);
         }
 
         return NextResponse.json({
