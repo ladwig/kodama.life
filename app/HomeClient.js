@@ -591,7 +591,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                                     onMouseLeave={() => setBtnHovered(false)}
                                 >
                                     <FireImg className={styles.illustratedBtnImgLeft} hovered={btnHovered} />
-                                    <span className={styles.illustratedBtnLabel}>JOIN THE QUEST</span>
+                                    <span className={styles.illustratedBtnLabel}>TICKETS</span>
                                     <FireImg className={styles.illustratedBtnImgRight} hovered={btnHovered} />
                                 </Link>
                                 <a
