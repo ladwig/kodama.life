@@ -383,7 +383,6 @@ export default function HomeClient({ buyer, orders, tickets }) {
     });
 
     const hasTickets = orders.length > 0;
-    const buyerFirstName = buyer?.name?.trim()?.split(/\s+/)?.[0] || '';
 
     // Flat list of tickets in render order, for the QR lightbox
     const flatTickets = orders.flatMap((o) =>
@@ -481,24 +480,13 @@ export default function HomeClient({ buyer, orders, tickets }) {
                 </div>
                 <div className={styles.description} data-description="true">
                     <p style={{ marginBottom: '1.4rem' }}>
-                        {buyerFirstName
-                            ? `Once a year at the end of August, the monsters set out, ${buyerFirstName}. When the summer starts to tip towards Autumn.`
-                            : "Once a year at the end of August, the monsters set out. When the summer starts to tip towards Autumn."}
-                        {' '}They head off on a quest, not entirely sure if or what they are looking for, just a shared thirst for adventure.
+                        When the summer starts to tip towards Autumn, the monsters set out on a quest. They head off into the woods with a shared thirst for adventure, unsure of what they are looking for.
                     </p>
                     <p style={{ marginBottom: '1.4rem' }}>
-                        Warmly welcoming other creatures that arrive with kindness and a willingness to share the trail.<br />
-                        No concern for where you came from, what you believe, what you look like, or who you love.
-                    </p>
-                    <p style={{ marginBottom: '1.4rem' }}>
-                        The quest develops into strange confessions, big questions, laughter echoing through the trees, moments of unexpected kindness. Pairs and threes wander off to explore side paths and come back with stories.
-                    </p>
-                    <p style={{ marginBottom: '1.4rem' }}>
-                        For a little while, the monsters become a village moving, dancing and shaking through the wilderness together.
+                        The pack grows as they share the trail with other creatures, with no concern for where they came from, what they believe, what they look like, or who they love. Pairs and threes wander off to explore side paths and come back with stories. The quest develops into strange confessions, big questions, and moments of unexpected kindness. For a little while, the monsters become a village. Moving, dancing and shaking through the wilderness together.
                     </p>
                     <p>
-                        By the next day the site is quiet again.<br />
-                        The paths are empty except for footprints pressed into the dirt and the feeling that something important passed through here together.
+                        By the next day the site is quiet again. The trails and footprints fade, but a feeling lingers in the air. Something magical occurred between the trees.
                     </p>
                 </div>
                 </>}

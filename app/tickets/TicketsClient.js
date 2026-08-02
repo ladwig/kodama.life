@@ -333,6 +333,9 @@ export default function TicketsClient({ minPrice = 30 }) {
                             <p className={styles.selfFundedNote}>
                                 sidequest is a self-funded, community-driven project. It only happens through donations and volunteering.
                             </p>
+                            <p className={styles.selfFundedNote}>
+                                The price of a ticket should never be the barrier for someone attending sidequest. If you are in a position to pay a little more for a ticket, we urge you to consider doing so, as the sliding scale allows for those who it is not financially viable for to still attend the event. If you&apos;d love to join us but it&apos;s out of reach right now, get in touch. We&apos;ll see what we can figure out together.
+                            </p>
                             <div className={styles.priceSteps}>
                                 {[0, 5, 10, 15, 20, 25, 30].map((d) => (
                                     <button key={d} type="button"
