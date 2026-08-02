@@ -24,7 +24,7 @@ function FAQ() {
                     <div className={styles.faqLine} />
                     {open === i && (
                         <div className={styles.faqBody}>
-                            <p style={{ margin: 0 }}>{item.a}{item.link && <> <a href={item.link.href} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>{item.link.label}</a></>}</p>
+                            <p style={{ margin: 0, whiteSpace: 'pre-line' }}>{item.a}{item.link && <> <a href={item.link.href} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>{item.link.label}</a></>}</p>
                             {item.images && (
                                 <div className={styles.faqImages}>
                                     {item.images.map((src, j) => (
@@ -42,6 +42,37 @@ function FAQ() {
 
 function formatPrice(cents) {
     return `${(cents / 100).toFixed(0)} €`;
+}
+
+// Red doodles that randomly fade in, linger, then fade out — ambient decoration.
+function AmbientDoodles() {
+    const [items, setItems] = useState([]);
+    const idRef = useRef(0);
+    useEffect(() => {
+        const GIFS = ['/star1.gif', '/star2.gif', '/spiral.gif'];
+        let timer;
+        const spawn = () => {
+            setItems((prev) => {
+                if (prev.length >= 3) return prev; // cap at 3 on screen
+                const id = ++idRef.current;
+                const src = GIFS[Math.floor(Math.random() * GIFS.length)];
+                // Spiral reads bigger/denser — scale it down; stars stay as-is.
+                const size = src === '/spiral.gif' ? 12 + Math.random() * 10 : 34 + Math.random() * 46;
+                const x = 5 + Math.random() * 85;
+                const y = 8 + Math.random() * 80;
+                const dur = Math.round(4000 + Math.random() * 3000);
+                setTimeout(() => setItems((p) => p.filter((i) => i.id !== id)), dur);
+                return [...prev, { id, src, size, x, y, dur }];
+            });
+            timer = setTimeout(spawn, 900 + Math.random() * 1800);
+        };
+        timer = setTimeout(spawn, 900);
+        return () => clearTimeout(timer);
+    }, []);
+    return items.map((i) => (
+        <img key={i.id} src={i.src} alt="" aria-hidden="true"
+            style={{ position: 'fixed', left: `${i.x}vw`, top: `${i.y}vh`, width: `${i.size}px`, height: 'auto', pointerEvents: 'none', zIndex: 3, animation: `ambientFade ${i.dur}ms ease-in-out forwards` }} />
+    ));
 }
 
 function TicketLightbox({ tickets, index, onClose, onNav }) {
@@ -445,7 +476,13 @@ export default function HomeClient({ buyer, orders, tickets }) {
                         </a>
                     </div>
                 )}
-                <div className={styles.newsletterMinimal}>
+                <img
+                    src="https://cdn.resend.app/b2e18824-71c0-49fb-aae8-668775eb6475"
+                    alt="sidequest lineup"
+                    style={{ width: '100%', height: 'auto', display: 'block', margin: '0 auto 1.5rem' }}
+                />
+                {/* ponytail: newsletter signup hidden for now — flip to true to restore */}
+                {false && <div className={styles.newsletterMinimal}>
                     {newsletterState === 'success' ? (
                         <div className={styles.successBox}>
                             Signed up. You&apos;ll hear from us when there&apos;s something to say.
@@ -477,7 +514,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                             )}
                         </form>
                     )}
-                </div>
+                </div>}
                 <div className={styles.description} data-description="true">
                     <p style={{ marginBottom: '1.4rem' }}>
                         When the summer starts to tip towards Autumn, the monsters set out on a quest. They head off into the woods with a shared thirst for adventure, unsure of what they are looking for.
@@ -596,9 +633,11 @@ export default function HomeClient({ buyer, orders, tickets }) {
                         </div>
                     </div>
                 )}
-
-                <FAQ />
             </div>
+
+            <FAQ />
+
+            <AmbientDoodles />
 
             {lightboxIdx !== null && (
                 <TicketLightbox

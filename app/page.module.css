@@ -249,6 +249,18 @@
   width: min(100%, 760px);
   display: flex;
   flex-direction: column;
+  z-index: 1;
+}
+
+/* Desktop: wider and two columns (FAQ sits outside the narrow text column) */
+@media (min-width: 900px) {
+  .faq {
+    width: min(92vw, 920px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 2.5rem;
+    align-items: start;
+  }
 }
 
 .faqItem {

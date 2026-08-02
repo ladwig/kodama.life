@@ -21,7 +21,7 @@ export default function NewsletterFAQ() {
                         <span className={styles.faqToggle} aria-hidden="true">{open === i ? '−' : '+'}</span>
                     </button>
                     {open === i && (
-                        <p className={styles.faqAnswer}>{item.a}{item.link && <> <a href={item.link.href} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>{item.link.label}</a></>}</p>
+                        <p className={styles.faqAnswer} style={{ whiteSpace: 'pre-line' }}>{item.a}{item.link && <> <a href={item.link.href} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>{item.link.label}</a></>}</p>
                     )}
                 </div>
             ))}
