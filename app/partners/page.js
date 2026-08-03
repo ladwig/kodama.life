@@ -132,7 +132,7 @@ export default function PartnersPage() {
                 <h1 className={styles.h1}>{t.tagline}</h1>
                 <p className={styles.intro}>{t.intro}</p>
 
-                <img src="https://cdn.resend.app/b2e18824-71c0-49fb-aae8-668775eb6475" alt="sidequest lineup" className={styles.artwork} />
+                <img src="/faq/lineup.jpg" alt="sidequest lineup" className={styles.artwork} />
 
                 <div className={styles.section}>
                     <h2 className={styles.h2}>{t.whyNow.heading}</h2>

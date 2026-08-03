@@ -477,7 +477,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                     </div>
                 )}
                 <img
-                    src="https://cdn.resend.app/b2e18824-71c0-49fb-aae8-668775eb6475"
+                    src="/faq/lineup.jpg"
                     alt="sidequest lineup"
                     style={{ width: '100%', height: 'auto', display: 'block', margin: '0 auto 1.5rem' }}
                 />
