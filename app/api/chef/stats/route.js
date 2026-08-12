@@ -45,6 +45,17 @@ export async function POST(req) {
         const grossRevenue = salesOrders.reduce((sum, o) => sum + o.total_price, 0);
         const netRevenue = salesOrders.reduce((sum, o) => sum + netOf(o), 0);
 
+        // Ticket mix (by tickets). Group deals are inferred: charged less than base
+        // (4-for-3 discount), whereas normal/magic always add a fee on top.
+        const mix = { normal: 0, group: 0, magic: 0, offline: 0 };
+        for (const o of salesOrders) {
+            const src = o.source || 'online';
+            if (src === 'magic_link') mix.magic += o.quantity;
+            else if (src === 'offline') mix.offline += o.quantity;
+            else if (o.total_price < o.price_per_ticket * o.quantity) mix.group += o.quantity;
+            else mix.normal += o.quantity;
+        }
+
         // By source
         const bySource = {};
         for (const o of salesOrders) {
@@ -93,6 +104,7 @@ export async function POST(req) {
                 avgPricePerTicket: totalTickets > 0 ? Math.round(netRevenue / totalTickets) : 0,
                 guestlistTickets,
             },
+            mix,
             checkins: {
                 total: tickets.length,
                 checkedIn,

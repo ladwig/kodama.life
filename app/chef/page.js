@@ -637,10 +637,20 @@ export default function ChefPage() {
     }
 
     return (
-        <main style={styles.main}>
+        <main className="chef-main" style={styles.main}>
             <style dangerouslySetInnerHTML={{ __html: `
                 .chef-container {
                     animation: fadeIn 0.4s ease-out;
+                }
+
+                @media (max-width: 640px) {
+                    .chef-main {
+                        padding: 0.75rem !important;
+                    }
+                    .chef-container {
+                        padding: 1.25rem !important;
+                        border-radius: 16px !important;
+                    }
                 }
                 
                 @keyframes fadeIn {
@@ -1267,6 +1277,43 @@ export default function ChefPage() {
                                                     </div>
                                                 ))}
                                             </div>
+
+                                            {/* Ticket Mix (ratios) */}
+                                            {stats.mix && (() => {
+                                                const CATS = [
+                                                    { key: 'normal', label: 'Normal', color: 'var(--accent)' },
+                                                    { key: 'group', label: 'Group (4-for-3)', color: '#8CB2AB' },
+                                                    { key: 'magic', label: 'Magic link', color: '#c98a3a' },
+                                                    { key: 'offline', label: 'Offline', color: 'var(--ink-muted)' },
+                                                ];
+                                                const total = CATS.reduce((s, c) => s + (stats.mix[c.key] || 0), 0);
+                                                if (!total) return null;
+                                                const cats = CATS.filter((c) => (stats.mix[c.key] || 0) > 0);
+                                                return (
+                                                    <div>
+                                                        <div style={sectionHead}>Ticket Mix</div>
+                                                        <div style={{ display: 'flex', width: '100%', height: '22px', borderRadius: '4px', overflow: 'hidden' }}>
+                                                            {cats.map((c) => (
+                                                                <div key={c.key} title={c.label} style={{ width: `${(stats.mix[c.key] / total) * 100}%`, background: c.color }} />
+                                                            ))}
+                                                        </div>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', marginTop: '0.75rem' }}>
+                                                            {cats.map((c) => {
+                                                                const v = stats.mix[c.key];
+                                                                const pct = Math.round((v / total) * 100);
+                                                                return (
+                                                                    <div key={c.key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem' }}>
+                                                                        <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: c.color, flexShrink: 0 }} />
+                                                                        <span style={{ flex: 1 }}>{c.label}</span>
+                                                                        <span style={{ fontWeight: 700 }}>{v}</span>
+                                                                        <span style={{ width: '44px', textAlign: 'right', color: 'var(--ink-muted)' }}>{pct}%</span>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })()}
 
                                             {/* Check-ins */}
                                             <div>
