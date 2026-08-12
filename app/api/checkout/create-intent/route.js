@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { getMinTicketPrice } from '@/lib/config';
+import { getMinTicketPrice, isGroupTicketsEnabled } from '@/lib/config';
 
 const STEP = 500; // 5 EUR increments
 const MAX_QUANTITY = 10;
@@ -10,9 +10,11 @@ const EVENT_DATE = '2026-08-22';
 export async function POST(req) {
     try {
         const body = await req.json();
-        const { buyer_name, buyer_email, buyer_phone, quantity, price_per_ticket, ticket_holders, group_deal } = body;
+        const { buyer_name, buyer_email, buyer_phone, quantity, price_per_ticket, ticket_holders } = body;
 
         const MIN_PRICE = (await getMinTicketPrice()) * 100; // euros → cents
+        // Group deal only counts if still enabled — can't be forced via the API
+        const group_deal = body.group_deal && (await isGroupTicketsEnabled());
 
         // Validation
         if (!buyer_name || !buyer_email) {

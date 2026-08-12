@@ -91,7 +91,7 @@ function PaymentScreen({ total, totalWithFee, quantity, pricePerTicket, holderNa
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────
-export default function TicketsClient({ minPrice = 30 }) {
+export default function TicketsClient({ minPrice = 30, groupEnabled = true }) {
     const MIN_PRICE = minPrice;
     const [buyerName, setBuyerName] = useState('');
     const [buyerEmail, setBuyerEmail] = useState('');
@@ -303,15 +303,23 @@ export default function TicketsClient({ minPrice = 30 }) {
                                     onClick={() => { playKeyboard(); setQuantity((q) => Math.min(MAX_QUANTITY, q + 1)); }}
                                     disabled={quantity >= MAX_QUANTITY || groupDeal} aria-label="More">+</button>
                             </div>
-                            <label className={styles.groupDealRow}>
-                                <input
-                                    type="checkbox"
-                                    checked={groupDeal}
-                                    onChange={(e) => { playKeyboard(); handleGroupDeal(e.target.checked); }}
-                                    className={styles.groupDealCheck}
-                                />
-                                <span>Group · 4 for the price of 3</span>
-                            </label>
+                            {groupEnabled ? (
+                                <label className={styles.groupDealRow}>
+                                    <input
+                                        type="checkbox"
+                                        checked={groupDeal}
+                                        onChange={(e) => { playKeyboard(); handleGroupDeal(e.target.checked); }}
+                                        className={styles.groupDealCheck}
+                                    />
+                                    <span>Group · 4 for the price of 3</span>
+                                </label>
+                            ) : (
+                                <label className={styles.groupDealRow} title="Sold out" style={{ opacity: 0.4, cursor: 'not-allowed' }}>
+                                    <input type="checkbox" checked={false} disabled className={styles.groupDealCheck} style={{ cursor: 'not-allowed' }} />
+                                    <span style={{ textDecoration: 'line-through' }}>Group · 4 for the price of 3</span>
+                                    <span style={{ marginLeft: '0.4rem', fontStyle: 'italic' }}>· sold out</span>
+                                </label>
+                            )}
                         </section>
 
                         <section className={styles.section}>
@@ -337,6 +345,17 @@ export default function TicketsClient({ minPrice = 30 }) {
                                 The price of a ticket should never be the barrier for someone attending sidequest. If you are in a position to pay a little more for a ticket, we urge you to consider doing so, as the sliding scale allows for those who it is not financially viable for to still attend the event. If you&apos;d love to join us but it&apos;s out of reach right now, get in touch. We&apos;ll see what we can figure out together.
                             </p>
                             <div className={styles.priceSteps}>
+                                {(() => {
+                                    const soldOut = [];
+                                    for (let p = 30; p < MIN_PRICE; p += 5) soldOut.push(p);
+                                    return soldOut.map((p) => (
+                                        <button key={`sold-${p}`} type="button" disabled title="Sold out"
+                                            className={styles.priceStep}
+                                            style={{ opacity: 0.4, textDecoration: 'line-through', cursor: 'not-allowed' }}>
+                                            {`€${p}`}
+                                        </button>
+                                    ));
+                                })()}
                                 {[0, 5, 10, 15, 20, 25, 30].map((d) => (
                                     <button key={d} type="button"
                                         className={`${styles.priceStep} ${donation === d ? styles.priceStepActive : ''}`}
