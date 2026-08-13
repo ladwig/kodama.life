@@ -25,6 +25,11 @@ export async function POST(req) {
                 return NextResponse.json({ error: 'Ticket not found' }, { status: 404 });
             }
 
+            // Reject tickets whose order is no longer paid (refunded / cancelled / pending)
+            if (ticket.orders && ticket.orders.status !== 'paid') {
+                return NextResponse.json({ error: `Ticket not valid — order is ${ticket.orders.status}` }, { status: 403 });
+            }
+
             return NextResponse.json({ ticket });
         }
 

@@ -11,9 +11,11 @@ export async function POST(req) {
         }
 
         const supabase = getSupabaseAdmin();
+        // Only tickets whose order is still paid — excludes refunded/cancelled from the roster
         const { data: tickets, error } = await supabase
             .from('tickets')
-            .select('id, holder_name, ticket_code, checked_in, checked_in_at, created_at')
+            .select('id, holder_name, ticket_code, checked_in, checked_in_at, created_at, orders!inner(status)')
+            .eq('orders.status', 'paid')
             .order('created_at', { ascending: false });
 
         if (error) throw error;

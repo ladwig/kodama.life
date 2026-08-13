@@ -63,7 +63,7 @@ export default function ChefPage() {
 
         const handleOnline = () => {
             setIsOnline(true);
-            setTimeout(attemptSync, 1000);
+            setTimeout(() => { attemptSync(); fetchGuestlist(); }, 1000);
         }
         const handleOffline = () => setIsOnline(false);
 
@@ -75,6 +75,17 @@ export default function ChefPage() {
             window.removeEventListener('offline', handleOffline);
         };
     }, []);
+
+    // While signed in and online, keep the roster fresh and flush the queue (every 60s).
+    useEffect(() => {
+        if (!authorized) return;
+        const id = setInterval(() => {
+            if (!navigator.onLine) return;
+            fetchGuestlist();
+            attemptSync();
+        }, 60000);
+        return () => clearInterval(id);
+    }, [authorized]);
 
     const attemptSync = async () => {
         if (!navigator.onLine) return;
@@ -425,12 +436,14 @@ export default function ChefPage() {
         
         try {
             const scanner = new Html5QrcodeScanner(
-                "qr-reader", 
-                { 
-                   fps: 10, 
+                "qr-reader",
+                {
+                   fps: 10,
                    qrbox: { width: 250, height: 250 },
                    aspectRatio: 1.0,
                    rememberLastUsedCamera: true,
+                   // Default to the rear/main camera (best for scanning QR codes)
+                   videoConstraints: { facingMode: { ideal: 'environment' } },
                 },
                 /* verbose= */ false
             );
@@ -595,9 +608,11 @@ export default function ChefPage() {
         setScanError('');
         lastScannedCode.current = ''; // Allow scanning same or next code
         
-        // Add cooldown to prevent immediate rescan if still looking at the same phone
+        // Brief cooldown so the same phone still in frame doesn't instantly re-pop.
+        // Different codes scan straight through; a re-scan of a checked-in ticket just
+        // shows "already checked in" (no double count).
         setScanCooldown(true);
-        setTimeout(() => setScanCooldown(false), 1500); 
+        setTimeout(() => setScanCooldown(false), 700);
     };
 
     const handleSubmit = async (e) => {
@@ -741,36 +756,28 @@ export default function ChefPage() {
                 }
             `}} />
             
-            <div style={{
-                position: 'fixed',
-                top: '20px',
-                right: '20px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-end',
-                gap: '8px',
-                fontSize: '0.85rem',
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                padding: '12px 16px',
-                borderRadius: '12px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                border: '1px solid var(--border, rgba(26, 26, 26, 0.08))',
-                zIndex: 1000
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-muted)' }}>
+            {(() => {
+                const quiet = isOnline && syncQueue.length === 0;
+                return (
                     <div style={{
-                        width: '8px', height: '8px', borderRadius: '50%',
-                        backgroundColor: isOnline ? '#10b981' : '#ef4444',
-                        boxShadow: isOnline ? '0 0 8px rgba(16, 185, 129, 0.4)' : '0 0 8px rgba(239, 68, 68, 0.4)'
-                    }}></div>
-                    <span style={{ fontWeight: '500' }}>{isOnline ? 'Network Online' : 'Network Offline (Local Mode)'}</span>
-                </div>
-                {syncQueue.length > 0 && (
-                    <div style={{ color: '#f59e0b', fontWeight: '700', fontSize: '0.8rem' }}>
-                        {syncQueue.length} pending sync(s)
+                        position: 'fixed', top: '10px', right: '10px', zIndex: 1000,
+                        display: 'flex', alignItems: 'center', gap: '6px',
+                        padding: quiet ? '5px' : '5px 10px',
+                        borderRadius: '999px',
+                        backgroundColor: quiet ? 'transparent' : 'rgba(255,255,255,0.92)',
+                        boxShadow: quiet ? 'none' : '0 2px 8px rgba(0,0,0,0.08)',
+                        fontSize: '0.72rem', fontWeight: 600,
+                    }}>
+                        <div style={{
+                            width: '9px', height: '9px', borderRadius: '50%', flexShrink: 0,
+                            backgroundColor: isOnline ? '#10b981' : '#ef4444',
+                            boxShadow: isOnline ? '0 0 6px rgba(16,185,129,0.5)' : '0 0 6px rgba(239,68,68,0.5)',
+                        }} />
+                        {!isOnline && <span style={{ color: '#ef4444' }}>Offline</span>}
+                        {syncQueue.length > 0 && <span style={{ color: '#f59e0b' }}>{syncQueue.length} pending</span>}
                     </div>
-                )}
-            </div>
+                );
+            })()}
 
             <div className="chef-container" style={styles.container}>
                 <div style={styles.tabsCol}>
@@ -1148,48 +1155,47 @@ export default function ChefPage() {
                                 }}></div>
 
                                 {scanError && (
-                                    <div style={styles.scanErrorBox}>
+                                    <div style={{ ...styles.scanErrorBox, backgroundColor: '#dc2626', color: '#fff', borderColor: '#dc2626' }}>
                                         <div style={styles.errorIcon}>⚠️</div>
-                                        <div style={styles.errorText}>{scanError}</div>
+                                        <div style={{ ...styles.errorText, color: '#fff', fontWeight: 700 }}>{scanError}</div>
                                         <button onClick={resetScanner} style={styles.scanAgainBtn}>Scan Again</button>
                                     </div>
                                 )}
 
                                 {scannedTicket && (
-                                    <div style={styles.ticketResult}>
+                                    <div style={{ ...styles.ticketResult, backgroundColor: scannedTicket.checked_in ? '#dc2626' : '#16a34a', color: '#fff', border: 'none' }}>
                                         <div style={styles.resultHeader}>
-                                            <span style={styles.badge}>{scannedTicket.checked_in ? 'Checked In' : 'Valid Ticket'}</span>
-                                            {scannedTicket.checked_in && (
-                                                <div style={styles.checkedInTime}>
-                                                    {new Date(scannedTicket.checked_in_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            <span style={{ ...styles.badge, backgroundColor: 'rgba(255,255,255,0.2)', color: '#fff' }}>
+                                                {scannedTicket.checked_in ? '⛔ Already checked in' : '✓ Valid ticket'}
+                                            </span>
+                                            {scannedTicket.checked_in && scannedTicket.checked_in_at && (
+                                                <div style={{ ...styles.checkedInTime, color: '#fff', opacity: 0.85 }}>
+                                                    at {new Date(scannedTicket.checked_in_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </div>
                                             )}
                                         </div>
-                                        
+
                                         <div style={styles.ticketInfo}>
-                                            <div style={styles.holderName}>{scannedTicket.holder_name}</div>
-                                            <div style={styles.ticketCode}>{scannedTicket.ticket_code}</div>
+                                            <div style={{ ...styles.holderName, color: '#fff' }}>{scannedTicket.holder_name}</div>
+                                            <div style={{ ...styles.ticketCode, color: 'rgba(255,255,255,0.8)' }}>{scannedTicket.ticket_code}</div>
                                         </div>
 
                                         {!scannedTicket.checked_in ? (
                                             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
-                                                <button 
-                                                    onClick={handleCheckInAndNext} 
+                                                <button
+                                                    onClick={handleCheckInAndNext}
                                                     disabled={processing}
-                                                    style={styles.checkInBtn}
+                                                    style={{ ...styles.checkInBtn, backgroundColor: '#fff', color: '#16a34a' }}
                                                 >
                                                     {processing ? 'Processing...' : '✅ Check In & Next'}
                                                 </button>
-                                                <button onClick={resetScanner} style={styles.cancelBtn}>
+                                                <button onClick={resetScanner} style={{ ...styles.cancelBtn, color: '#fff', borderColor: 'rgba(255,255,255,0.6)' }}>
                                                     Back without Check In
                                                 </button>
                                             </div>
                                         ) : (
                                             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
-                                                <div style={{ color: 'var(--accent)', fontWeight: '600', marginBottom: '0.5rem' }}>
-                                                    Already checked in!
-                                                </div>
-                                                <button onClick={resetScanner} style={styles.scanNextBtn}>Next Scan</button>
+                                                <button onClick={resetScanner} style={{ ...styles.scanNextBtn, backgroundColor: '#fff', color: '#dc2626' }}>Next Scan</button>
                                             </div>
                                         )}
                                     </div>
