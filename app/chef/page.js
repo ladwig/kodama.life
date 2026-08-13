@@ -265,6 +265,22 @@ export default function ChefPage() {
         }
     };
 
+    const removeGuestlistLink = async (jti, label) => {
+        if (!confirm(`Deactivate the guestlist "${label || 'this link'}"? It will stop working immediately and can't be undone.`)) return;
+        try {
+            const res = await fetch('/api/chef/guestlists', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password, action: 'remove', jti }),
+            });
+            const data = await res.json();
+            if (res.ok) fetchGuestlistLinks();
+            else alert(data.error || 'Failed to deactivate.');
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+
     const handleGenerateLinks = async (e) => {
         e.preventDefault();
         setMagicStatus('');
@@ -1107,6 +1123,14 @@ export default function ChefPage() {
                                                         style={{ ...styles.button, marginTop: 0, padding: '0 12px', fontSize: '0.75rem', whiteSpace: 'nowrap', flexShrink: 0 }}
                                                     >
                                                         {glCopiedJti === gl.jti ? '✓ Copied' : 'Copy link'}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeGuestlistLink(gl.jti, gl.label)}
+                                                        title="Deactivate"
+                                                        style={{ ...styles.button, marginTop: 0, padding: '0 10px', fontSize: '0.75rem', whiteSpace: 'nowrap', flexShrink: 0 }}
+                                                    >
+                                                        ✕
                                                     </button>
                                                 </div>
                                             ))}

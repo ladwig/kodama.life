@@ -80,9 +80,12 @@ export async function POST(req, { params }) {
         // Cap comes from the guestlists table (editable), falling back to the token.
         const { data: glRow } = await supabase
             .from('guestlists')
-            .select('max_tickets')
+            .select('max_tickets, revoked')
             .eq('jti', jti)
             .maybeSingle();
+        if (glRow?.revoked) {
+            return NextResponse.json({ error: 'This guestlist link is no longer active.' }, { status: 409 });
+        }
         const uses = glRow?.max_tickets || payload.uses || 1;
 
         // Count already-issued tickets on this link

@@ -15,9 +15,12 @@ export default async function GuestlistPage({ params }) {
     // Cap comes from the guestlists table (editable in chef), falling back to the token.
     const { data: glRow } = await supabase
         .from('guestlists')
-        .select('max_tickets')
+        .select('max_tickets, revoked')
         .eq('jti', payload.jti)
         .maybeSingle();
+    if (glRow?.revoked) {
+        return <ErrorState message="This guestlist link is no longer active." />;
+    }
     const max = glRow?.max_tickets || payload.uses || 1;
 
     const { data: orders } = await supabase

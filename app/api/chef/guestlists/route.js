@@ -29,12 +29,20 @@ export async function POST(req) {
             return NextResponse.json({ ok: true });
         }
 
-        const { data: lists } = await supabase
+        // ── Deactivate a guestlist link (revoke + hide) ──
+        if (action === 'remove') {
+            const { error } = await supabase.from('guestlists').update({ revoked: true }).eq('jti', jti);
+            if (error) throw error;
+            return NextResponse.json({ ok: true });
+        }
+
+        const { data: allLists } = await supabase
             .from('guestlists')
-            .select('jti, label, max_tickets, token, created_at')
+            .select('jti, label, max_tickets, token, created_at, revoked')
             .order('created_at', { ascending: false });
 
-        if (!lists || lists.length === 0) return NextResponse.json({ guestlists: [] });
+        const lists = (allLists || []).filter((g) => !g.revoked);
+        if (lists.length === 0) return NextResponse.json({ guestlists: [] });
 
         // Count issued tickets per link (one order = one guest ticket)
         const { data: orders } = await supabase
