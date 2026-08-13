@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
 
 export default function ChefPage() {
     const [password, setPassword] = useState('');
@@ -444,6 +444,7 @@ export default function ChefPage() {
                    rememberLastUsedCamera: true,
                    // Default to the rear/main camera (best for scanning QR codes)
                    videoConstraints: { facingMode: { ideal: 'environment' } },
+                   supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA], // no "scan image file" option
                 },
                 /* verbose= */ false
             );
@@ -1233,11 +1234,11 @@ export default function ChefPage() {
                                             <span style={{ flex: 1 }}>Status</span>
                                             <span style={{ flex: 0.8, textAlign: 'right' }}>Code</span>
                                         </div>
-                                        {guestlist.filter(t => t.holder_name.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 ? (
+                                        {guestlist.filter(t => (t.holder_name.toLowerCase().includes(searchTerm.toLowerCase()) || t.ticket_code?.toLowerCase().includes(searchTerm.toLowerCase()))).length === 0 ? (
                                             <div style={styles.placeholderText}>No matches found.</div>
                                         ) : (
                                             guestlist
-                                                .filter(t => t.holder_name.toLowerCase().includes(searchTerm.toLowerCase()))
+                                                .filter(t => (t.holder_name.toLowerCase().includes(searchTerm.toLowerCase()) || t.ticket_code?.toLowerCase().includes(searchTerm.toLowerCase())))
                                                 .map((t) => (
                                                     <div key={t.id} style={styles.tableRow}>
                                                         <span style={{ flex: 1.5, fontWeight: 500 }}>{t.holder_name}</span>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
 
 // Fullscreen on-site door tool: scanner + guestlist (manual check-in).
 // Reuses the same chef password, APIs, and localStorage cache/queue as /chef.
@@ -166,6 +166,7 @@ export default function ScannerPage() {
                 aspectRatio: 1.0,
                 rememberLastUsedCamera: true,
                 videoConstraints: { facingMode: { ideal: 'environment' } },
+                supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA], // no "scan image file" option
             }, false);
             scanner.render(onScanSuccess, () => {});
             scannerInstRef.current = scanner;
@@ -288,7 +289,10 @@ export default function ScannerPage() {
     }
 
     const checkedInCount = guestlist.filter((t) => t.checked_in).length;
-    const filtered = guestlist.filter((t) => t.holder_name?.toLowerCase().includes(searchTerm.toLowerCase()));
+    const q = searchTerm.toLowerCase();
+    const filtered = guestlist.filter((t) =>
+        t.holder_name?.toLowerCase().includes(q) || t.ticket_code?.toLowerCase().includes(q)
+    );
 
     return (
         <main style={S.main}>
@@ -345,7 +349,7 @@ export default function ScannerPage() {
                                 {loadingGuestlist ? '…' : '↻ Refresh'}
                             </button>
                         </div>
-                        <input type="text" placeholder="Search name…" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={S.search} />
+                        <input type="text" placeholder="Search name or code…" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={S.search} />
                         <div style={{ overflowY: 'auto', flex: 1 }}>
                             {filtered.length === 0 ? (
                                 <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.5 }}>No tickets</div>
