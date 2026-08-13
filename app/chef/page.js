@@ -1302,6 +1302,24 @@ export default function ChefPage() {
                                                 ))}
                                             </div>
 
+                                            {/* Potential guests — unclaimed link capacity */}
+                                            {stats.potential && stats.potential.total > 0 && (
+                                                <div>
+                                                    <div style={sectionHead}>Potential Guests</div>
+                                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                        <div style={{ ...statPill, color: 'var(--ink)' }}>
+                                                            <strong>{stats.potential.total}</strong> open total
+                                                        </div>
+                                                        <div style={{ ...statPill, color: 'var(--ink-muted)' }}>
+                                                            <strong>{stats.potential.magic}</strong> magic links
+                                                        </div>
+                                                        <div style={{ ...statPill, color: 'var(--ink-muted)' }}>
+                                                            <strong>{stats.potential.guestlist}</strong> guestlist
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
                                             {/* Ticket Mix (ratios) */}
                                             {stats.mix && (() => {
                                                 const CATS = [

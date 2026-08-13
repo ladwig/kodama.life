@@ -12,19 +12,34 @@ export async function POST(req) {
 
         const supabase = getSupabaseAdmin();
 
-        const [{ data: orders }, { data: tickets }] = await Promise.all([
+        const [{ data: orders }, { data: tickets }, { data: magicLinks }, { data: guestLinks }] = await Promise.all([
             supabase
                 .from('orders')
-                .select('quantity, total_price, price_per_ticket, source, payment_method, created_at')
+                .select('quantity, total_price, price_per_ticket, source, payment_method, created_at, magic_link_jti')
                 .eq('status', 'paid'),
             supabase
                 .from('tickets')
                 .select('checked_in'),
+            supabase.from('magic_links').select('jti, uses, revoked'),
+            supabase.from('guestlists').select('jti, max_tickets, revoked'),
         ]);
 
         if (!orders || !tickets) {
             return NextResponse.json({ error: 'Failed to load data' }, { status: 500 });
         }
+
+        // Claimed count per link (magic + guestlist jtis are distinct)
+        const claimedByJti = {};
+        for (const o of orders) {
+            if (o.magic_link_jti) claimedByJti[o.magic_link_jti] = (claimedByJti[o.magic_link_jti] || 0) + o.quantity;
+        }
+        // Potential guests = unclaimed capacity on active (non-revoked) links
+        const openMagic = (magicLinks || [])
+            .filter((l) => !l.revoked)
+            .reduce((s, l) => s + Math.max(0, (l.uses || 0) - (claimedByJti[l.jti] || 0)), 0);
+        const openGuestlist = (guestLinks || [])
+            .filter((g) => !g.revoked)
+            .reduce((s, g) => s + Math.max(0, (g.max_tickets || 0) - (claimedByJti[g.jti] || 0)), 0);
 
         // Guestlist tickets are free and tracked separately — exclude from all sales KPIs.
         const salesOrders = orders.filter((o) => o.source !== 'guestlist');
@@ -104,6 +119,7 @@ export async function POST(req) {
                 avgPricePerTicket: totalTickets > 0 ? Math.round(netRevenue / totalTickets) : 0,
                 guestlistTickets,
             },
+            potential: { magic: openMagic, guestlist: openGuestlist, total: openMagic + openGuestlist },
             mix,
             checkins: {
                 total: tickets.length,
