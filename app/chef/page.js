@@ -3,12 +3,32 @@
 import { useState, useEffect, useRef } from 'react';
 import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
 
-// Short beep via Web Audio (no asset, works offline)
-function playTone(freq, duration = 0.14, type = 'sine') {
+// One shared AudioContext, resumed on a user gesture (required on iOS).
+let _audioCtx = null;
+function getAudioCtx() {
+    if (typeof window === 'undefined') return null;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    if (!_audioCtx) { try { _audioCtx = new AC(); } catch { return null; } }
+    return _audioCtx;
+}
+function unlockAudio() {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
     try {
-        const AC = window.AudioContext || window.webkitAudioContext;
-        if (!AC) return;
-        const ctx = new AC();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        g.gain.value = 0.0001;
+        o.connect(g); g.connect(ctx.destination);
+        o.start(); o.stop(ctx.currentTime + 0.02);
+    } catch {}
+}
+function playTone(freq, duration = 0.14, type = 'sine') {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    try {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = type;
@@ -19,7 +39,6 @@ function playTone(freq, duration = 0.14, type = 'sine') {
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
         osc.start();
         osc.stop(ctx.currentTime + duration);
-        osc.onended = () => ctx.close();
     } catch {}
 }
 function scanBeep(kind) {
@@ -110,6 +129,17 @@ export default function ChefPage() {
         }, 60000);
         return () => clearInterval(id);
     }, [authorized]);
+
+    // Unlock audio on any tap/click (iOS needs a gesture to enable sound)
+    useEffect(() => {
+        const unlock = () => unlockAudio();
+        window.addEventListener('pointerdown', unlock);
+        window.addEventListener('touchend', unlock);
+        return () => {
+            window.removeEventListener('pointerdown', unlock);
+            window.removeEventListener('touchend', unlock);
+        };
+    }, []);
 
     const attemptSync = async () => {
         if (!navigator.onLine) return;
