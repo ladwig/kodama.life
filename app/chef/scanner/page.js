@@ -71,13 +71,21 @@ export default function ScannerPage() {
     const scannerInstRef = useRef(null);
     const lastScannedCode = useRef('');
     const isScanApiCallInProgress = useRef(false);
+    // Refs mirror state so the (long-lived) scanner callback reads live values, not a stale closure
+    const guestlistRef = useRef([]);
+    const scannedRef = useRef(false);
+    const cooldownRef = useRef(false);
 
     const pw = () => password || (typeof window !== 'undefined' ? localStorage.getItem('chef_pw') : '') || '';
 
     const updateGuestlist = (list) => {
         setGuestlist(list);
+        guestlistRef.current = list;
         try { localStorage.setItem('kodama_guestlist', JSON.stringify(list)); } catch {}
     };
+
+    // Keep the ref in sync for any other setGuestlist path (cache load, etc.)
+    useEffect(() => { guestlistRef.current = guestlist; }, [guestlist]);
 
     const fetchGuestlist = async (providedPw) => {
         const p = (typeof providedPw === 'string') ? providedPw : pw();
@@ -250,7 +258,9 @@ export default function ScannerPage() {
     useEffect(() => () => stopScanner(), []);
 
     async function onScanSuccess(decodedText) {
-        if (processing || scannedTicket || scanCooldown || isScanApiCallInProgress.current) return;
+        // Guards use refs — this callback is captured once by the scanner and would
+        // otherwise read stale state.
+        if (scannedRef.current || cooldownRef.current || isScanApiCallInProgress.current) return;
 
         let ticketCode = decodedText;
         if (decodedText.includes('ticket_code=')) {
@@ -262,9 +272,10 @@ export default function ScannerPage() {
         isScanApiCallInProgress.current = true;
         lastScannedCode.current = ticketCode;
 
-        // Local-first (roster cache already excludes non-paid)
-        const local = guestlist.find((t) => t.ticket_code === ticketCode);
+        // Local-first (roster cache already excludes non-paid) — read the live ref
+        const local = guestlistRef.current.find((t) => t.ticket_code === ticketCode);
         if (local) {
+            scannedRef.current = true;
             setScannedTicket(local);
             setScanError('');
             scanBeep(local.checked_in ? 'error' : 'success');
@@ -281,16 +292,19 @@ export default function ScannerPage() {
             });
             const data = await res.json();
             if (res.ok) {
+                scannedRef.current = true;
                 setScannedTicket(data.ticket);
                 setScanError('');
                 scanBeep(data.ticket.checked_in ? 'error' : 'success');
             } else {
+                scannedRef.current = true;
                 setScanError(data.error || 'Invalid ticket');
                 setScannedTicket(null);
                 lastScannedCode.current = '';
                 scanBeep('error');
             }
         } catch {
+            scannedRef.current = true;
             setScanError('Connection error. Try again.');
             lastScannedCode.current = '';
             scanBeep('error');
@@ -303,9 +317,11 @@ export default function ScannerPage() {
     const resetScanner = () => {
         setScannedTicket(null);
         setScanError('');
+        scannedRef.current = false;
         lastScannedCode.current = '';
+        cooldownRef.current = true;
         setScanCooldown(true);
-        setTimeout(() => setScanCooldown(false), 700);
+        setTimeout(() => { cooldownRef.current = false; setScanCooldown(false); }, 700);
     };
 
     const handleCheckInAndNext = () => {

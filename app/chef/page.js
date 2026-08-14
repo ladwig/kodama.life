@@ -64,6 +64,7 @@ export default function ChefPage() {
 
     const updateGuestlist = (newList) => {
         setGuestlist(newList);
+        guestlistRef.current = newList;
         localStorage.setItem('kodama_guestlist', JSON.stringify(newList));
     };
 
@@ -76,6 +77,11 @@ export default function ChefPage() {
     const scannerInstRef = useRef(null);
     const isScanApiCallInProgress = useRef(false);
     const lastScannedCode = useRef('');
+    // Refs mirror state so the long-lived scanner callback reads live values
+    const guestlistRef = useRef([]);
+    const scannedRef = useRef(false);
+    const cooldownRef = useRef(false);
+    useEffect(() => { guestlistRef.current = guestlist; }, [guestlist]);
 
     // Initial check for session and cached guestlist
     useEffect(() => {
@@ -545,8 +551,10 @@ export default function ChefPage() {
     }, []);
 
     async function onScanSuccess(decodedText) {
-        if (processing || scannedTicket || scanCooldown || isScanApiCallInProgress.current) return;
-        
+        // Guards use refs — this callback is captured once by the scanner and would
+        // otherwise read stale state.
+        if (scannedRef.current || cooldownRef.current || isScanApiCallInProgress.current) return;
+
         // Code might be full URL or just the code
         let ticketCode = decodedText;
         if (decodedText.includes('ticket_code=')) {
@@ -557,13 +565,14 @@ export default function ChefPage() {
 
         // Additional synchronously-blocking check
         if (lastScannedCode.current === ticketCode) return;
-        
+
         isScanApiCallInProgress.current = true;
         lastScannedCode.current = ticketCode;
 
-        // 1. Local Validation (Faster)
-        const localTicket = guestlist.find(t => t.ticket_code === ticketCode);
+        // 1. Local Validation (Faster) — read the live ref, not a stale closure
+        const localTicket = guestlistRef.current.find(t => t.ticket_code === ticketCode);
         if (localTicket) {
+            scannedRef.current = true;
             setScannedTicket(localTicket);
             setScanError('');
             scanBeep(localTicket.checked_in ? 'error' : 'success');
@@ -586,11 +595,13 @@ export default function ChefPage() {
 
             const data = await res.json();
             if (res.ok) {
+                scannedRef.current = true;
                 setScannedTicket(data.ticket);
                 setScanError('');
                 scanBeep(data.ticket.checked_in ? 'error' : 'success');
-                // We keep scanner running but it won't trigger because of scannedTicket condition
+                // We keep scanner running but it won't trigger because of scannedRef
             } else {
+                scannedRef.current = true;
                 setScanError(data.error || 'Invalid ticket');
                 setScannedTicket(null);
                 // Allow re-scanning the same code if it failed
@@ -598,6 +609,7 @@ export default function ChefPage() {
                 scanBeep('error');
             }
         } catch (err) {
+            scannedRef.current = true;
             setScanError('Connection error. Try again.');
             lastScannedCode.current = '';
             scanBeep('error');
@@ -665,13 +677,15 @@ export default function ChefPage() {
     const resetScanner = () => {
         setScannedTicket(null);
         setScanError('');
+        scannedRef.current = false;
         lastScannedCode.current = ''; // Allow scanning same or next code
-        
+
         // Brief cooldown so the same phone still in frame doesn't instantly re-pop.
         // Different codes scan straight through; a re-scan of a checked-in ticket just
         // shows "already checked in" (no double count).
+        cooldownRef.current = true;
         setScanCooldown(true);
-        setTimeout(() => setScanCooldown(false), 700);
+        setTimeout(() => { cooldownRef.current = false; setScanCooldown(false); }, 700);
     };
 
     const handleSubmit = async (e) => {
