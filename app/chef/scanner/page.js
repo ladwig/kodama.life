@@ -321,7 +321,7 @@ export default function ScannerPage() {
                                 <div style={{ fontSize: '1rem', fontWeight: 700, letterSpacing: '0.05em' }}>
                                     {scannedTicket.checked_in ? '⛔ ALREADY CHECKED IN' : '✓ VALID TICKET'}
                                 </div>
-                                <div style={{ fontSize: '2rem', fontWeight: 800, textAlign: 'center' }}>{scannedTicket.holder_name}</div>
+                                <div style={{ fontSize: 'clamp(2.4rem, 10vw, 4rem)', fontWeight: 800, textAlign: 'center', lineHeight: 1.05 }}>{scannedTicket.holder_name}</div>
                                 <div style={{ opacity: 0.8, fontFamily: 'monospace' }}>{scannedTicket.ticket_code}</div>
                                 {scannedTicket.checked_in && scannedTicket.checked_in_at && (
                                     <div style={{ opacity: 0.85 }}>at {new Date(scannedTicket.checked_in_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>

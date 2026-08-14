@@ -1177,7 +1177,7 @@ export default function ChefPage() {
                                         </div>
 
                                         <div style={styles.ticketInfo}>
-                                            <div style={{ ...styles.holderName, color: '#fff' }}>{scannedTicket.holder_name}</div>
+                                            <div style={{ ...styles.holderName, color: '#fff', fontSize: 'clamp(2rem, 8vw, 3rem)', lineHeight: 1.05 }}>{scannedTicket.holder_name}</div>
                                             <div style={{ ...styles.ticketCode, color: 'rgba(255,255,255,0.8)' }}>{scannedTicket.ticket_code}</div>
                                         </div>
 
