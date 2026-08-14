@@ -3,6 +3,30 @@
 import { useState, useEffect, useRef } from 'react';
 import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
 
+// Short beep via Web Audio (no asset, works offline)
+function playTone(freq, duration = 0.14, type = 'sine') {
+    try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        const ctx = new AC();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        gain.gain.setValueAtTime(0.22, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+        osc.onended = () => ctx.close();
+    } catch {}
+}
+function scanBeep(kind) {
+    if (kind === 'success') { playTone(880, 0.11); setTimeout(() => playTone(1320, 0.12), 85); }
+    else { playTone(200, 0.35, 'square'); }
+}
+
 // Fullscreen on-site door tool: scanner + guestlist (manual check-in).
 // Reuses the same chef password, APIs, and localStorage cache/queue as /chef.
 export default function ScannerPage() {
@@ -213,6 +237,7 @@ export default function ScannerPage() {
         if (local) {
             setScannedTicket(local);
             setScanError('');
+            scanBeep(local.checked_in ? 'error' : 'success');
             isScanApiCallInProgress.current = false;
             return;
         }
@@ -228,14 +253,17 @@ export default function ScannerPage() {
             if (res.ok) {
                 setScannedTicket(data.ticket);
                 setScanError('');
+                scanBeep(data.ticket.checked_in ? 'error' : 'success');
             } else {
                 setScanError(data.error || 'Invalid ticket');
                 setScannedTicket(null);
                 lastScannedCode.current = '';
+                scanBeep('error');
             }
         } catch {
             setScanError('Connection error. Try again.');
             lastScannedCode.current = '';
+            scanBeep('error');
         } finally {
             setProcessing(false);
             isScanApiCallInProgress.current = false;
