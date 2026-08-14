@@ -194,19 +194,8 @@ export async function POST(req) {
                     console.log('[webhook] Confirmation email sent to', meta.buyer_email, '| ID:', resendResponse.data?.id);
                 }
 
-                // 6d. Internal sale notification
-                if (process.env.NOTIFY_EMAIL) {
-                    try {
-                        await resend.emails.send({
-                            from: `sidequest <${process.env.RESEND_FROM_ADDRESS}>`,
-                            to: process.env.NOTIFY_EMAIL,
-                            subject: `🎟 New ticket sold — ${meta.buyer_name}`,
-                            text: `${meta.buyer_name} (${meta.buyer_email}) bought ${quantity} ticket(s) for ${(pi.amount / 100).toFixed(2)} €.\n\nTickets: ${tickets.map(t => t.ticket_code).join(', ')}`,
-                        });
-                    } catch (notifyErr) {
-                        console.warn('[webhook] Notify email failed (non-fatal):', notifyErr.message);
-                    }
-                }
+                // 6d. Internal per-sale notification email disabled — Telegram covers this.
+                // (The NOTIFY_EMAIL fallback for Telegram failures below is kept.)
 
             } else if (process.env.MAIL_WEBHOOK_URL && !process.env.MAIL_WEBHOOK_URL.trim().startsWith('#')) {
                 await fetch(process.env.MAIL_WEBHOOK_URL, {
