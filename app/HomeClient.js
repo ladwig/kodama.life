@@ -353,7 +353,7 @@ function spawnData(existing = []) {
     return { id: Math.random(), startX: Math.random() * (W - 60) + 10, startY: Math.random() * (H - 60) + 10, direction, mobile: false, src: monsterSrc };
 }
 
-export default function HomeClient({ buyer, orders, tickets }) {
+export default function HomeClient({ buyer, orders, tickets, soldOut = false }) {
     const [newsletterEmail, setNewsletterEmail] = useState('');
     const [newsletterState, setNewsletterState] = useState('idle');
     const [newsletterError, setNewsletterError] = useState('');
@@ -606,19 +606,39 @@ export default function HomeClient({ buyer, orders, tickets }) {
                 {/* ── No tickets yet ── */}
                 {(!hasTickets || showHome) && (
                     <div className={styles.guestSection}>
+                        {soldOut && (
+                            <p className={styles.details} style={{ textTransform: 'none', letterSpacing: 0, fontSize: 'clamp(0.85rem, 2.4vw, 1rem)', fontWeight: 400, maxWidth: '32rem', margin: '0 auto 1.5rem', lineHeight: 1.6 }}>
+                                We&apos;re sold out. To keep sidequest the intimate, familiar gathering we imagined, we kept the numbers small this year. Thank you for the love — join the Telegram group to stay close and be first to know next time.
+                            </p>
+                        )}
                         <div className={styles.actionContainer}>
                             <div className={styles.illustratedBtns}>
-                                <Link
-                                    href="/tickets"
-                                    className={styles.illustratedBtn}
-                                    onClick={playKeyboard}
-                                    onMouseEnter={() => setBtnHovered(true)}
-                                    onMouseLeave={() => setBtnHovered(false)}
-                                >
-                                    <FireImg className={styles.illustratedBtnImgLeft} hovered={btnHovered} />
-                                    <span className={styles.illustratedBtnLabel}>TICKETS</span>
-                                    <FireImg className={styles.illustratedBtnImgRight} hovered={btnHovered} />
-                                </Link>
+                                {soldOut ? (
+                                    <div
+                                        className={styles.illustratedBtn}
+                                        style={{ position: 'relative', opacity: 0.45, cursor: 'not-allowed', pointerEvents: 'none' }}
+                                        aria-disabled="true"
+                                    >
+                                        <FireImg className={styles.illustratedBtnImgLeft} hovered={false} />
+                                        <span className={styles.illustratedBtnLabel} style={{ visibility: 'hidden' }}>TICKETS</span>
+                                        <FireImg className={styles.illustratedBtnImgRight} hovered={false} />
+                                        <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%) rotate(-6deg)', fontFamily: "'Funnel Display', sans-serif", fontWeight: 700, fontSize: 'clamp(0.9rem, 3vw, 1.2rem)', letterSpacing: '0.08em', color: '#000', whiteSpace: 'nowrap', pointerEvents: 'none' }}>
+                                            SOLD OUT
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <Link
+                                        href="/tickets"
+                                        className={styles.illustratedBtn}
+                                        onClick={playKeyboard}
+                                        onMouseEnter={() => setBtnHovered(true)}
+                                        onMouseLeave={() => setBtnHovered(false)}
+                                    >
+                                        <FireImg className={styles.illustratedBtnImgLeft} hovered={btnHovered} />
+                                        <span className={styles.illustratedBtnLabel}>TICKETS</span>
+                                        <FireImg className={styles.illustratedBtnImgRight} hovered={btnHovered} />
+                                    </Link>
+                                )}
                                 <a
                                     href="https://telegram.me/+RjM5ar5Y-Y81MGFi"
                                     target="_blank"
