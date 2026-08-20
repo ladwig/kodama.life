@@ -5,18 +5,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import styles from './directions.module.css';
 
-// ponytail: content lives right here — replace the copy and drop images into
-// public/directions/, then list them below. No CMS until there's a second page.
-const SECTIONS = [
-    {
-        heading: 'Getting there',
-        body: `Directions text goes here. Replace this paragraph with the real copy.
-
-Blank lines become new paragraphs.`,
-    },
-];
-
-// e.g. { src: '/directions/map.jpg', alt: 'Map to the venue', caption: 'The last turn' }
+// ponytail: content goes here — copy in SECTIONS, images into public/directions/
+// and listed in IMAGES, e.g. { src: '/directions/map.jpg', alt: '…', caption: '…' }
+const SECTIONS = [];
 const IMAGES = [];
 
 export default function DirectionsClient() {
