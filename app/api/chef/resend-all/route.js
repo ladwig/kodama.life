@@ -12,9 +12,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
  * Re-send the ticket mail to every buyer of a paid, non-guestlist order.
  * One mail per buyer email, containing all their tickets.
  *
- * POST { password, confirm: true, limit?: 50, offset?: 0, only?: ["a@b.c"] }
+ * POST { password, confirm: true, limit?, offset?, only?: ["a@b.c"] }
  * Without confirm it's a dry run: reports who would get mail, sends nothing.
- * Run in batches with offset if there are more buyers than the limit.
+ * Sends to everyone by default; limit/offset only exist to resume a run that
+ * died halfway (the response's nextOffset tells you where to pick up).
  */
 export async function POST(req) {
     return run(await req.json());
@@ -23,20 +24,21 @@ export async function POST(req) {
 /**
  * Same thing from the address bar:
  * /api/chef/resend-all?password=…                       → dry run
- * /api/chef/resend-all?password=…&confirm=1&offset=0    → sends
+ * /api/chef/resend-all?password=…&confirm=1            → sends to everyone
  */
 export async function GET(req) {
     const q = req.nextUrl.searchParams;
     return run({
         password: q.get('password'),
         confirm: q.get('confirm') === '1' || q.get('confirm') === 'true',
-        limit: q.get('limit') ? parseInt(q.get('limit'), 10) : 50,
+        limit: q.get('limit') ? parseInt(q.get('limit'), 10) : 0,
         offset: q.get('offset') ? parseInt(q.get('offset'), 10) : 0,
         only: q.get('only') ? q.get('only').split(',') : undefined,
     });
 }
 
-async function run({ password, confirm = false, limit = 50, offset = 0, only }) {
+// limit 0 = send to everyone in one go
+async function run({ password, confirm = false, limit = 0, offset = 0, only }) {
     try {
 
         if (password !== await getChefPassword()) {
@@ -74,7 +76,7 @@ async function run({ password, confirm = false, limit = 50, offset = 0, only }) 
         }
 
         const all = [...buyers.values()];
-        const batch = all.slice(offset, offset + limit);
+        const batch = limit > 0 ? all.slice(offset, offset + limit) : all.slice(offset);
 
         if (!confirm) {
             return NextResponse.json({
@@ -110,7 +112,7 @@ async function run({ password, confirm = false, limit = 50, offset = 0, only }) 
                 console.error('Resend-all failed for', b.email, err.message);
                 failed.push({ email: b.email, error: err.message });
             }
-            await sleep(600); // stay under the Resend rate limit
+            await sleep(550); // stay under the Resend rate limit (2/s)
         }
 
         return NextResponse.json({
