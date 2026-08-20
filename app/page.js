@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createHash } from "crypto";
 import { verifyJWT } from "@/lib/jwt";
 import { getSupabaseAdmin } from "@/lib/supabase";
-import { isPasswordProtectionEnabled, isSoldOut } from "@/lib/config";
+import { isPasswordProtectionEnabled } from "@/lib/config";
 import HomeClient from "./HomeClient";
 
 async function getBuyerData(email) {
@@ -56,7 +56,6 @@ export default async function Home() {
   const protectionEnabled = await isPasswordProtectionEnabled();
   if (protectionEnabled && !isLoggedIn && !buyer) redirect("/login");
 
-  const soldOut = await isSoldOut();
 
-  return <HomeClient buyer={buyer} orders={orders} tickets={tickets} soldOut={soldOut} />;
+  return <HomeClient buyer={buyer} orders={orders} tickets={tickets} />;
 }

@@ -29,15 +29,13 @@
     max-width: 640px;
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1.75rem;
 }
 
 .header {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    border-bottom: 3px solid #000;
-    padding-bottom: 0.6rem;
 }
 
 .title {
@@ -54,8 +52,7 @@
     font-size: 0.72rem;
     font-weight: 700;
     font-family: 'Funnel Display', sans-serif;
-    color: #000;
-    opacity: 0.5;
+    color: #1F4A40;
 }
 
 /* ── Code form ── */
@@ -65,9 +62,38 @@
     gap: 0.75rem;
 }
 
+.inputWrap {
+    position: relative;
+}
+
+.submit {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    bottom: 2px;
+    width: 3.25rem;
+    border: none;
+    background: transparent;
+    color: #000;
+    font-family: 'Funnel Display', sans-serif;
+    font-size: 1.9rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.15s;
+}
+
+.submit:hover:not(:disabled) {
+    transform: translateX(3px);
+}
+
+.submit:disabled {
+    opacity: 0.25;
+    cursor: default;
+}
+
 .input {
     width: 100%;
-    padding: 0.8rem 1rem;
+    padding: 0.8rem 3.5rem 0.8rem 1rem;
     border: 2px solid #000;
     background: transparent;
     color: #000;
@@ -95,8 +121,6 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    border-top: 3px solid #000;
-    padding-top: 1rem;
 }
 
 .sectionHead {
@@ -136,4 +160,149 @@
     opacity: 0.5;
     text-transform: uppercase;
     letter-spacing: 0.04em;
+}
+
+/* ── Highlighted (important) section ── */
+.important {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    border: 3px solid #1F4A40;
+    background: #e3efea;
+    padding: 1rem;
+}
+
+.important .body {
+    color: #143830;
+}
+
+.importantHead {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    font-family: 'Funnel Display', sans-serif;
+    color: #000;
+    opacity: 0.5;
+}
+
+.link {
+    color: inherit;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+/* ── Route choice ── */
+.choices {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: 0.4rem;
+}
+
+.choice {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    text-align: left;
+    padding: 0.9rem 1rem;
+    border: 2px solid #000;
+    background: transparent;
+    cursor: pointer;
+    transition: box-shadow 0.15s, background 0.15s;
+}
+
+.choice:hover {
+    box-shadow: 3px 3px 0 #000;
+}
+
+.choiceActive {
+    background: #000;
+    box-shadow: none;
+}
+
+.choiceLabel {
+    font-family: 'Funnel Display', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #000;
+}
+
+.choiceHint {
+    font-family: 'Funnel Display', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #000;
+    opacity: 0.5;
+}
+
+.choiceActive .choiceLabel,
+.choiceActive .choiceHint {
+    color: var(--bg);
+}
+
+.choiceActive .choiceHint {
+    opacity: 0.65;
+}
+
+/* ── Route view ── */
+.backBtn {
+    align-self: flex-start;
+    margin-bottom: 1.5rem;
+    max-width: 640px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: none;
+    padding: 0;
+    color: #000;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: 'Funnel Display', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.backBtn:hover {
+    opacity: 0.6;
+}
+
+.routeTitle {
+    font-family: 'Funnel Display', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #000;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+}
+
+.mapLink {
+    display: block;
+    text-align: center;
+    padding: 0.9rem 1rem;
+    border: 2px solid #000;
+    color: #000;
+    text-decoration: none;
+    font-family: 'Funnel Display', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    transition: box-shadow 0.15s;
+}
+
+.mapLink:hover {
+    box-shadow: 3px 3px 0 #000;
+}
+
+.importantTag {
+    align-self: flex-start;
+    background: #1F4A40;
+    color: #e3efea;
+    font-family: 'Funnel Display', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    padding: 3px 8px;
+    margin-bottom: 0.1rem;
 }

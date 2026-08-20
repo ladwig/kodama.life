@@ -9,6 +9,12 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Enter your ticket code.' }, { status: 400 });
         }
 
+        // ponytail: local dev has no Supabase creds — any code opens the page.
+        // NODE_ENV is 'production' on Vercel, so this can't leak to the live site.
+        if (process.env.NODE_ENV !== 'production') {
+            return NextResponse.json({ ok: true, name: 'Test Guest' });
+        }
+
         const supabase = getSupabaseAdmin();
         const { data: ticket, error } = await supabase
             .from('tickets')

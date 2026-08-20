@@ -17,13 +17,13 @@ export default async function NewsletterPage({ params }) {
             <div className={styles.content}>
                 <div className={styles.logoWrap}>
                     <img
-                        src="https://loveatfirstside.quest/sidequest-logo.png"
+                        src="/sidequest-logo.png"
                         alt="sidequest"
                         className={styles.logo}
                     />
                 </div>
 
-                <NewsletterSignup />
+                {!newsletter.hideSignup && <NewsletterSignup />}
 
                 <p className={styles.date}>{newsletter.date}</p>
 
@@ -31,9 +31,9 @@ export default async function NewsletterPage({ params }) {
                     if (block.type === 'heading') {
                         return <h3 key={i} className={styles.heading}>{block.text}</h3>;
                     }
-                    if (block.type === 'text') {
+                    if (block.type === 'text' || block.type === 'callout') {
                         const renderSegments = (segs) => segs.map((s, j) =>
-                            s.href ? <a key={j} href={s.href} target="_blank" rel="noopener noreferrer" style={{ color: '#0670DB' }}>{s.text}</a>
+                            s.href ? <a key={j} href={s.href} {...(s.href.startsWith('/') ? {} : { target: '_blank', rel: 'noopener noreferrer' })} style={{ color: '#0670DB' }}>{s.text}</a>
                             : s.bold ? <strong key={j}>{s.text}</strong>
                             : s.br ? <br key={j} />
                             : s.text
@@ -41,6 +41,14 @@ export default async function NewsletterPage({ params }) {
                         const content = block.segments
                             ? (block.italic ? <em>{renderSegments(block.segments)}</em> : renderSegments(block.segments))
                             : block.italic ? <em>{block.text}</em> : block.text;
+                        if (block.type === 'callout') {
+                            return (
+                                <div key={i} className={styles.callout}>
+                                    {block.title && <p className={styles.calloutTitle}>{block.title}</p>}
+                                    <p className={styles.paragraph}>{content}</p>
+                                </div>
+                            );
+                        }
                         return (
                             <p key={i} className={styles.paragraph} {...(i === 0 ? { 'data-description': 'true' } : {})}>
                                 {content}
@@ -60,7 +68,7 @@ export default async function NewsletterPage({ params }) {
                 })}
 
                 <div className={styles.ctaWrap}>
-                    <IllustratedButtons ticketHref="/api/auth/magic?redirect=/tickets" />
+                    <IllustratedButtons ticketHref="/api/auth/magic?redirect=/tickets" showTicket={false} />
                 </div>
 
                 <NewsletterFAQ />
