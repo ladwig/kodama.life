@@ -13,10 +13,6 @@ function formatDate(dateStr) {
     });
 }
 
-function formatPrice(cents) {
-    return `€${(cents / 100).toFixed(0)}`;
-}
-
 export default function MeinTicketClient({ buyer, orders, tickets }) {
     // Group tickets by order_id
     const ticketsByOrder = {};
@@ -71,7 +67,6 @@ export default function MeinTicketClient({ buyer, orders, tickets }) {
                                             <p className={styles.ticketName}>{ticket.holder_name}</p>
                                             <div className={styles.ticketMeta}>
                                                 <span>22. Aug 2026</span>
-                                                <span>{formatPrice(order.price_per_ticket)}</span>
                                             </div>
                                         </div>
                                         <div className={styles.ticketDivider} />

@@ -458,6 +458,26 @@ export default function ChefPage() {
         }
     };
 
+    // Resend the ticket email for a guestlist row (sends the whole order's mail again)
+    const [resendingCode, setResendingCode] = useState(null);
+    const handleResendTicket = async (t) => {
+        if (!confirm(`Resend the ticket email for ${t.holder_name} (${t.ticket_code})?`)) return;
+        setResendingCode(t.ticket_code);
+        try {
+            const res = await fetch('/api/chef/resend-ticket', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: password || localStorage.getItem('chef_pw'), ticket_code: t.ticket_code })
+            });
+            const data = await res.json();
+            alert(res.ok ? `Sent to ${data.email} (${data.count} ticket${data.count === 1 ? '' : 's'})` : `Failed: ${data.error}`);
+        } catch (err) {
+            alert('Failed: network error');
+        } finally {
+            setResendingCode(null);
+        }
+    };
+
     // Stats
     const [stats, setStats] = useState(null);
     const [statsLoading, setStatsLoading] = useState(false);
@@ -1305,6 +1325,7 @@ export default function ChefPage() {
                                             <span style={{ flex: 1.5 }}>Name</span>
                                             <span style={{ flex: 1 }}>Status</span>
                                             <span style={{ flex: 0.8, textAlign: 'right' }}>Code</span>
+                                            <span style={{ flex: 0.4, textAlign: 'right' }}>Mail</span>
                                         </div>
                                         {guestlist.filter(t => (t.holder_name.toLowerCase().includes(searchTerm.toLowerCase()) || t.ticket_code?.toLowerCase().includes(searchTerm.toLowerCase()))).length === 0 ? (
                                             <div style={styles.placeholderText}>No matches found.</div>
@@ -1334,6 +1355,23 @@ export default function ChefPage() {
                                                             </span>
                                                         </span>
                                                         <span style={{ flex: 0.8, textAlign: 'right', fontFamily: 'monospace', opacity: 0.6 }}>{t.ticket_code}</span>
+                                                        <span style={{ flex: 0.4, textAlign: 'right' }}>
+                                                            <button
+                                                                onClick={() => handleResendTicket(t)}
+                                                                disabled={resendingCode === t.ticket_code}
+                                                                title="Resend ticket email"
+                                                                style={{
+                                                                    background: 'none',
+                                                                    border: 'none',
+                                                                    cursor: 'pointer',
+                                                                    fontSize: '0.9rem',
+                                                                    opacity: resendingCode === t.ticket_code ? 0.3 : 0.6,
+                                                                    padding: '2px 4px',
+                                                                }}
+                                                            >
+                                                                {resendingCode === t.ticket_code ? '…' : '✉'}
+                                                            </button>
+                                                        </span>
                                                     </div>
                                                 ))
                                         )}
