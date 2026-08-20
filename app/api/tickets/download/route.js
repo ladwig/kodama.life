@@ -62,7 +62,7 @@ export async function GET(req) {
 
         const { data: orders } = await supabase
             .from('orders')
-            .select('id, price_per_ticket')
+            .select('id')
             .eq('buyer_email', payload.buyer_email)
             .eq('status', 'paid');
 
@@ -71,7 +71,6 @@ export async function GET(req) {
         }
 
         const orderIds = orders.map(o => o.id);
-        const priceByOrder = Object.fromEntries(orders.map(o => [o.id, o.price_per_ticket]));
 
         const { data: tickets } = await supabase
             .from('tickets')
@@ -167,21 +166,6 @@ export async function GET(req) {
                 font,
                 color: rgb(0.45, 0.45, 0.45),
             });
-
-            // Price
-            const priceCents = priceByOrder[ticket.order_id];
-            const priceStr = priceCents
-                ? `€ ${(priceCents / 100).toFixed(2).replace('.', ',')}`
-                : '';
-            if (priceStr) {
-                page.drawText(priceStr, {
-                    x: tX + pad,
-                    y: midY - 34,
-                    size: 10,
-                    font,
-                    color: rgb(0.45, 0.45, 0.45),
-                });
-            }
 
             // --- Stub: QR code + ticket code vertically ---
             const qrSize = 70;

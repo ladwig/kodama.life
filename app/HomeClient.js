@@ -40,10 +40,6 @@ function FAQ() {
     );
 }
 
-function formatPrice(cents) {
-    return `${(cents / 100).toFixed(0)} €`;
-}
-
 // Red doodles that randomly fade in, linger, then fade out — ambient decoration.
 function AmbientDoodles() {
     const [items, setItems] = useState([]);
@@ -417,7 +413,7 @@ export default function HomeClient({ buyer, orders, tickets, soldOut = false }) 
 
     // Flat list of tickets in render order, for the QR lightbox
     const flatTickets = orders.flatMap((o) =>
-        (ticketsByOrder[o.id] || []).map((t) => ({ code: t.ticket_code, name: t.holder_name, price: o.price_per_ticket }))
+        (ticketsByOrder[o.id] || []).map((t) => ({ code: t.ticket_code, name: t.holder_name }))
     );
     const [lightboxIdx, setLightboxIdx] = useState(null);
 
@@ -558,7 +554,6 @@ export default function HomeClient({ buyer, orders, tickets, soldOut = false }) 
                                                 <div style={{ position: 'absolute', left: '26%', top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', gap: '0.2em' }}>
                                                     <span className={styles.ticketText}>{ticket.holder_name.toUpperCase()}</span>
                                                     <span className={styles.ticketText}>22. Aug 2026</span>
-                                                    <span className={styles.ticketText}>{formatPrice(order.price_per_ticket)}</span>
                                                 </div>
                                                 {/* Stub text — rotated, centered in stub area */}
                                                 <div style={{ position: 'absolute', left: '72.5%', top: '50%', transform: 'translate(-50%, -50%) rotate(-90deg)', whiteSpace: 'nowrap' }}>

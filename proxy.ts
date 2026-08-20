@@ -37,6 +37,9 @@ const PUBLIC_PATHS = [
     '/api/guestlist',
     '/confirmation',
     '/newsletters',
+    // Directions — the ticket code entered on the page is the auth
+    '/directions',
+    '/api/directions',
 ];
 
 
