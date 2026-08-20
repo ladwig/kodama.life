@@ -1433,6 +1433,10 @@ export default function ChefPage() {
                                                         <div style={{ ...statPill, color: 'var(--ink-muted)' }}>
                                                             <strong>{stats.potential.guestlist}</strong> guestlist
                                                         </div>
+                                                        {/* Ceiling: everyone holding a ticket + every open seat on active links */}
+                                                        <div style={{ ...statPill, color: 'var(--ink)' }}>
+                                                            <strong>{stats.summary.totalTickets + (stats.summary.guestlistTickets ?? 0) + stats.potential.total}</strong> max total
+                                                        </div>
                                                     </div>
                                                 </div>
                                             )}

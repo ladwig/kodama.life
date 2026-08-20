@@ -1,12 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { signTicketJWT } from '@/lib/jwt';
 import { getChefPassword } from '@/lib/config';
-import { Resend } from 'resend';
-
-const resend = (process.env.RESEND_API_KEY && !process.env.RESEND_API_KEY.endsWith('_...'))
-    ? new Resend(process.env.RESEND_API_KEY)
-    : null;
+import { sendTicketMail, mailEnabled } from '@/lib/ticketMail';
 
 export async function POST(req) {
     try {
@@ -18,7 +13,7 @@ export async function POST(req) {
         if (!ticket_code) {
             return NextResponse.json({ error: 'ticket_code required' }, { status: 400 });
         }
-        if (!resend) {
+        if (!mailEnabled()) {
             return NextResponse.json({ error: 'Mail provider not configured' }, { status: 503 });
         }
 
@@ -46,30 +41,10 @@ export async function POST(req) {
         if (tErr) throw tErr;
 
         const { buyer_email, buyer_name } = ticket.orders;
-        const jwt = await signTicketJWT({ buyer_email, buyer_name });
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://sidequest.life';
-
-        const res = await resend.emails.send({
-            from: `sidequest <${process.env.RESEND_FROM_ADDRESS}>`,
-            to: buyer_email,
-            subject: 'Your sidequest ticket',
-            template: {
-                id: process.env.RESEND_TEMPLATE_TICKET_PURCHASE_CONFIRMATION_ID,
-                variables: {
-                    firstName: buyer_name,
-                    magicLink: `${baseUrl}/api/auth/verify?token=${jwt}`,
-                    pdfLink: `${baseUrl}/api/tickets/download?token=${jwt}`,
-                    tickets: tickets.map((t) => ({
-                        code: t.ticket_code,
-                        holderName: t.holder_name || buyer_name,
-                        qrUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${t.ticket_code}`,
-                    })),
-                },
-            },
-        });
-
-        if (res.error) {
-            console.error('Ticket resend failed:', JSON.stringify(res.error));
+        try {
+            await sendTicketMail({ email: buyer_email, name: buyer_name, tickets });
+        } catch (mailErr) {
+            console.error('Ticket resend failed:', mailErr.message);
             return NextResponse.json({ error: 'Sending failed' }, { status: 502 });
         }
 
