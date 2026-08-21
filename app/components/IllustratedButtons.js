@@ -6,7 +6,7 @@ import FireImg from './FireImg';
 import { playKeyboard } from '@/lib/sounds';
 import styles from './IllustratedButtons.module.css';
 
-export default function IllustratedButtons({ ticketHref = '/tickets', showTicket = true }) {
+export default function IllustratedButtons({ ticketHref = '/tickets', showTicket = true, ticketLabel = 'JOIN THE QUEST' }) {
     const [btnHovered, setBtnHovered] = useState(false);
 
     return (
@@ -20,7 +20,7 @@ export default function IllustratedButtons({ ticketHref = '/tickets', showTicket
                     onMouseLeave={() => setBtnHovered(false)}
                 >
                     <FireImg className={styles.illustratedBtnImgLeft} hovered={btnHovered} />
-                    <span className={styles.illustratedBtnLabel}>JOIN THE QUEST</span>
+                    <span className={styles.illustratedBtnLabel}>{ticketLabel}</span>
                     <FireImg className={styles.illustratedBtnImgRight} hovered={btnHovered} />
                 </Link>
             )}

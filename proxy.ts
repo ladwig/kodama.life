@@ -40,6 +40,8 @@ const PUBLIC_PATHS = [
     // Directions — the ticket code entered on the page is the auth
     '/directions',
     '/api/directions',
+    // Build photos — nothing sensitive, linked from the newsletter
+    '/gallery',
 ];
 
 

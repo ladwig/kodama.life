@@ -6,6 +6,7 @@ import Link from 'next/link';
 import styles from './page.module.css';
 import { playKeyboard, preloadSounds } from '@/lib/sounds';
 import { FAQ_ITEMS } from '@/lib/faq';
+import IllustratedButtons from '@/app/components/IllustratedButtons';
 
 function FAQ() {
     const [open, setOpen] = useState(null);
@@ -433,7 +434,7 @@ export default function HomeClient({ buyer, orders, tickets }) {
                 <p className={styles.details}>
                     August 22, 2026
                     <br />
-                    outskirts of Berlin
+                    Berlin
                 </p>
                 {(!hasTickets || showHome) && <>
                 {showHome && (
@@ -573,24 +574,12 @@ export default function HomeClient({ buyer, orders, tickets }) {
                 {(!hasTickets || showHome) && (
                     <div className={styles.guestSection}>
                         <div className={styles.actionContainer}>
-                            <div className={styles.illustratedBtns}>
-                                <a
-                                    href="https://telegram.me/+RjM5ar5Y-Y81MGFi"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={styles.illustratedBtn}
-                                    onClick={playKeyboard}
-                                >
-                                    <img src="/cerchio3.png" alt="" className={styles.illustratedBtnCircle} />
-                                    <span className={styles.illustratedBtnLabel}>ENTER TELEGRAM GROUP</span>
-                                </a>
-                            </div>
+                            <IllustratedButtons ticketHref="/tickets" ticketLabel="TICKETS" />
                         </div>
                     </div>
                 )}
             </div>
 
-            <FAQ />
 
             <AmbientDoodles />
 

@@ -97,8 +97,7 @@ export default function TicketsClient({ minPrice = 30, groupEnabled = true }) {
     const [buyerEmail, setBuyerEmail] = useState('');
     const [buyerPhone, setBuyerPhone] = useState('');
     const [quantity, setQuantity] = useState(1);
-    const [donation, setDonation] = useState(0);
-    const pricePerTicket = MIN_PRICE + donation;
+    const pricePerTicket = MIN_PRICE;
     const [holderNames, setHolderNames] = useState(['']);
     const [holder0Touched, setHolder0Touched] = useState(false);
 
@@ -344,26 +343,6 @@ export default function TicketsClient({ minPrice = 30, groupEnabled = true }) {
                             <p className={styles.selfFundedNote}>
                                 The price of a ticket should never be the barrier for someone attending sidequest. If you are in a position to pay a little more for a ticket, we urge you to consider doing so, as the sliding scale allows for those who it is not financially viable for to still attend the event. If you&apos;d love to join us but it&apos;s out of reach right now, get in touch. We&apos;ll see what we can figure out together.
                             </p>
-                            <div className={styles.priceSteps}>
-                                {(() => {
-                                    const soldOut = [];
-                                    for (let p = 30; p < MIN_PRICE; p += 5) soldOut.push(p);
-                                    return soldOut.map((p) => (
-                                        <button key={`sold-${p}`} type="button" disabled title="Sold out"
-                                            className={styles.priceStep}
-                                            style={{ opacity: 0.4, textDecoration: 'line-through', cursor: 'not-allowed' }}>
-                                            {`€${p}`}
-                                        </button>
-                                    ));
-                                })()}
-                                {[0, 5, 10, 15, 20, 25, 30].map((d) => (
-                                    <button key={d} type="button"
-                                        className={`${styles.priceStep} ${donation === d ? styles.priceStepActive : ''}`}
-                                        onClick={() => { playKeyboard(); setDonation(d); }}>
-                                        {`€${MIN_PRICE + d}`}
-                                    </button>
-                                ))}
-                            </div>
                         </section>
 
                         {formError && <p className={styles.errorText}>{formError}</p>}

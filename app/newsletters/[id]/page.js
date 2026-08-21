@@ -1,9 +1,7 @@
 import { notFound } from 'next/navigation';
 import { NEWSLETTERS } from '@/lib/newsletters';
-import NewsletterFAQ from './NewsletterFAQ';
 import IllustratedButtons from '@/app/components/IllustratedButtons';
 import MiniMonsters from '@/app/components/MiniMonsters';
-import NewsletterSignup from '@/app/components/NewsletterSignup';
 import styles from './newsletter.module.css';
 
 export default async function NewsletterPage({ params }) {
@@ -22,8 +20,6 @@ export default async function NewsletterPage({ params }) {
                         className={styles.logo}
                     />
                 </div>
-
-                {!newsletter.hideSignup && <NewsletterSignup />}
 
                 <p className={styles.date}>{newsletter.date}</p>
 
@@ -68,10 +64,9 @@ export default async function NewsletterPage({ params }) {
                 })}
 
                 <div className={styles.ctaWrap}>
-                    <IllustratedButtons ticketHref="/api/auth/magic?redirect=/tickets" showTicket={false} />
+                    <IllustratedButtons ticketHref="/api/auth/magic?redirect=/tickets" showTicket={!!newsletter.showTicket} />
                 </div>
 
-                <NewsletterFAQ />
             </div>
         </main>
     );
