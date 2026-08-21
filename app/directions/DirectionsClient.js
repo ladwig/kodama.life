@@ -92,18 +92,19 @@ function Section({ sec, i }) {
     );
 }
 
-export default function DirectionsClient() {
+export default function DirectionsClient({ initialGuest = null }) {
     const [code, setCode] = useState('');
-    const [guest, setGuest] = useState(null);
+    const [guest, setGuest] = useState(initialGuest);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [route, setRoute] = useState(null);
 
     // Remember the guest so a refresh doesn't ask again
     useEffect(() => {
+        if (initialGuest !== null) return;
         const saved = localStorage.getItem('sq_directions_guest');
         if (saved !== null) setGuest(saved);
-    }, []);
+    }, [initialGuest]);
 
     const submit = async (e) => {
         e.preventDefault();
