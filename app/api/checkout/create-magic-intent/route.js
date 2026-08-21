@@ -44,7 +44,7 @@ export async function POST(req) {
             .eq('jti', payload.jti)
             .maybeSingle();
         if (mlRow?.revoked) {
-            return NextResponse.json({ error: 'This link is no longer valid.' }, { status: 409 });
+            return NextResponse.json({ error: "This link is no longer valid. We're sold out and there are no sign-ups at the door — please don't make the trip without a guestlist spot." }, { status: 409 });
         }
 
         const uses = payload.uses || 1;

@@ -7,7 +7,7 @@ export default async function MagicTicketPage({ params }) {
 
     const payload = await verifyLinkTokenIgnoreExpiry(token);
     if (!payload || payload.type !== 'magic_ticket') {
-        return <ErrorState message="This link is invalid or has expired." />;
+        return <ErrorState message="This link is no longer valid. We're sold out and there are no sign-ups at the door — please don't make the trip without a guestlist spot." />;
     }
 
     const supabase = getSupabaseAdmin();
@@ -19,7 +19,7 @@ export default async function MagicTicketPage({ params }) {
         .eq('jti', payload.jti)
         .maybeSingle();
     if (mlRow?.revoked) {
-        return <ErrorState message="This link is no longer valid." />;
+        return <ErrorState message="This link is no longer valid. We're sold out and there are no sign-ups at the door — please don't make the trip without a guestlist spot." />;
     }
 
     const uses = payload.uses || 1;
@@ -31,7 +31,7 @@ export default async function MagicTicketPage({ params }) {
     const remaining = uses - sold;
 
     if (remaining <= 0) {
-        return <ErrorState message="This ticket link has been fully claimed." />;
+        return <ErrorState message="This link has been fully claimed. We're sold out and there are no sign-ups at the door — please don't make the trip without a guestlist spot." />;
     }
 
     return <MagicTicketClient minPrice={payload.price} token={token} remaining={remaining} />;

@@ -84,7 +84,7 @@ export async function POST(req, { params }) {
             .eq('jti', jti)
             .maybeSingle();
         if (glRow?.revoked) {
-            return NextResponse.json({ error: 'This guestlist link is no longer active.' }, { status: 409 });
+            return NextResponse.json({ error: "This guestlist link is no longer active. We're sold out and there are no sign-ups at the door — please don't make the trip without a guestlist spot." }, { status: 409 });
         }
         const uses = glRow?.max_tickets || payload.uses || 1;
 
@@ -104,7 +104,7 @@ export async function POST(req, { params }) {
             if (!name) return NextResponse.json({ error: 'Name is required.' }, { status: 400 });
 
             if ((await issuedCount()) >= uses) {
-                return NextResponse.json({ error: 'This guestlist is full.' }, { status: 409 });
+                return NextResponse.json({ error: "This guestlist is full. We're sold out and there are no sign-ups at the door — please don't make the trip without a guestlist spot." }, { status: 409 });
             }
 
             const buyerEmail = email || placeholderEmail(jti);

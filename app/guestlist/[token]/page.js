@@ -7,7 +7,7 @@ export default async function GuestlistPage({ params }) {
 
     const payload = await verifyLinkTokenIgnoreExpiry(token);
     if (!payload || payload.type !== 'guestlist') {
-        return <ErrorState message="This guestlist link is invalid or has expired." />;
+        return <ErrorState message="This guestlist link is no longer valid. We're sold out and there are no sign-ups at the door — please don't make the trip without a guestlist spot." />;
     }
 
     const supabase = getSupabaseAdmin();
@@ -19,7 +19,7 @@ export default async function GuestlistPage({ params }) {
         .eq('jti', payload.jti)
         .maybeSingle();
     if (glRow?.revoked) {
-        return <ErrorState message="This guestlist link is no longer active." />;
+        return <ErrorState message="This guestlist link is no longer active. We're sold out and there are no sign-ups at the door — please don't make the trip without a guestlist spot." />;
     }
     const max = glRow?.max_tickets || payload.uses || 1;
 

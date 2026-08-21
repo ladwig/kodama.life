@@ -6,7 +6,7 @@ export async function POST(req) {
         const { code } = await req.json();
         const ticketCode = String(code || '').trim().toUpperCase();
         if (!ticketCode) {
-            return NextResponse.json({ error: 'Enter your ticket code.' }, { status: 400 });
+            return NextResponse.json({ error: 'Enter your code.' }, { status: 400 });
         }
 
         // ponytail: local dev has no Supabase creds — any code opens the page.
@@ -25,7 +25,7 @@ export async function POST(req) {
 
         if (error) throw error;
         if (!ticket) {
-            return NextResponse.json({ error: 'We could not find that ticket code.' }, { status: 404 });
+            return NextResponse.json({ error: 'We could not find that code on the guestlist.' }, { status: 404 });
         }
 
         return NextResponse.json({ ok: true, name: ticket.holder_name });

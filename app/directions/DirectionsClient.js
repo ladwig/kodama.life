@@ -16,8 +16,8 @@ const MAP_PARKING = 'https://maps.app.goo.gl/FytSSYLJmLWLQwgw5';
 const INTRO = [
     {
         important: true,
-        heading: 'No tickets at the door',
-        body: `There won't be any tickets at the door. Please do not come if you don't have one already — it's not worth the trip.`,
+        heading: 'Guestlist only',
+        body: `There's no signing up at the door. If your name isn't on the guestlist (QR code) already, please don't make the trip — it's not worth it.`,
     },
 ];
 
@@ -144,7 +144,7 @@ export default function DirectionsClient() {
                     <>
                         <div className={styles.header}>
                             <h1 className={styles.title}>Directions</h1>
-                            <p className={styles.subtitle}>Enter your ticket code to see how to get there.</p>
+                            <p className={styles.subtitle}>Enter your guestlist code (QR code) to see how to get there.</p>
                         </div>
 
                         <form onSubmit={submit} className={styles.form}>
