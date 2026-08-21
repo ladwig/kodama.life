@@ -1,6 +1,5 @@
 import { verifyLinkTokenIgnoreExpiry } from '@/lib/jwt';
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { isSoldOut } from '@/lib/config';
 import MagicTicketClient from './MagicTicketClient';
 
 export default async function MagicTicketPage({ params }) {
@@ -9,11 +8,6 @@ export default async function MagicTicketPage({ params }) {
     const payload = await verifyLinkTokenIgnoreExpiry(token);
     if (!payload || payload.type !== 'magic_ticket') {
         return <ErrorState message="This link is no longer valid. We're sold out and there are no sign-ups at the door — please don't make the trip without a guestlist spot." />;
-    }
-
-    // Sold out → every outstanding link stops selling, no need to revoke them one by one
-    if (await isSoldOut()) {
-        return <ErrorState message="We're sold out and there are no sign-ups at the door — please don't make the trip without a guestlist spot." />;
     }
 
     const supabase = getSupabaseAdmin();
