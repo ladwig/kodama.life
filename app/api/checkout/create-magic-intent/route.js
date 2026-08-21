@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
+import { isSoldOut } from '@/lib/config';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { verifyLinkTokenIgnoreExpiry } from '@/lib/jwt';
 
@@ -36,6 +37,10 @@ export async function POST(req) {
         );
 
         const supabase = getSupabaseAdmin();
+
+        if (await isSoldOut()) {
+            return NextResponse.json({ error: "We're sold out and there are no sign-ups at the door — please don't make the trip without a guestlist spot." }, { status: 409 });
+        }
 
         // Reject if the link was revoked in chef
         const { data: mlRow } = await supabase

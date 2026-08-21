@@ -11,13 +11,17 @@ import styles from './directions.module.css';
 // section can carry image: { src, alt, caption } (files in public/directions/).
 // ─────────────────────────────────────────────────────────────
 const MAP_ROUTE = 'https://maps.app.goo.gl/RUWSMyvrqgMyJGxF9';
+const MAP_PICKUP = 'https://maps.app.goo.gl/YasYASyZD7DgRxgz7';
 const MAP_PARKING = 'https://maps.app.goo.gl/FytSSYLJmLWLQwgw5';
 
 const INTRO = [
     {
         important: true,
-        heading: 'Guestlist only',
-        body: `There's no signing up at the door. If your name isn't on the guestlist (QR code) already, please don't make the trip — it's not worth it.`,
+        heading: 'No entry without a QR code',
+        body: `There won't be any entry without a QR code at the door. Please do not come if you don't have one already — there's little else here to do in the area unless you're open to booking a last minute flight.`,
+    },
+    {
+        body: `Dust off your dancing shoes, shake out your adventure gear, here are the clues to get you to sidequest this weekend.`,
     },
 ];
 
@@ -28,12 +32,12 @@ const ROUTES = [
         hint: '35 min walk or a few minutes by bike from BER',
         sections: [
             {
-                body: `First, public transport to BER Airport. From there follow the ‘Fahrradweg’ signs — we'll leave a couple of hints along the way too.
+                body: `First, public transport to BER Airport. From there follow the bike path signs marked ‘Schönefeld’ (we will leave a couple of hints along the way too). It's a few minutes by bike along the marked path, or about a 35-minute walk on that same bike path.
 
-It's a few minutes by bike along the marked path, or about a 35-minute walk on that same bike path.`,
+The way may feel strange, but trust us on this one.`,
             },
         ],
-        mapLink: { href: MAP_ROUTE, label: 'Open the route · BER to site' },
+        mapLinks: [{ href: MAP_ROUTE, label: 'Open the route · BER to site' }],
     },
     {
         key: 'taxi',
@@ -41,22 +45,24 @@ It's a few minutes by bike along the marked path, or about a 35-minute walk on t
         hint: 'Drop-off at the roundabout, then 10 min on foot',
         sections: [
             {
-                body: `Take a taxi or Uber, from the airport or straight from Berlin, to the drop-off point marked on the map. From there it's roughly 10 minutes on foot along the bike path.`,
+                body: `Take a taxi or Uber, from the airport or straight from Berlin to the drop-off point marked on the map. From there it's roughly 10 min on foot along the bike path.`,
             },
             {
                 important: true,
                 heading: 'Use the roundabout only',
-                body: `Only use the marked pick-up point (the roundabout) for taxis and Ubers, then walk the rest following the route below. Driving a car on the bike lane is prohibited.`,
+                body: `Only use the marked pick-up point (the roundabout) for taxis and Uber's and walk the rest of the bike path. Driving a car along the bike path is strictly prohibited.`,
             },
         ],
-        mapLink: { href: MAP_ROUTE, label: 'Open the route · drop-off to site' },
+        mapLinks: [{ href: MAP_PICKUP, label: 'Open the pick-up point · the roundabout' }],
     },
 ];
 
 // Shown right under the two choices — applies whatever you pick
 const CAR_NOTE = {
     heading: 'Please avoid coming by car',
-    body: `If you really have to, use the [marked path and parking area](${MAP_PARKING}) and do not take any other route.`,
+    body: `If you do, please use the [marked path and parking area](${MAP_PARKING}) and do not take any other route.
+
+Please note that the path is uneven in places, so it's not step-free throughout. If you need support getting there or moving around on site, get in touch beforehand.`,
 };
 
 // ponytail: [text](url) only — no markdown lib for one link syntax
@@ -178,16 +184,17 @@ export default function DirectionsClient({ initialGuest = null }) {
                             <>
                                 <h1 className={styles.routeTitle}>{chosen.label}</h1>
                                 {chosen.sections.map((sec, i) => <Section key={i} sec={sec} />)}
-                                {chosen.mapLink && (
+                                {(chosen.mapLinks || []).map((m) => (
                                     <a
-                                        href={chosen.mapLink.href}
+                                        key={m.href}
+                                        href={m.href}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className={styles.mapLink}
                                     >
-                                        {chosen.mapLink.label} →
+                                        {m.label} →
                                     </a>
-                                )}
+                                ))}
                             </>
                         ) : (
                             <>

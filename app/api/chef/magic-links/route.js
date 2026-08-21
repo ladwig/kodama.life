@@ -15,8 +15,16 @@ export async function POST(req) {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://loveatfirstside.quest';
 
         if (action === 'remove') {
-            const { error } = await supabase.from('magic_links').update({ revoked: true }).eq('jti', jti);
+            const { data, error } = await supabase
+                .from('magic_links')
+                .update({ revoked: true })
+                .eq('jti', jti)
+                .select('jti');
             if (error) throw error;
+            // No row means the link predates this table — it would keep working silently
+            if (!data || data.length === 0) {
+                return NextResponse.json({ error: 'No stored link with that id — nothing was revoked.' }, { status: 404 });
+            }
             return NextResponse.json({ ok: true });
         }
 
