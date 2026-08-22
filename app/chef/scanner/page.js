@@ -379,12 +379,14 @@ export default function ScannerPage() {
 
     return (
         <main style={S.main}>
-            {/* In / open counter — full-width bar so it's always visible */}
+            {/* In / open counter — hidden on the Buy tab, which guests look at */}
+            {tab !== 'buy' && (
             <div style={S.counterBar}>
                 <strong>{checkedInCount}</strong> in
                 <span style={{ opacity: 0.35 }}>/</span>
                 <strong>{guestlist.length - checkedInCount}</strong> open
             </div>
+            )}
 
             {/* Network dot */}
             <div style={S.netDot(isOnline, syncQueue.length)}>
