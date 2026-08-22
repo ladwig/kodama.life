@@ -53,7 +53,7 @@ export default function ChefPage() {
     const [loginLoading, setLoginLoading] = useState(false);
     
     // Tabs
-    const [activeTab, setActiveTab] = useState('offline');
+    const [activeTab, setActiveTab] = useState('magic');
     const [guestlist, setGuestlist] = useState([]);
     const [loadingGuestlist, setLoadingGuestlist] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -204,9 +204,6 @@ export default function ChefPage() {
     };
 
     // Offline ticket form
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [quantity, setQuantity] = useState(1);
     const [price, setPrice] = useState(30);
     const [status, setStatus] = useState('');
 
@@ -746,38 +743,6 @@ export default function ChefPage() {
         setTimeout(() => { cooldownRef.current = false; setScanCooldown(false); }, 700);
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setStatus('Creating...');
-        
-        try {
-            const res = await fetch('/api/chef/ticket', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    password,
-                    name,
-                    email,
-                    quantity: parseInt(quantity, 10),
-                    price_per_ticket: Math.round(parseFloat(price) * 100)
-                })
-            });
-
-            const data = await res.json();
-            if (res.ok) {
-                setStatus(`Success! Created ${data.tickets.length} ticket(s) for ${name}.`);
-                setName('');
-                setEmail('');
-                setQuantity(1);
-            } else {
-                setStatus(`Error: ${data.error}`);
-                if (res.status === 401) setAuthorized(false);
-            }
-        } catch (err) {
-            setStatus(`Error: ${err.message}`);
-        }
-    };
-
     if (!authorized) {
         return (
             <main style={styles.main}>
@@ -914,16 +879,10 @@ export default function ChefPage() {
                 <div style={styles.tabsCol}>
                     <div style={styles.tabNav}>
                         <button
-                            onClick={() => toggleTab('offline')}
-                            className={`tab-btn ${activeTab === 'offline' ? 'active' : ''}`}
-                        >
-                            Offline Ticket
-                        </button>
-                        <button
                             onClick={() => toggleTab('magic')}
                             className={`tab-btn ${activeTab === 'magic' ? 'active' : ''}`}
                         >
-                            Magic Links
+                            Guestlist Setup
                         </button>
                         <button
                             onClick={() => toggleTab('scanner')}
@@ -946,82 +905,38 @@ export default function ChefPage() {
                     </div>
 
                     <div style={styles.tabContent}>
-                        {activeTab === 'offline' && (
-                            <form onSubmit={handleSubmit} style={styles.form}>
-                                <div style={styles.fieldGroup}>
-                                    <label style={styles.label}>Buyer Name</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        style={styles.input}
-                                        placeholder="Full Name"
-                                    />
-                                </div>
-
-                                <div style={styles.fieldGroup}>
-                                    <label style={styles.label}>Buyer Email</label>
-                                    <input
-                                        type="email"
-                                        required
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        style={styles.input}
-                                        placeholder="hello@kodama.life"
-                                    />
-                                </div>
-
-                                <div style={styles.row}>
-                                    <div style={{ ...styles.fieldGroup, flex: 1 }}>
-                                        <label style={styles.label}>Quantity</label>
-                                        <input
-                                            type="number"
-                                            min="1"
-                                            required
-                                            value={quantity}
-                                            onChange={(e) => setQuantity(e.target.value)}
-                                            style={styles.input}
-                                        />
-                                    </div>
-                                    <div style={{ ...styles.fieldGroup, flex: 1 }}>
-                                        <label style={styles.label}>Price (Euro)</label>
-                                        <input
-                                            type="number"
-                                            step="0.01"
-                                            min="0"
-                                            required
-                                            value={price}
-                                            onChange={(e) => setPrice(e.target.value)}
-                                            style={styles.input}
-                                            placeholder="0.00"
-                                        />
-                                    </div>
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    className="submit-btn"
-                                    style={styles.button}
-                                >
-                                    Issue Offline Tickets
-                                </button>
-
-                                {status && (
-                                    <div style={{
-                                        ...styles.status,
-                                        backgroundColor: status.includes('Error') ? 'rgba(220, 38, 38, 0.1)' : 'rgba(74, 103, 65, 0.1)',
-                                        color: status.includes('Error') ? '#dc2626' : 'var(--accent)',
-                                        borderColor: status.includes('Error') ? 'rgba(220, 38, 38, 0.2)' : 'rgba(74, 103, 65, 0.2)'
-                                    }}>
-                                        {status}
-                                    </div>
-                                )}
-                            </form>
-                        )}
-
                         {activeTab === 'magic' && (
                             <div style={styles.form}>
+                                {/* ── Add names straight to the guestlist ── */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--border)', marginBottom: '0.5rem' }}>
+                                    <label style={styles.label}>Add to guestlist</label>
+                                <form onSubmit={handleAddGuests} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                                    <input
+                                        type="text"
+                                        placeholder="Add names — comma separated"
+                                        value={addNames}
+                                        onChange={(e) => setAddNames(e.target.value)}
+                                        style={{ ...styles.searchBar, width: '100%' }}
+                                    />
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <input
+                                            type="email"
+                                            placeholder="Email (one name only, optional)"
+                                            value={addEmail}
+                                            onChange={(e) => setAddEmail(e.target.value)}
+                                            disabled={addNames.includes(',')}
+                                            style={{ ...styles.searchBar, flex: 1, width: 'auto', opacity: addNames.includes(',') ? 0.4 : 1 }}
+                                        />
+                                        <button type="submit" disabled={adding || !addNames.trim()} style={styles.refreshBtn}>
+                                            {adding ? '...' : 'Add to guestlist'}
+                                        </button>
+                                    </div>
+                                    {addStatus && (
+                                        <span style={{ fontSize: '0.7rem', color: 'var(--ink-muted)', paddingLeft: '4px' }}>{addStatus}</span>
+                                    )}
+                                </form>
+                                </div>
+
                                 <form onSubmit={handleGenerateLinks} style={styles.form}>
                                     <div style={styles.row}>
                                         <div style={{ ...styles.fieldGroup, flex: 1 }}>
@@ -1336,31 +1251,6 @@ export default function ChefPage() {
 
                         {activeTab === 'guestlist' && (
                             <div style={styles.listContainer}>
-                                <form onSubmit={handleAddGuests} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
-                                    <input
-                                        type="text"
-                                        placeholder="Add names — comma separated"
-                                        value={addNames}
-                                        onChange={(e) => setAddNames(e.target.value)}
-                                        style={{ ...styles.searchBar, width: '100%' }}
-                                    />
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        <input
-                                            type="email"
-                                            placeholder="Email (one name only, optional)"
-                                            value={addEmail}
-                                            onChange={(e) => setAddEmail(e.target.value)}
-                                            disabled={addNames.includes(',')}
-                                            style={{ ...styles.searchBar, flex: 1, width: 'auto', opacity: addNames.includes(',') ? 0.4 : 1 }}
-                                        />
-                                        <button type="submit" disabled={adding || !addNames.trim()} style={styles.refreshBtn}>
-                                            {adding ? '...' : 'Add to guestlist'}
-                                        </button>
-                                    </div>
-                                    {addStatus && (
-                                        <span style={{ fontSize: '0.7rem', color: 'var(--ink-muted)', paddingLeft: '4px' }}>{addStatus}</span>
-                                    )}
-                                </form>
                                 <div style={styles.listHeader}>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                         <span style={styles.countText}>{guestlist.length} Tickets total</span>

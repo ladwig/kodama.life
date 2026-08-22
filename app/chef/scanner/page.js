@@ -379,6 +379,13 @@ export default function ScannerPage() {
 
     return (
         <main style={S.main}>
+            {/* In / open counter — full-width bar so it's always visible */}
+            <div style={S.counterBar}>
+                <strong>{checkedInCount}</strong> in
+                <span style={{ opacity: 0.35 }}>/</span>
+                <strong>{guestlist.length - checkedInCount}</strong> open
+            </div>
+
             {/* Network dot */}
             <div style={S.netDot(isOnline, syncQueue.length)}>
                 <span style={{ width: 9, height: 9, borderRadius: '50%', background: isOnline ? '#10b981' : '#ef4444', display: 'inline-block' }} />
@@ -480,6 +487,7 @@ const S = {
 
     main: { position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', background: '#000', color: '#fff' },
     netDot: (online, pending) => ({ position: 'absolute', top: 8, right: 10, zIndex: 20, display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.7rem', fontWeight: 600, padding: (online && !pending) ? 4 : '4px 8px', borderRadius: 999, background: (online && !pending) ? 'transparent' : 'rgba(255,255,255,0.12)' }),
+    counterBar: { flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0.7rem 3.5rem', background: '#111', color: '#fff', fontSize: '0.9rem', fontWeight: 600, letterSpacing: '0.02em', borderBottom: '1px solid rgba(255,255,255,0.15)' },
     body: { flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' },
 
     scannerWrap: { flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '1rem', background: '#fff', color: '#000' },
