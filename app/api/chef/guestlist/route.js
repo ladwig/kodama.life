@@ -10,6 +10,12 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        // ponytail: local dev without Supabase creds — the chef login validates
+        // against this route, so hand back an empty roster instead of a 500
+        if (!process.env.SUPABASE_URL) {
+            return NextResponse.json({ tickets: [] });
+        }
+
         const supabase = getSupabaseAdmin();
         // Only tickets whose order is still paid — excludes refunded/cancelled from the roster
         const { data: tickets, error } = await supabase

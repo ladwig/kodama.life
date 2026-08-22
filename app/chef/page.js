@@ -458,6 +458,44 @@ export default function ChefPage() {
         }
     };
 
+    // Add names straight to the guestlist — no link needed
+    const [addNames, setAddNames] = useState('');
+    const [addEmail, setAddEmail] = useState('');
+    const [addStatus, setAddStatus] = useState('');
+    const [adding, setAdding] = useState(false);
+    const handleAddGuests = async (e) => {
+        e.preventDefault();
+        setAdding(true);
+        setAddStatus('');
+        try {
+            const res = await fetch('/api/chef/guestlist-add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    password: password || localStorage.getItem('chef_pw'),
+                    names: addNames,
+                    email: addEmail,
+                }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                setAddStatus(data.error || 'Failed.');
+            } else {
+                const codes = data.added.map((a) => `${a.name} · ${a.code}`).join(' | ');
+                setAddStatus(
+                    `${data.added.length} added${data.emailed ? ' + emailed' : ''}${data.failed.length ? `, ${data.failed.length} failed` : ''}${codes ? ` — ${codes}` : ''}`
+                );
+                setAddNames('');
+                setAddEmail('');
+                fetchGuestlist();
+            }
+        } catch (err) {
+            setAddStatus('Network error.');
+        } finally {
+            setAdding(false);
+        }
+    };
+
     // Resend the ticket email for a guestlist row (sends the whole order's mail again)
     const [resendingCode, setResendingCode] = useState(null);
     const handleResendTicket = async (t) => {
@@ -1298,6 +1336,31 @@ export default function ChefPage() {
 
                         {activeTab === 'guestlist' && (
                             <div style={styles.listContainer}>
+                                <form onSubmit={handleAddGuests} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                                    <input
+                                        type="text"
+                                        placeholder="Add names — comma separated"
+                                        value={addNames}
+                                        onChange={(e) => setAddNames(e.target.value)}
+                                        style={{ ...styles.searchBar, width: '100%' }}
+                                    />
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <input
+                                            type="email"
+                                            placeholder="Email (one name only, optional)"
+                                            value={addEmail}
+                                            onChange={(e) => setAddEmail(e.target.value)}
+                                            disabled={addNames.includes(',')}
+                                            style={{ ...styles.searchBar, flex: 1, width: 'auto', opacity: addNames.includes(',') ? 0.4 : 1 }}
+                                        />
+                                        <button type="submit" disabled={adding || !addNames.trim()} style={styles.refreshBtn}>
+                                            {adding ? '...' : 'Add to guestlist'}
+                                        </button>
+                                    </div>
+                                    {addStatus && (
+                                        <span style={{ fontSize: '0.7rem', color: 'var(--ink-muted)', paddingLeft: '4px' }}>{addStatus}</span>
+                                    )}
+                                </form>
                                 <div style={styles.listHeader}>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                         <span style={styles.countText}>{guestlist.length} Tickets total</span>

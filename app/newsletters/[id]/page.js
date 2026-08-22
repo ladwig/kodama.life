@@ -25,7 +25,7 @@ export default async function NewsletterPage({ params }) {
 
                 {newsletter.content.map((block, i) => {
                     if (block.type === 'heading') {
-                        return <h3 key={i} className={styles.heading}>{block.text}</h3>;
+                        return <h3 key={i} className={block.small ? styles.headingSmall : styles.heading}>{block.text}</h3>;
                     }
                     if (block.type === 'text' || block.type === 'callout') {
                         const renderSegments = (segs) => segs.map((s, j) =>

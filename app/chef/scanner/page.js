@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
+import QRCode from 'qrcode';
 
 // One shared AudioContext, resumed on a user gesture (required on iOS).
 let _audioCtx = null;
@@ -54,7 +55,7 @@ export default function ScannerPage() {
     const [loginError, setLoginError] = useState('');
     const [loginLoading, setLoginLoading] = useState(false);
 
-    const [tab, setTab] = useState('scanner'); // 'scanner' | 'guestlist'
+    const [tab, setTab] = useState('scanner'); // 'scanner' | 'guestlist' | 'buy'
     const [guestlist, setGuestlist] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [loadingGuestlist, setLoadingGuestlist] = useState(false);
@@ -243,6 +244,14 @@ export default function ScannerPage() {
             scannerInstRef.current = null;
         }
     };
+
+    // QR for the public ticket page — drawn locally, so it works without a connection
+    const [buyQr, setBuyQr] = useState(null);
+    const buyUrl = typeof window !== 'undefined' ? `${window.location.origin}/tickets` : '';
+    useEffect(() => {
+        if (tab !== 'buy' || buyQr || !buyUrl) return;
+        QRCode.toDataURL(buyUrl, { width: 900, margin: 1 }).then(setBuyQr).catch(() => {});
+    }, [tab, buyQr, buyUrl]);
 
     useEffect(() => {
         if (!authorized) return;
@@ -439,6 +448,15 @@ export default function ScannerPage() {
                         </div>
                     </div>
                 )}
+                {tab === 'buy' && (
+                    <div style={S.buyWrap}>
+                        <div style={S.buyTitle}>Scan to buy a ticket</div>
+                        {buyQr
+                            ? <img src={buyQr} alt="" style={S.buyQr} />
+                            : <div style={{ opacity: 0.5 }}>Generating…</div>}
+                        <div style={S.buyUrl}>{buyUrl.replace(/^https?:\/\//, '')}</div>
+                    </div>
+                )}
             </div>
 
             {status && <div style={S.toast}>{status}</div>}
@@ -447,6 +465,7 @@ export default function ScannerPage() {
             <div style={S.tabBar}>
                 <button onClick={() => setTab('scanner')} style={S.tabBtn(tab === 'scanner')}>Scanner</button>
                 <button onClick={() => setTab('guestlist')} style={S.tabBtn(tab === 'guestlist')}>Guestlist</button>
+                <button onClick={() => setTab('buy')} style={S.tabBtn(tab === 'buy')}>Buy</button>
             </div>
         </main>
     );
@@ -476,6 +495,10 @@ const S = {
 
     toast: { position: 'absolute', bottom: 76, left: '50%', transform: 'translateX(-50%)', background: 'rgba(0,0,0,0.85)', color: '#fff', padding: '0.6rem 1.2rem', borderRadius: 999, fontSize: '0.85rem', fontWeight: 600, zIndex: 30 },
 
+    buyWrap: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1.25rem', padding: '1.5rem' },
+    buyTitle: { fontSize: '1rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' },
+    buyQr: { width: 'min(78vw, 340px)', height: 'auto', background: '#fff', padding: '12px', borderRadius: '8px' },
+    buyUrl: { fontFamily: 'monospace', fontSize: '0.8rem', opacity: 0.6 },
     tabBar: { display: 'flex', borderTop: '1px solid rgba(255,255,255,0.15)', background: '#000' },
     tabBtn: (active) => ({ flex: 1, padding: '1rem', background: active ? '#fff' : 'transparent', color: active ? '#000' : '#fff', border: 'none', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.05em' }),
 };
