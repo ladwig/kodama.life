@@ -1,0 +1,67 @@
+.main {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+/* Flames flank the text like they do on the ticket button */
+.frame {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.flame {
+    flex-shrink: 0;
+    width: clamp(60px, 11vw, 95px);
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+}
+
+.flameLeft {
+    transform: scaleX(-1) translateY(-6px);
+}
+
+.text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    text-align: center;
+}
+
+.title {
+    font-family: 'Funnel Display', sans-serif;
+    font-size: clamp(0.95rem, 3vw, 1.25rem);
+    font-weight: 700;
+    color: #000;
+    line-height: 1;
+    letter-spacing: -0.01em;
+}
+
+.sub {
+    font-family: 'Funnel Display', sans-serif;
+    font-size: clamp(0.6rem, 2vw, 0.72rem);
+    font-weight: 700;
+    color: #000;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    opacity: 0.6;
+}
+
+/* Narrow screens: the flames become a top and bottom border instead */
+@media (max-width: 560px) {
+    .frame {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .flameLeft {
+        transform: scaleY(-1);
+    }
+}
