@@ -32,8 +32,6 @@ const PUBLIC_PATHS = [
     '/guestlist',
     '/api/guestlist',
     '/confirmation',
-    // Build photos — nothing sensitive
-    '/gallery',
 ];
 
 

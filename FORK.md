@@ -112,8 +112,8 @@ Roughly top-down by effort. Steps 1–3 are an afternoon; step 4 is the real wor
 
 This branch has already deleted the sidequest-only parts: newsletters (pages,
 API, Resend segment, `subscribers` table), `/directions`, `/partners`, the FAQ
-(`lib/faq.js`), the illustrated landing page (`HomeClient.js`) and its
-decorative assets. `git show af64cd2:app/HomeClient.js` brings the old page
+(`lib/faq.js`), the photo gallery, the illustrated landing page
+(`HomeClient.js`) and its decorative assets. `git show af64cd2:app/HomeClient.js` brings the old page
 back if a client wants that structure.
 
 Leave alone: `lib/jwt.js`, `proxy.ts`, `app/chef/*` (portal + scanner),
