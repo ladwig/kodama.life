@@ -64,6 +64,7 @@ in parallel — code doesn't need the keys until you want to test a purchase.
       | `price_max` | sliding scale up to here in €5 steps; equal to the min → one fixed price |
       | `group_deal` | `"4,3"` = 4 tickets for the price of 3; `false` → off |
       | `sold_out` | `true` closes checkout |
+      | `sounds_enabled` | `false` silences the button click sounds |
       | `password_protection_enabled` | `true` puts the site behind `SITE_PASSWORD` (default off) |
       | `telegram_notifications` | per-sale Telegram message (default on) |
       | `email_notifications` | per-sale mail to `NOTIFY_EMAIL` (default off) |

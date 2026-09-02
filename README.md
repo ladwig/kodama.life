@@ -64,6 +64,7 @@ EDGE_MIN_TICKET_PRICE=30
 EDGE_PRICE_MAX=60          # equal to the min → one fixed price
 EDGE_GROUP_DEAL=4,3        # false → no group deal
 EDGE_SOLD_OUT=true
+EDGE_SOUNDS_ENABLED=false   # silence the button click sounds
 EDGE_PASSWORD_PROTECTION_ENABLED=true
 EDGE_TELEGRAM_NOTIFICATIONS=false
 EDGE_EMAIL_NOTIFICATIONS=false

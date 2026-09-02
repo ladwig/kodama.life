@@ -1,5 +1,6 @@
 import "./globals.css";
 import AnalyticsFiltered from "./components/AnalyticsFiltered";
+import { areSoundsEnabled } from "@/lib/config";
 
 // The favicon comes from app/icon.jpg (Next's file convention) — no icons entry.
 export const metadata = {
@@ -18,10 +19,13 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  // lib/sounds.js reads this attribute — one server-side lookup for every page.
+  const sounds = await areSoundsEnabled();
+
   return (
     <html lang="en">
-      <body>
+      <body data-sounds={sounds ? "on" : "off"}>
         {children}
         <AnalyticsFiltered />
       </body>
