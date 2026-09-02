@@ -1,8 +1,7 @@
 -- ============================================================
 -- Ticket app – Supabase schema
 -- Run in your Supabase project → SQL Editor → New Query.
--- Reconstructed from the code's queries; verify against a live
--- project before trusting it for a fork.
+-- Idempotent: safe to re-run.
 -- ============================================================
 
 -- ── orders (one payment) ─────────────────────────────────────
