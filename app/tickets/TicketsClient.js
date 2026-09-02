@@ -16,6 +16,7 @@ import { grossUpCents } from '@/lib/event';
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 const MAX_QUANTITY = 10;
+const PRICE_STEP = 5; // € increments on the sliding scale
 
 // ─── Payment Screen ───────────────────────────────────────────────────────
 function PaymentScreen({ total, totalWithFee, quantity, pricePerTicket, holderNames, onBack }) {
@@ -92,13 +93,16 @@ function PaymentScreen({ total, totalWithFee, quantity, pricePerTicket, holderNa
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────
-export default function TicketsClient({ minPrice = 30, groupEnabled = true }) {
-    const MIN_PRICE = minPrice;
+export default function TicketsClient({ pricing, groupDeal: deal = null }) {
+    const { min: MIN_PRICE, max: MAX_PRICE } = pricing;
+    // max > min → the buyer picks a price in €5 steps; equal → one fixed price.
+    const priceOptions = [];
+    for (let p = MIN_PRICE; p <= MAX_PRICE; p += PRICE_STEP) priceOptions.push(p);
     const [buyerName, setBuyerName] = useState('');
     const [buyerEmail, setBuyerEmail] = useState('');
     const [buyerPhone, setBuyerPhone] = useState('');
     const [quantity, setQuantity] = useState(1);
-    const pricePerTicket = MIN_PRICE;
+    const [pricePerTicket, setPricePerTicket] = useState(MIN_PRICE);
     const [holderNames, setHolderNames] = useState(['']);
     const [holder0Touched, setHolder0Touched] = useState(false);
 
@@ -128,15 +132,15 @@ export default function TicketsClient({ minPrice = 30, groupEnabled = true }) {
         }
     }, [buyerName, holder0Touched]);
 
-    const billedQuantity = groupDeal ? quantity - 1 : quantity;
+    // Group deal: pay for `deal.pay` of the `deal.size` tickets.
+    const billedQuantity = groupDeal ? deal.pay : quantity;
     const total = billedQuantity * pricePerTicket;
-    // Fee-inclusive amount charged to Stripe: covers 1.5% + €0.25 per transaction
+    // Fee-inclusive amount charged to the buyer — see EVENT.fee.
     const totalWithFee = grossUpCents(total * 100) / 100;
 
     function handleGroupDeal(checked) {
         setGroupDeal(checked);
-        if (checked) setQuantity(4);
-        else setQuantity(1);
+        setQuantity(checked ? deal.size : 1);
     }
 
     function updateHolder(idx, val) {
@@ -303,7 +307,7 @@ export default function TicketsClient({ minPrice = 30, groupEnabled = true }) {
                                     onClick={() => { playKeyboard(); setQuantity((q) => Math.min(MAX_QUANTITY, q + 1)); }}
                                     disabled={quantity >= MAX_QUANTITY || groupDeal} aria-label="More">+</button>
                             </div>
-                            {groupEnabled ? (
+                            {deal && (
                                 <label className={styles.groupDealRow}>
                                     <input
                                         type="checkbox"
@@ -311,13 +315,7 @@ export default function TicketsClient({ minPrice = 30, groupEnabled = true }) {
                                         onChange={(e) => { playKeyboard(); handleGroupDeal(e.target.checked); }}
                                         className={styles.groupDealCheck}
                                     />
-                                    <span>Group · 4 for the price of 3</span>
-                                </label>
-                            ) : (
-                                <label className={styles.groupDealRow} title="Sold out" style={{ opacity: 0.4, cursor: 'not-allowed' }}>
-                                    <input type="checkbox" checked={false} disabled className={styles.groupDealCheck} style={{ cursor: 'not-allowed' }} />
-                                    <span style={{ textDecoration: 'line-through' }}>Group · 4 for the price of 3</span>
-                                    <span style={{ marginLeft: '0.4rem', fontStyle: 'italic' }}>· sold out</span>
+                                    <span>Group · {deal.size} for the price of {deal.pay}</span>
                                 </label>
                             )}
                         </section>
@@ -341,9 +339,22 @@ export default function TicketsClient({ minPrice = 30, groupEnabled = true }) {
                             <p className={styles.selfFundedNote}>
                                 sidequest is a self-funded, community-driven project. It only happens through donations and volunteering.
                             </p>
-                            <p className={styles.selfFundedNote}>
-                                The price of a ticket should never be the barrier for someone attending sidequest. If you are in a position to pay a little more for a ticket, we urge you to consider doing so, as the sliding scale allows for those who it is not financially viable for to still attend the event. If you&apos;d love to join us but it&apos;s out of reach right now, get in touch. We&apos;ll see what we can figure out together.
-                            </p>
+                            {priceOptions.length > 1 && (
+                                <>
+                                    <p className={styles.selfFundedNote}>
+                                        The price of a ticket should never be the barrier for someone attending. If you are in a position to pay a little more, we urge you to consider doing so — the sliding scale lets people for whom it is not financially viable still attend. If you&apos;d love to join us but it&apos;s out of reach right now, get in touch.
+                                    </p>
+                                    <div className={styles.priceSteps}>
+                                        {priceOptions.map((p) => (
+                                            <button key={p} type="button"
+                                                className={`${styles.priceStep} ${pricePerTicket === p ? styles.priceStepActive : ''}`}
+                                                onClick={() => { playKeyboard(); setPricePerTicket(p); }}>
+                                                {`€${p}`}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
                         </section>
 
                         {formError && <p className={styles.errorText}>{formError}</p>}

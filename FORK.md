@@ -35,8 +35,7 @@ in parallel — code doesn't need the keys until you want to test a purchase.
       - `magicLink` — logs the buyer into their ticket page
       - `pdfLink` — downloads the PDF
       - `tickets[]` with `code`, `holderName`, `qrUrl`
-- [ ] Two audience segments → `RESEND_SEGMENT_TICKET_HOLDERS_ID`,
-      `RESEND_SEGMENT_SUBSCRIBERS_ID`
+- [ ] One audience segment for buyers → `RESEND_SEGMENT_TICKET_HOLDERS_ID`
 - [ ] API key → `RESEND_API_KEY`
 
 ### 3. Payments (Stripe)
@@ -55,13 +54,19 @@ in parallel — code doesn't need the keys until you want to test a purchase.
 ### 5. Vercel
 - [ ] Import the fork, add the domain
 - [ ] All env vars from the table below
-- [ ] Storage → Edge Config store → connect to the project, keys:
+- [ ] Storage → Edge Config store → connect to the project. Every key is
+      optional and falls back to `lib/event.js`, so you only set what you want
+      to change without a deploy:
       | key | effect |
       |---|---|
+      | `min_ticket_price` | floor price in € |
+      | `price_max` | sliding scale up to here in €5 steps; equal to the min → one fixed price |
+      | `group_deal` | `"4,3"` = 4 tickets for the price of 3; `false` → off |
+      | `sold_out` | `true` closes checkout |
       | `password_protection_enabled` | `false` opens the site publicly |
-      | `min_ticket_price` | floor price (bypassed while `/tickets` uses `EVENT.minPrice`) |
-      | `group_tickets_enabled` | the 4-for-3 group deal |
-      | `chef_password` | overrides `CHEF_PASSWORD`, changeable without a deploy |
+      | `telegram_notifications` | per-sale Telegram message (default on) |
+      | `email_notifications` | per-sale mail to `NOTIFY_EMAIL` (default off) |
+      | `chef_password` | overrides `CHEF_PASSWORD` |
 
 ### Env vars (all of them)
 
@@ -70,7 +75,7 @@ in parallel — code doesn't need the keys until you want to test a purchase.
 | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API |
 | `RESEND_API_KEY`, `RESEND_FROM_ADDRESS` | Resend |
 | `RESEND_TEMPLATE_TICKET_PURCHASE_CONFIRMATION_ID` | Resend template |
-| `RESEND_SEGMENT_TICKET_HOLDERS_ID`, `RESEND_SEGMENT_SUBSCRIBERS_ID` | Resend audiences |
+| `RESEND_SEGMENT_TICKET_HOLDERS_ID` | Resend audience |
 | `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` | Stripe |
 | `NEXT_PUBLIC_BASE_URL` | `https://<domain>` — wrong value breaks every ticket link |
 | `JWT_SECRET` | `openssl rand -base64 32` |
@@ -83,8 +88,9 @@ in parallel — code doesn't need the keys until you want to test a purchase.
 
 Roughly top-down by effort. Steps 1–3 are an afternoon; step 4 is the real work.
 
-1. **`lib/event.js`** — name, date, `ticketPrefix`, `minPrice`, currency, `fee`.
-   Six values, and they reach the whole app.
+1. **`lib/event.js`** — name, date, `ticketPrefix`, `minPrice`, `maxPrice`,
+   `groupDeal`, currency, `fee`. These are the defaults; Edge Config overrides
+   price and group deal at runtime.
 2. **`app/layout.js`** — `metadataBase`, title, description, OG/Twitter image.
    Still says `kodama.life` and `sidequest`.
 3. **`public/`** — swap `favicon.ico`, `sidequest-logo.{svg,png}` (rename the
@@ -94,21 +100,22 @@ Roughly top-down by effort. Steps 1–3 are an afternoon; step 4 is the real wor
    `spiral.gif`, `bird1.png`, `cerchio3.png`.
 4. **`app/HomeClient.js`** (612 lines) — the landing page: copy, lineup, logo,
    date/place, sections. Budget real design time here, or replace it wholesale.
-5. **`lib/faq.js`**, **`lib/newsletters.js`** + `emails/` — event content.
-   Delete the newsletter feature if they don't want one (`/newsletters`,
-   `app/api/newsletter/*`, `NewsletterSignup`, both Resend segments).
-6. **`app/directions/DirectionsClient.js`** — three hardcoded
-   `maps.app.goo.gl` links (route / pick-up / parking) plus arrival copy.
-7. **`app/partners/page.js`** — sidequest sponsor pitch. Delete unless needed.
-8. **`app/api/tickets/download/route.js`** — PDF filename
+
+6. **`lib/faq.js`** — event content, and `public/faq/` + `public/location/`.
+7. **`app/api/tickets/download/route.js`** — PDF filename
    (`sidequest-tickets.pdf`) and the layout, if the ticket should look theirs.
-9. **German strings** — `app/api/checkout/create-intent/route.js` validation
+8. **German strings** — `app/api/checkout/create-intent/route.js` validation
    messages and `app/api/newsletter/subscribe/route.js`. Translate or leave.
-10. **`app/chef/page.js`** — drop the legacy `'KOD-'` prefix check; the current
+9. **`app/chef/page.js`** — drop the legacy `'KOD-'` prefix check; the current
     prefix comes from `EVENT.ticketPrefix`. Same for the `SQ-XXXX` placeholder
     in `DirectionsClient`.
-11. **`app/components/`** — `MiniMonsters`, `FireImg`, `IllustratedButtons`,
+10. **`app/components/`** — `MiniMonsters`, `FireImg`, `IllustratedButtons`,
     `lib/sounds.js` are sidequest's visual identity. Delete or replace.
+
+This branch has already deleted the sidequest-only features: newsletters
+(pages, API, Resend segment, `subscribers` table), the `/directions` page and
+the `/partners` pitch. Restore any of them from git history if a client wants
+one.
 
 Leave alone: `lib/jwt.js`, `proxy.ts`, `app/chef/*` (portal + scanner),
 `app/api/chef/*`, `app/api/guestlist/*`, magic links, PDF generation,
@@ -125,6 +132,10 @@ Leave alone: `lib/jwt.js`, `proxy.ts`, `app/chef/*` (portal + scanner),
 - [ ] Chef stats: net revenue matches gross minus the real fee
 - [ ] Magic link with `uses: 3` sells exactly 3 tickets, then refuses
 - [ ] Guestlist link admits its `max_tickets` and no more
+- [ ] `price_max` equal to the min shows one price; higher shows the €5 steps
+- [ ] `group_deal: "4,3"` bills 3 of 4 tickets; `false` hides the row, and the
+      API rejects a forced `group_deal` in the request body
+- [ ] `telegram_notifications` / `email_notifications` both fire once
 - [ ] `password_protection_enabled: false` in Edge Config actually opens the site
 - [ ] Switch Stripe to live keys, re-point the webhook, re-test once for real
 

@@ -323,10 +323,6 @@ function spawnData(existing = []) {
 }
 
 export default function HomeClient({ buyer, orders, tickets }) {
-    const [newsletterEmail, setNewsletterEmail] = useState('');
-    const [newsletterState, setNewsletterState] = useState('idle');
-    const [newsletterError, setNewsletterError] = useState('');
-
     const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
     const [monsters, setMonsters] = useState([]);
     const [showHome, setShowHome] = useState(false);
@@ -352,25 +348,6 @@ export default function HomeClient({ buyer, orders, tickets }) {
             alert('Error generating the PDF.');
         } finally {
             setIsGeneratingPDF(false);
-        }
-    }
-
-    async function handleNewsletter(e) {
-        e.preventDefault();
-        setNewsletterState('loading');
-        setNewsletterError('');
-        try {
-            const res = await fetch('/api/newsletter/subscribe', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: newsletterEmail }),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Error');
-            setNewsletterState('success');
-        } catch (err) {
-            setNewsletterError(err.message);
-            setNewsletterState('error');
         }
     }
 
@@ -449,40 +426,6 @@ export default function HomeClient({ buyer, orders, tickets }) {
                     alt="sidequest lineup"
                     style={{ width: '100%', height: 'auto', display: 'block', margin: '0 auto 1.5rem' }}
                 />
-                {/* ponytail: newsletter signup hidden for now — flip to true to restore */}
-                {false && <div className={styles.newsletterMinimal}>
-                    {newsletterState === 'success' ? (
-                        <div className={styles.successBox}>
-                            Signed up. You&apos;ll hear from us when there&apos;s something to say.
-                        </div>
-                    ) : (
-                        <form onSubmit={handleNewsletter} className={styles.newsletterForm}>
-                            <div className={styles.newsletterBox}>
-                                <div className={styles.newsletterBoxInner}>
-                                    <input
-                                        id="newsletter-email"
-                                        type="email"
-                                        placeholder="Enter email address for updates"
-                                        value={newsletterEmail}
-                                        onChange={(e) => setNewsletterEmail(e.target.value)}
-                                        required
-                                        className={styles.newsletterInput}
-                                    />
-                                </div>
-                                <button
-                                    type="submit"
-                                    className={`${styles.newsletterArrow} ${newsletterEmail.length > 0 ? styles.newsletterArrowVisible : ''}`}
-                                    disabled={newsletterState === 'loading'}
-                                >
-                                    {newsletterState === 'loading' ? '…' : <img src="/arrow.svg" alt="→" width={16} height={15} />}
-                                </button>
-                            </div>
-                            {newsletterState === 'error' && (
-                                <p className={styles.errorText}>{newsletterError}</p>
-                            )}
-                        </form>
-                    )}
-                </div>}
                 <div className={styles.description} data-description="true">
                     <p style={{ marginBottom: '1.4rem' }}>
                         When the summer starts to tip towards Autumn, the monsters set out on a quest. They head off into the woods with a shared thirst for adventure, unsure of what they are looking for.

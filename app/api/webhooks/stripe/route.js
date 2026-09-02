@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe';
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { signTicketJWT, signUnsubscribeJWT } from '@/lib/jwt';
+import { signTicketJWT } from '@/lib/jwt';
 import { EVENT, baseUrl, mailFrom, uniqueTicketCode } from '@/lib/event';
 import { getResend } from '@/lib/ticketMail';
+import { getNotifications } from '@/lib/config';
 
 // Only init Resend if the key looks real (not the placeholder 're_...')
 const resend = getResend();
@@ -59,6 +60,8 @@ export async function POST(req) {
 
     try {
         console.log('[webhook] Processing payment:', pi.id, '| buyer:', meta.buyer_email);
+
+        const notify = await getNotifications();
 
         // 1. Create order
         console.log('[webhook] Step 1: inserting order...');
@@ -170,8 +173,16 @@ export async function POST(req) {
                     console.log('[webhook] Confirmation email sent to', meta.buyer_email, '| ID:', resendResponse.data?.id);
                 }
 
-                // 6d. Internal per-sale notification email disabled — Telegram covers this.
-                // (The NOTIFY_EMAIL fallback for Telegram failures below is kept.)
+                // 6d. Internal per-sale notification mail — Edge Config
+                // email_notifications, off by default (Telegram usually covers it).
+                if (notify.email && process.env.NOTIFY_EMAIL) {
+                    await resend.emails.send({
+                        from: mailFrom(),
+                        to: process.env.NOTIFY_EMAIL,
+                        subject: `🎟 ${quantity} ticket(s) sold — ${(pi.amount / 100).toFixed(2)} €`,
+                        text: `${meta.buyer_name} (${meta.buyer_email}) bought ${quantity} ticket(s) for ${(pi.amount / 100).toFixed(2)} €.\n\nCodes: ${tickets.map((t) => t.ticket_code).join(', ')}`,
+                    });
+                }
 
             } else if (process.env.MAIL_WEBHOOK_URL && !process.env.MAIL_WEBHOOK_URL.trim().startsWith('#')) {
                 await fetch(process.env.MAIL_WEBHOOK_URL, {
@@ -186,8 +197,8 @@ export async function POST(req) {
             console.warn('Email sending failed (non-fatal):', mailErr.message);
         }
 
-        // 7. Telegram group notification
-        if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
+        // 7. Telegram group notification — Edge Config telegram_notifications
+        if (notify.telegram && process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
             let tgError = null;
             try {
                 const text = `🎟 New ticket sold\n${meta.buyer_name} (${meta.buyer_email}) bought ${quantity} ticket(s) for ${(pi.amount / 100).toFixed(2)} €.`;
@@ -217,7 +228,7 @@ export async function POST(req) {
                     console.warn('[webhook] Telegram error mail failed:', errMailErr.message);
                 }
             }
-        } else {
+        } else if (notify.telegram) {
             console.warn('[webhook] Telegram not configured — TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID missing');
         }
 

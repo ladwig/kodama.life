@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe';
-import { getSupabaseAdmin } from '@/lib/supabase';
-import { getMinTicketPrice, isGroupTicketsEnabled } from '@/lib/config';
+import { getPricing, getGroupDeal } from '@/lib/config';
 import { EVENT, grossUpCents } from '@/lib/event';
 
 const STEP = 500; // 5 EUR increments
@@ -12,9 +11,11 @@ export async function POST(req) {
         const body = await req.json();
         const { buyer_name, buyer_email, buyer_phone, quantity, price_per_ticket, ticket_holders } = body;
 
-        const MIN_PRICE = (await getMinTicketPrice()) * 100; // euros → cents
-        // Group deal only counts if still enabled — can't be forced via the API
-        const group_deal = body.group_deal && (await isGroupTicketsEnabled());
+        const [pricing, deal] = await Promise.all([getPricing(), getGroupDeal()]);
+        const MIN_PRICE = pricing.min * 100; // euros → cents
+        const MAX_PRICE = pricing.max * 100;
+        // Group deal only counts if one is configured — can't be forced via the API
+        const group_deal = !!body.group_deal && !!deal;
 
         // Validation
         if (!buyer_name || !buyer_email) {
@@ -29,6 +30,9 @@ export async function POST(req) {
         if (!price_per_ticket || price_per_ticket < MIN_PRICE) {
             return NextResponse.json({ error: `Mindestpreis ist ${MIN_PRICE / 100} €.` }, { status: 400 });
         }
+        if (price_per_ticket > MAX_PRICE) {
+            return NextResponse.json({ error: `Höchstpreis ist ${MAX_PRICE / 100} €.` }, { status: 400 });
+        }
         if ((price_per_ticket - MIN_PRICE) % STEP !== 0) {
             return NextResponse.json({ error: 'Preis muss in 5 €-Schritten gewählt werden.' }, { status: 400 });
         }
@@ -38,23 +42,14 @@ export async function POST(req) {
         if (ticket_holders.some((name) => !name?.trim())) {
             return NextResponse.json({ error: 'Alle Ticket-Inhaber müssen einen Namen haben.' }, { status: 400 });
         }
-        if (group_deal && quantity !== 4) {
-            return NextResponse.json({ error: 'Gruppenticket ist nur für genau 4 Personen.' }, { status: 400 });
+        if (group_deal && quantity !== deal.size) {
+            return NextResponse.json({ error: `Gruppenticket ist nur für genau ${deal.size} Personen.` }, { status: 400 });
         }
 
-        const baseTotal = group_deal ? (quantity - 1) * price_per_ticket : quantity * price_per_ticket;
+        // Group deal: pay for deal.pay of the deal.size tickets.
+        const baseTotal = (group_deal ? deal.pay : quantity) * price_per_ticket;
         // Pass the processor fee on so we receive the full base amount
         const total = grossUpCents(baseTotal);
-
-        // Check if buyer is a newsletter subscriber (for pre-fill info)
-        const supabase = getSupabaseAdmin();
-        let subscriberName = null;
-        const { data: subscriber } = await supabase
-            .from('subscribers')
-            .select('name')
-            .eq('email', buyer_email.toLowerCase())
-            .maybeSingle();
-        if (subscriber?.name) subscriberName = subscriber.name;
 
         // Create Stripe PaymentIntent
         const paymentIntent = await getStripe().paymentIntents.create({
@@ -76,7 +71,6 @@ export async function POST(req) {
 
         const response = NextResponse.json({
             client_secret: paymentIntent.client_secret,
-            subscriber_name: subscriberName,
             min_price: MIN_PRICE / 100,
         });
         response.cookies.set('checkout_pi', paymentIntent.id, {

@@ -5,14 +5,6 @@
 -- project before trusting it for a fork.
 -- ============================================================
 
--- ── subscribers (newsletter) ─────────────────────────────────
-create table if not exists subscribers (
-  id         uuid primary key default gen_random_uuid(),
-  email      text unique not null,
-  name       text,
-  created_at timestamptz default now()
-);
-
 -- ── orders (one payment) ─────────────────────────────────────
 create table if not exists orders (
   id               uuid primary key default gen_random_uuid(),
@@ -68,13 +60,12 @@ create table if not exists guestlists (
 );
 
 -- ── RLS: server-side service_role only, zero public access ───
-alter table subscribers enable row level security;
 alter table orders      enable row level security;
 alter table tickets     enable row level security;
 alter table magic_links enable row level security;
 alter table guestlists  enable row level security;
 
-grant all on table subscribers, orders, tickets, magic_links, guestlists to service_role;
+grant all on table orders, tickets, magic_links, guestlists to service_role;
 grant usage, select on all sequences in schema public to service_role;
 
 -- ── indexes ──────────────────────────────────────────────────
@@ -84,4 +75,3 @@ create index if not exists idx_orders_status         on orders(status);
 create index if not exists idx_orders_magic_link_jti on orders(magic_link_jti);
 create index if not exists idx_tickets_order_id      on tickets(order_id);
 create index if not exists idx_tickets_ticket_code   on tickets(ticket_code);
-create index if not exists idx_subscribers_email     on subscribers(email);

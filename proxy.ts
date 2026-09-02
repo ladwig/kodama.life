@@ -21,11 +21,7 @@ const PUBLIC_PATHS = [
     '/api/auth/set-cookie',
     '/api/auth/magic',
     '/api/webhooks/stripe',
-    '/api/newsletter/unsubscribe',
     '/api/confirmation/status',
-    '/unsubscribed',
-    // Partner pitch page — public, not linked from the main site
-    '/partners',
     // Chef portal — has its own password protection
     '/chef',
     '/api/chef/',
@@ -36,11 +32,7 @@ const PUBLIC_PATHS = [
     '/guestlist',
     '/api/guestlist',
     '/confirmation',
-    '/newsletters',
-    // Directions — the ticket code entered on the page is the auth
-    '/directions',
-    '/api/directions',
-    // Build photos — nothing sensitive, linked from the newsletter
+    // Build photos — nothing sensitive
     '/gallery',
 ];
 
