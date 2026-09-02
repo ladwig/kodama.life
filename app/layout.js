@@ -9,12 +9,12 @@ export const metadata = {
     title: "coppi",
     siteName: "coppi",
     type: "website",
-    images: [{ url: "/coppi-logo.jpg" }],
+    images: [{ url: "/logo.png" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "coppi",
-    images: ["/coppi-logo.jpg"],
+    images: ["/logo.png"],
   },
 };
 

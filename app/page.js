@@ -15,13 +15,13 @@ export default function Home() {
                 padding: '2rem',
             }}
         >
-            {/* Shown at its own 150×150 — never scaled or stretched */}
+            {/* 900×561 transparent PNG — height auto keeps the ratio */}
             <img
-                src="/coppi-logo.jpg"
+                src="/logo.png"
                 alt="coppi"
-                width={150}
-                height={150}
-                style={{ width: 150, height: 'auto', maxWidth: '80vw' }}
+                width={900}
+                height={561}
+                style={{ width: 'min(320px, 70vw)', height: 'auto' }}
             />
             <Link href="/tickets" className="btn-raw">TICKETS</Link>
         </main>

@@ -198,10 +198,10 @@ function LoginForm() {
             <div className={styles.content}>
                 <div className={styles.logoArea}>
                     <Image
-                        src="/coppi-logo.jpg"
+                        src="/logo.png"
                         alt="coppi"
                         width={340}
-                        height={102}
+                        height={212}
                         priority
                         onClick={handleLogoClick}
                         style={{ cursor: 'pointer' }}
