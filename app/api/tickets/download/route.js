@@ -3,7 +3,7 @@ import { verifyJWT } from '@/lib/jwt';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib';
 import QRCode from 'qrcode';
-import { EVENT } from '@/lib/event';
+import { EVENT, eventDateLong } from '@/lib/event';
 
 // Builds an SVG path for a ticket shape with wavy left and right edges.
 // tx, ty = top-left corner (PDF coords, y-up), tw = width, th = height
@@ -160,7 +160,7 @@ export async function GET(req) {
             });
 
             // Date
-            page.drawText('22. AUGUST 2026', {
+            page.drawText(eventDateLong().toUpperCase(), {
                 x: tX + pad,
                 y: midY - 14,
                 size: 10,

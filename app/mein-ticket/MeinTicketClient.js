@@ -32,11 +32,8 @@ export default function MeinTicketClient({ buyer, orders, tickets }) {
                 {/* ── Header ── */}
                 <div className={styles.header}>
                     <h1 className={styles.title}>
-                        Welcome, {buyer.name} <span className={styles.titleAccent}>🌿</span>
+                        Welcome, {buyer.name}
                     </h1>
-                    <p className={styles.subtitle}>
-                        You'll find all the info about directions, lineup and more here soon.
-                    </p>
                 </div>
 
                 {/* ── No tickets state ── */}
