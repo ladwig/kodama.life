@@ -55,6 +55,20 @@ Edge Config's `password_protection_enabled` or `SITE_PASSWORD_PROTECTION=true`
 says otherwise; the chef portal always keeps its own password). Landing page and
 `/tickets` render without any secrets; completing a payment needs Stripe keys.
 
-There is no local Edge Config emulator: either put a real `EDGE_CONFIG`
-connection string in `.env.local` and edit values in the Vercel dashboard, or
-change the defaults in `lib/event.js`.
+**Edge Config locally:** there is no emulator — the SDK only reads a local file
+when it detects Vercel's runtime, otherwise it fetches the hosted store. So
+every key has an env-var twin, `EDGE_<KEY>` in `.env.local`:
+
+```
+EDGE_MIN_TICKET_PRICE=30
+EDGE_PRICE_MAX=60          # equal to the min → one fixed price
+EDGE_GROUP_DEAL=4,3        # false → no group deal
+EDGE_SOLD_OUT=true
+EDGE_PASSWORD_PROTECTION_ENABLED=true
+EDGE_TELEGRAM_NOTIFICATIONS=false
+EDGE_EMAIL_NOTIFICATIONS=false
+```
+
+Precedence is Edge Config → `EDGE_*` → the default in `lib/event.js`, so
+production is unaffected by these. The list lives in `ENV_OVERRIDES`
+(`lib/config.js`); a new key needs one line there.

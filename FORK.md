@@ -55,8 +55,9 @@ in parallel — code doesn't need the keys until you want to test a purchase.
 - [ ] Import the fork, add the domain
 - [ ] All env vars from the table below
 - [ ] Storage → Edge Config store → connect to the project. Every key is
-      optional and falls back to `lib/event.js`, so you only set what you want
-      to change without a deploy:
+      optional and falls back to the `EDGE_<KEY>` env var and then to
+      `lib/event.js`, so you only set what you want to change without a
+      deploy (see the README for the local env twins):
       | key | effect |
       |---|---|
       | `min_ticket_price` | floor price in € |
