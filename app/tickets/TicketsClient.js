@@ -337,20 +337,15 @@ export default function TicketsClient({ pricing, groupDeal: deal = null }) {
                                 <span className={styles.priceDisplay}>€{pricePerTicket}</span>
                             </h2>
                             {priceOptions.length > 1 && (
-                                <>
-                                    <p className={styles.selfFundedNote}>
-                                        The price of a ticket should never be the barrier for someone attending. If you are in a position to pay a little more, we urge you to consider doing so — the sliding scale lets people for whom it is not financially viable still attend. If you&apos;d love to join us but it&apos;s out of reach right now, get in touch.
-                                    </p>
-                                    <div className={styles.priceSteps}>
-                                        {priceOptions.map((p) => (
-                                            <button key={p} type="button"
-                                                className={`${styles.priceStep} ${pricePerTicket === p ? styles.priceStepActive : ''}`}
-                                                onClick={() => { playKeyboard(); setPricePerTicket(p); }}>
-                                                {`€${p}`}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </>
+                                <div className={styles.priceSteps}>
+                                    {priceOptions.map((p) => (
+                                        <button key={p} type="button"
+                                            className={`${styles.priceStep} ${pricePerTicket === p ? styles.priceStepActive : ''}`}
+                                            onClick={() => { playKeyboard(); setPricePerTicket(p); }}>
+                                            {`€${p}`}
+                                        </button>
+                                    ))}
+                                </div>
                             )}
                         </section>
 
