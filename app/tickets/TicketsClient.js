@@ -11,6 +11,7 @@ import {
 import Link from 'next/link';
 import styles from './tickets.module.css';
 import { playKeyboard, preloadSounds } from '@/lib/sounds';
+import { grossUpCents } from '@/lib/event';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
@@ -130,7 +131,7 @@ export default function TicketsClient({ minPrice = 30, groupEnabled = true }) {
     const billedQuantity = groupDeal ? quantity - 1 : quantity;
     const total = billedQuantity * pricePerTicket;
     // Fee-inclusive amount charged to Stripe: covers 1.5% + €0.25 per transaction
-    const totalWithFee = Math.ceil((total * 100 + 25) / 0.985) / 100;
+    const totalWithFee = grossUpCents(total * 100) / 100;
 
     function handleGroupDeal(checked) {
         setGroupDeal(checked);

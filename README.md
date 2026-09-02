@@ -34,3 +34,28 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Reusing this app for another event
+
+Everything event-specific is in `lib/event.js` (name, date, ticket-code prefix,
+floor price, currency, processor fee model) plus the copy and assets under
+`app/` and `public/`. To fork:
+
+1. Change `lib/event.js`.
+2. Replace copy/assets: `app/HomeClient.js`, `app/gallery`, `app/directions`,
+   `app/partners`, `app/newsletters`, `lib/faq.js`, `lib/newsletters.js`,
+   `emails/`, `public/`.
+3. New accounts + env: Supabase (run `supabase/schema.sql`), Resend (domain,
+   from-address, ticket template), payment provider, Telegram bot, Vercel Edge
+   Config store, `SITE_PASSWORD`, `CHEF_PASSWORD`, `JWT_SECRET`.
+
+Untouched by a fork: auth/magic links (`lib/jwt.js`), the chef portal and QR
+scanner (`app/chef`), PDF tickets, guestlists, the password gate (`proxy.ts`).
+
+Money-path self-check: `node scripts/check-event.mjs`.
+
+### Local dev with all features
+
+`npm run dev`, then open `http://localhost:3000/secret=<SITE_PASSWORD>` to set
+the gate cookie. Landing page and `/tickets` render without any secrets;
+completing a payment needs real Stripe keys.

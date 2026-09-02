@@ -2,24 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getChefPassword } from '@/lib/config';
 import { sendTicketMail, mailEnabled } from '@/lib/ticketMail';
-
-const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-
-function generateTicketCode() {
-    let code = 'SQ-';
-    for (let i = 0; i < 4; i++) code += CHARS[Math.floor(Math.random() * CHARS.length)];
-    return code;
-}
-
-async function uniqueTicketCode(supabase) {
-    let code, exists;
-    do {
-        code = generateTicketCode();
-        const { data } = await supabase.from('tickets').select('id').eq('ticket_code', code).maybeSingle();
-        exists = !!data;
-    } while (exists);
-    return code;
-}
+import { uniqueTicketCode } from '@/lib/event';
 
 /**
  * Put names straight on the guestlist — no link involved.

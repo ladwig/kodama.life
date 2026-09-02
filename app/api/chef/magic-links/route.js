@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getChefPassword } from '@/lib/config';
+import { baseUrl } from '@/lib/event';
 
 // Lists all stored magic links with their claimed count (tickets sold / cap).
 // action: 'remove' → revokes a link (kills it) and hides it from the list.
@@ -12,7 +13,7 @@ export async function POST(req) {
         }
 
         const supabase = getSupabaseAdmin();
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://loveatfirstside.quest';
+        const base = baseUrl();
 
         if (action === 'remove') {
             const { error } = await supabase.from('magic_links').update({ revoked: true }).eq('jti', jti);
@@ -45,7 +46,7 @@ export async function POST(req) {
             price: l.price,
             uses: l.uses,
             claimed: claimedByJti[l.jti] || 0,
-            url: `${baseUrl}/magic-ticket/${l.token}`,
+            url: `${base}/magic-ticket/${l.token}`,
         }));
 
         return NextResponse.json({ links: result });

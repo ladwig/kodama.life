@@ -11,6 +11,7 @@ import {
 import Link from 'next/link';
 import styles from '../../tickets/tickets.module.css';
 import { playKeyboard, preloadSounds } from '@/lib/sounds';
+import { grossUpCents } from '@/lib/event';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
@@ -130,7 +131,7 @@ export default function MagicTicketClient({ minPrice, token, remaining = 1 }) {
     }
 
     const amountNum = parseFloat(String(amount).replace(',', '.')) || 0;
-    const totalWithFee = Math.ceil((Math.round(amountNum * 100) * quantity + 25) / 0.985) / 100;
+    const totalWithFee = grossUpCents(Math.round(amountNum * 100) * quantity) / 100;
 
     async function handleOrder(e) {
         e.preventDefault();

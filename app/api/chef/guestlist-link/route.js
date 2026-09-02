@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { signGuestlistJWT } from '@/lib/jwt';
 import { getChefPassword } from '@/lib/config';
 import { getSupabaseAdmin } from '@/lib/supabase';
+import { baseUrl } from '@/lib/event';
 
 const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
@@ -26,11 +27,11 @@ export async function POST(req) {
         }
 
         const usesInt = Math.max(1, Math.min(1000, parseInt(count, 10) || 1));
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://loveatfirstside.quest';
+        const base = baseUrl();
 
         const jti = generateJti();
         const token = await signGuestlistJWT({ jti, uses: usesInt, label: label.trim() });
-        const url = `${baseUrl}/guestlist/${token}`;
+        const url = `${base}/guestlist/${token}`;
 
         const supabase = getSupabaseAdmin();
         const { error } = await supabase.from('guestlists').insert({

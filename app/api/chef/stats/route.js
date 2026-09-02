@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getChefPassword } from '@/lib/config';
+import { feeCents } from '@/lib/event';
 
 export async function POST(req) {
     try {
@@ -52,7 +53,7 @@ export async function POST(req) {
         // the same model checkout uses). Non-Stripe orders (offline) have no fee.
         const netOf = (o) => {
             const gross = o.total_price || 0;
-            const fee = (o.payment_method || '').startsWith('stripe') ? Math.round(gross * 0.015 + 25) : 0;
+            const fee = (o.payment_method || '').startsWith('stripe') ? feeCents(gross) : 0;
             return gross - fee;
         };
 

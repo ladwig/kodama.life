@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getChefPassword } from '@/lib/config';
+import { baseUrl } from '@/lib/event';
 
 // Lists all guestlist links with their usage (issued / max).
 export async function POST(req) {
@@ -11,7 +12,7 @@ export async function POST(req) {
         }
 
         const supabase = getSupabaseAdmin();
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://loveatfirstside.quest';
+        const base = baseUrl();
 
         // ── Change a guestlist's cap (must stay >= already issued) ──
         if (action === 'setMax') {
@@ -60,7 +61,7 @@ export async function POST(req) {
             label: g.label,
             max: g.max_tickets,
             used: usedByJti[g.jti] || 0,
-            url: `${baseUrl}/guestlist/${g.token}`,
+            url: `${base}/guestlist/${g.token}`,
         }));
 
         return NextResponse.json({ guestlists });

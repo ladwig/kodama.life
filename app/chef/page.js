@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
+import { EVENT } from '@/lib/event';
 
 // One shared AudioContext, resumed on a user gesture (required on iOS).
 let _audioCtx = null;
@@ -614,7 +615,7 @@ export default function ChefPage() {
         let ticketCode = decodedText;
         if (decodedText.includes('ticket_code=')) {
             ticketCode = new URL(decodedText).searchParams.get('ticket_code');
-        } else if (decodedText.startsWith('SQ-') || decodedText.startsWith('KOD-')) {
+        } else if (decodedText.startsWith(EVENT.ticketPrefix) || decodedText.startsWith('KOD-')) {
             ticketCode = decodedText;
         }
 

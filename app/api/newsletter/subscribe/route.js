@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { getResend } from '@/lib/ticketMail';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = getResend();
 
 export async function POST(req) {
     try {

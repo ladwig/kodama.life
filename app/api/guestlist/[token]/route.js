@@ -1,28 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { verifyLinkTokenIgnoreExpiry, signTicketJWT } from '@/lib/jwt';
-import { Resend } from 'resend';
+import { baseUrl, uniqueTicketCode } from '@/lib/event';
+import { getResend } from '@/lib/ticketMail';
 
-const resend = (process.env.RESEND_API_KEY && !process.env.RESEND_API_KEY.endsWith('_...'))
-    ? new Resend(process.env.RESEND_API_KEY)
-    : null;
-
-function generateTicketCode() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = 'SQ-';
-    for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
-    return code;
-}
-
-async function uniqueTicketCode(supabase) {
-    let code, exists;
-    do {
-        code = generateTicketCode();
-        const { data } = await supabase.from('tickets').select('id').eq('ticket_code', code).maybeSingle();
-        exists = !!data;
-    } while (exists);
-    return code;
-}
+const resend = getResend();
 
 // Placeholder email so buyer_email (NOT NULL) is satisfied when no real email is given.
 // Per-guest unique so PDF download (which groups by email) returns just this ticket.
@@ -34,9 +16,9 @@ function placeholderEmail(jti) {
 async function sendTicketEmail({ email, name, code }) {
     if (!resend || !email) return;
     const jwt = await signTicketJWT({ buyer_email: email, buyer_name: name });
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://loveatfirstside.quest';
-    const pdfLink = `${baseUrl}/api/tickets/download?token=${jwt}`;
-    const magicLink = `${baseUrl}/api/auth/verify?token=${jwt}`;
+    const base = baseUrl();
+    const pdfLink = `${base}/api/tickets/download?token=${jwt}`;
+    const magicLink = `${base}/api/auth/verify?token=${jwt}`;
     await resend.emails.send({
         from: `sidequest <${process.env.RESEND_FROM_ADDRESS}>`,
         to: email,

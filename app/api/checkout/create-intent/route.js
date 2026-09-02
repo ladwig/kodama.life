@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getMinTicketPrice, isGroupTicketsEnabled } from '@/lib/config';
+import { EVENT, grossUpCents } from '@/lib/event';
 
 const STEP = 500; // 5 EUR increments
 const MAX_QUANTITY = 10;
-const EVENT_DATE = '2026-08-22';
 
 export async function POST(req) {
     try {
@@ -43,8 +43,8 @@ export async function POST(req) {
         }
 
         const baseTotal = group_deal ? (quantity - 1) * price_per_ticket : quantity * price_per_ticket;
-        // Cover Stripe fees (1.5% + €0.25) so we receive the full base amount
-        const total = Math.ceil((baseTotal + 25) / 0.985);
+        // Pass the processor fee on so we receive the full base amount
+        const total = grossUpCents(baseTotal);
 
         // Check if buyer is a newsletter subscriber (for pre-fill info)
         const supabase = getSupabaseAdmin();
@@ -57,9 +57,9 @@ export async function POST(req) {
         if (subscriber?.name) subscriberName = subscriber.name;
 
         // Create Stripe PaymentIntent
-        const paymentIntent = await stripe.paymentIntents.create({
+        const paymentIntent = await getStripe().paymentIntents.create({
             amount: total,
-            currency: 'eur',
+            currency: EVENT.currency,
             metadata: {
                 buyer_name,
                 buyer_email: buyer_email.toLowerCase(),
@@ -67,7 +67,7 @@ export async function POST(req) {
                 quantity: String(quantity),
                 price_per_ticket: String(price_per_ticket),
                 base_total: String(baseTotal),
-                event_date: EVENT_DATE,
+                event_date: EVENT.date,
                 group_deal: group_deal ? 'true' : 'false',
                 ticket_holders: JSON.stringify(ticket_holders.map((h) => h.trim())),
             },

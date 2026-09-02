@@ -1,36 +1,12 @@
 import { NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { signTicketJWT, signUnsubscribeJWT } from '@/lib/jwt';
-import { Resend } from 'resend';
+import { EVENT, baseUrl, mailFrom, uniqueTicketCode } from '@/lib/event';
+import { getResend } from '@/lib/ticketMail';
 
 // Only init Resend if the key looks real (not the placeholder 're_...')
-const resend = (process.env.RESEND_API_KEY && !process.env.RESEND_API_KEY.endsWith('_...'))
-    ? new Resend(process.env.RESEND_API_KEY)
-    : null;
-
-function generateTicketCode() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = 'SQ-';
-    for (let i = 0; i < 4; i++) {
-        code += chars[Math.floor(Math.random() * chars.length)];
-    }
-    return code;
-}
-
-async function generateUniqueTicketCode(supabase) {
-    let code, exists;
-    do {
-        code = generateTicketCode();
-        const { data } = await supabase
-            .from('tickets')
-            .select('id')
-            .eq('ticket_code', code)
-            .maybeSingle();
-        exists = !!data;
-    } while (exists);
-    return code;
-}
+const resend = getResend();
 
 export async function POST(req) {
     const body = await req.text();
@@ -38,7 +14,7 @@ export async function POST(req) {
 
     let event;
     try {
-        event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET);
+        event = getStripe().webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET);
     } catch (err) {
         console.error('Webhook signature verification failed:', err.message);
         return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
@@ -113,7 +89,7 @@ export async function POST(req) {
         console.log('[webhook] Step 2: inserting', quantity, 'ticket(s)...');
         const ticketsToInsert = [];
         for (let i = 0; i < quantity; i++) {
-            const ticket_code = await generateUniqueTicketCode(supabase);
+            const ticket_code = await uniqueTicketCode(supabase);
             ticketsToInsert.push({
                 order_id: order.id,
                 ticket_code,
@@ -138,9 +114,9 @@ export async function POST(req) {
         console.log('[webhook] Step 3 done.');
 
         // 4. Build URLs
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://kodama.life';
-        const magicLink = `${baseUrl}/api/auth/verify?token=${jwt}`;
-        const pdfLink = `${baseUrl}/api/tickets/download?token=${jwt}`;
+        const base = baseUrl();
+        const magicLink = `${base}/api/auth/verify?token=${jwt}`;
+        const pdfLink = `${base}/api/tickets/download?token=${jwt}`;
 
         // 5. Send confirmation email (non-fatal — don't let email failure kill the webhook)
         try {
@@ -170,9 +146,9 @@ export async function POST(req) {
 
                 // 6c. Confirmation Mail via Resend Template
                 const resendResponse = await resend.emails.send({
-                    from: `sidequest <${process.env.RESEND_FROM_ADDRESS}>`,
+                    from: mailFrom(),
                     to: meta.buyer_email,
-                    subject: 'Your sidequest ticket',
+                    subject: `Your ${EVENT.name} ticket`,
                     template: {
                         id: process.env.RESEND_TEMPLATE_TICKET_PURCHASE_CONFIRMATION_ID,
                         variables: {
@@ -232,7 +208,7 @@ export async function POST(req) {
             if (tgError && process.env.NOTIFY_EMAIL && resend) {
                 try {
                     await resend.emails.send({
-                        from: `sidequest <${process.env.RESEND_FROM_ADDRESS}>`,
+                        from: mailFrom(),
                         to: process.env.NOTIFY_EMAIL,
                         subject: `⚠️ Telegram notification failed`,
                         text: `Telegram notification failed for the sale to ${meta.buyer_name} (${meta.buyer_email}).\n\nError: ${tgError}`,

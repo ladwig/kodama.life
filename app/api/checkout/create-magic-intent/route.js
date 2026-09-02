@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { verifyLinkTokenIgnoreExpiry } from '@/lib/jwt';
+import { EVENT, grossUpCents } from '@/lib/event';
 
-const EVENT_DATE = '2026-08-22';
 
 export async function POST(req) {
     try {
@@ -64,11 +64,11 @@ export async function POST(req) {
         }
 
         const baseAmount = amountCents * qty;
-        const total = Math.ceil((baseAmount + 25) / 0.985);
+        const total = grossUpCents(baseAmount);
 
-        const paymentIntent = await stripe.paymentIntents.create({
+        const paymentIntent = await getStripe().paymentIntents.create({
             amount: total,
-            currency: 'eur',
+            currency: EVENT.currency,
             metadata: {
                 buyer_name: buyer_name.trim(),
                 buyer_email: buyer_email.toLowerCase().trim(),
@@ -76,7 +76,7 @@ export async function POST(req) {
                 quantity: String(qty),
                 price_per_ticket: String(amountCents),
                 base_total: String(baseAmount),
-                event_date: EVENT_DATE,
+                event_date: EVENT.date,
                 group_deal: 'false',
                 ticket_holders: JSON.stringify(holders),
                 magic_link_jti: payload.jti,

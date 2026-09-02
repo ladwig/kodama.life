@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { verifyJWT } from '@/lib/jwt';
-import { Resend } from 'resend';
+import { getResend } from '@/lib/ticketMail';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = getResend();
 
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
