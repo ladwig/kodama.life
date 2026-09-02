@@ -615,7 +615,7 @@ export default function ChefPage() {
         let ticketCode = decodedText;
         if (decodedText.includes('ticket_code=')) {
             ticketCode = new URL(decodedText).searchParams.get('ticket_code');
-        } else if (decodedText.startsWith(EVENT.ticketPrefix) || decodedText.startsWith('KOD-')) {
+        } else if (decodedText.startsWith(EVENT.ticketPrefix)) {
             ticketCode = decodedText;
         }
 
@@ -1399,7 +1399,7 @@ export default function ChefPage() {
                                             {stats.mix && (() => {
                                                 const CATS = [
                                                     { key: 'normal', label: 'Normal', color: 'var(--accent)' },
-                                                    { key: 'group', label: 'Group (4-for-3)', color: '#8CB2AB' },
+                                                    { key: 'group', label: 'Group (4-for-3)', color: '#E7E2DF' },
                                                     { key: 'magic', label: 'Magic link', color: '#c98a3a' },
                                                     { key: 'offline', label: 'Offline', color: 'var(--ink-muted)' },
                                                 ];

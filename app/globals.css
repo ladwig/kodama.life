@@ -29,7 +29,7 @@ body {
   position: relative;
   isolation: isolate;
   min-height: 100%;
-  background-color: #8CB2AB;
+  background-color: #E7E2DF;
   color: var(--ink);
   font-family: 'Funnel Display', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -82,7 +82,7 @@ textarea {
 
 .btn-raw:hover:not(:disabled) {
   background: #000;
-  color: #8CB2AB;
+  color: #E7E2DF;
 }
 
 .btn-raw:disabled {

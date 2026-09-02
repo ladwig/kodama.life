@@ -1,8 +1,9 @@
 import { Suspense } from 'react';
 import ConfirmationClient from './ConfirmationClient';
+import { EVENT } from '@/lib/event';
 
 export const metadata = {
-    title: 'sidequest',
+    title: EVENT.name,
 };
 
 export default function ConfirmationPage() {

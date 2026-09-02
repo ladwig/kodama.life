@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { verifyLinkTokenIgnoreExpiry, signTicketJWT } from '@/lib/jwt';
-import { baseUrl, uniqueTicketCode } from '@/lib/event';
+import { EVENT, baseUrl, eventDateLong, mailFrom, uniqueTicketCode } from '@/lib/event';
 import { getResend } from '@/lib/ticketMail';
 
 const resend = getResend();
@@ -20,13 +20,13 @@ async function sendTicketEmail({ email, name, code }) {
     const pdfLink = `${base}/api/tickets/download?token=${jwt}`;
     const magicLink = `${base}/api/auth/verify?token=${jwt}`;
     await resend.emails.send({
-        from: `sidequest <${process.env.RESEND_FROM_ADDRESS}>`,
+        from: mailFrom(),
         to: email,
-        subject: '🎟 Your sidequest guestlist ticket',
+        subject: `🎟 Your ${EVENT.name} guestlist ticket`,
         html: `
             <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:2rem;">
                 <p>Hi ${name},</p>
-                <p>You're on the guestlist for <strong>sidequest</strong> — 22 August 2026.</p>
+                <p>You're on the guestlist for <strong>${EVENT.name}</strong> — ${eventDateLong()}.</p>
                 <p>Your ticket code: <strong style="font-size:1.2rem;">${code}</strong></p>
                 <p><a href="${pdfLink}" style="color:#000;font-weight:700;">Download your ticket (PDF) →</a></p>
                 <p style="font-size:12px;color:#888;"><a href="${magicLink}" style="color:#888;">View your ticket online</a></p>

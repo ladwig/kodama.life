@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import styles from './mein-ticket.module.css';
+import { EVENT } from '@/lib/event';
 
 function formatDate(dateStr) {
     if (!dateStr) return null;
@@ -63,10 +64,10 @@ export default function MeinTicketClient({ buyer, orders, tickets }) {
                                 {orderTickets.map((ticket) => (
                                     <div key={ticket.id} className={styles.ticketCard}>
                                         <div className={styles.ticketMain}>
-                                            <p className={styles.ticketEvent}>SIDEQUEST</p>
+                                            <p className={styles.ticketEvent}>{EVENT.name.toUpperCase()}</p>
                                             <p className={styles.ticketName}>{ticket.holder_name}</p>
                                             <div className={styles.ticketMeta}>
-                                                <span>22. Aug 2026</span>
+                                                <span>{formatDate(EVENT.date)}</span>
                                             </div>
                                         </div>
                                         <div className={styles.ticketDivider} />

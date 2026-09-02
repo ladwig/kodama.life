@@ -3,6 +3,7 @@ import { verifyJWT } from '@/lib/jwt';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib';
 import QRCode from 'qrcode';
+import { EVENT } from '@/lib/event';
 
 // Builds an SVG path for a ticket shape with wavy left and right edges.
 // tx, ty = top-left corner (PDF coords, y-up), tw = width, th = height
@@ -140,7 +141,7 @@ export async function GET(req) {
             const midY = tY - tH / 2;
 
             // Event name
-            page.drawText('SIDEQUEST', {
+            page.drawText(EVENT.name.toUpperCase(), {
                 x: tX + pad,
                 y: midY + 32,
                 size: 22,
@@ -195,7 +196,7 @@ export async function GET(req) {
             status: 200,
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': 'attachment; filename="sidequest-tickets.pdf"',
+                'Content-Disposition': `attachment; filename="${EVENT.name}-tickets.pdf"`,
             },
         });
 

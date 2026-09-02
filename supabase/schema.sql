@@ -7,7 +7,7 @@
 -- ── orders (one payment) ─────────────────────────────────────
 create table if not exists orders (
   id               uuid primary key default gen_random_uuid(),
-  stripe_payment_id text unique not null, -- processor's payment/checkout id
+  stripe_payment_id text unique not null, -- the processor's payment/checkout id
   buyer_email      text not null,
   buyer_name       text not null,
   buyer_phone      text,
@@ -17,10 +17,13 @@ create table if not exists orders (
   status           text default 'pending',-- 'pending' | 'paid' | 'refunded'
   payment_method   text,                  -- 'stripe_card', 'cash', ...
   source           text,                  -- 'online' | 'magic_link' | 'guestlist' | 'door'
+  guestlist_label  text,                  -- which guestlist a comped ticket came from
   -- NOT unique: a link with several uses produces several orders.
   magic_link_jti   text,
   created_at       timestamptz default now()
 );
+
+-- Existing DB? alter table orders add column if not exists guestlist_label text;
 
 -- ── tickets (one per person) ─────────────────────────────────
 create table if not exists tickets (

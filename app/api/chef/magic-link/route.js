@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { signMagicLinkJWT } from '@/lib/jwt';
 import { getChefPassword } from '@/lib/config';
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { baseUrl } from '@/lib/event';
+import { EVENT, baseUrl, mailFrom } from '@/lib/event';
 import { getResend } from '@/lib/ticketMail';
 
 const resend = getResend();
@@ -65,12 +65,12 @@ export async function POST(req) {
                 .join('');
 
             await resend.emails.send({
-                from: `sidequest <${process.env.RESEND_FROM_ADDRESS}>`,
+                from: mailFrom(),
                 to: email,
                 subject: countInt === 1 ? `Your ticket link — min. €${priceEuros}` : `${countInt} ticket links — min. €${priceEuros} each`,
                 html: `
                     <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:2rem;">
-                        <p>Here ${countInt === 1 ? 'is your ticket link' : `are ${countInt} ticket links`} for <strong>sidequest</strong>.</p>
+                        <p>Here ${countInt === 1 ? 'is your ticket link' : `are ${countInt} ticket links`} for <strong>${EVENT.name}</strong>.</p>
                         <p>Minimum price: <strong>€${priceEuros}</strong> per ticket. ${countInt === 1 ? 'This link expires' : 'Each link expires'} on <strong>${expiryStr}</strong> and ${usesInt === 1 ? 'is good for one ticket' : `is good for up to ${usesInt} tickets`}.</p>
                         <div style="margin:1.5rem 0;">${linkItems}</div>
                         ${countInt > 1 ? '<p style="font-size:12px;color:#888;">Share individual links — do not forward this email.</p>' : ''}

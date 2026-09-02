@@ -43,8 +43,8 @@ function LoginForm() {
 
     useEffect(() => {
         preloadSounds();
-        console.log('%c' + ASCII_LOGO, 'color: #8CB2AB; line-height: 1;');
-        console.log('%c those who knock on the same door\n seven times\n will find it was never locked.', 'color: #8CB2AB; font-style: italic;');
+        console.log('%c' + ASCII_LOGO, 'color: #E7E2DF; line-height: 1;');
+        console.log('%c those who knock on the same door\n seven times\n will find it was never locked.', 'color: #E7E2DF; font-style: italic;');
 
         idleTimer.current = setTimeout(() => {
             if (!wiggling.current) {
@@ -198,8 +198,8 @@ function LoginForm() {
             <div className={styles.content}>
                 <div className={styles.logoArea}>
                     <Image
-                        src="/sidequest-logo.svg"
-                        alt="Sidequest"
+                        src="/coppi-logo.jpg"
+                        alt="coppi"
                         width={340}
                         height={102}
                         priority

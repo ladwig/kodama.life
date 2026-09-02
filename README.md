@@ -50,6 +50,11 @@ Money-path self-check: `node scripts/check-event.mjs`.
 
 ### Local dev with all features
 
-`npm run dev`, then open `http://localhost:3000/secret=<SITE_PASSWORD>` to set
-the gate cookie. Landing page and `/tickets` render without any secrets;
-completing a payment needs real Stripe keys.
+`npm run dev` — the site is public by default (the password gate is off unless
+Edge Config's `password_protection_enabled` or `SITE_PASSWORD_PROTECTION=true`
+says otherwise; the chef portal always keeps its own password). Landing page and
+`/tickets` render without any secrets; completing a payment needs Stripe keys.
+
+There is no local Edge Config emulator: either put a real `EDGE_CONFIG`
+connection string in `.env.local` and edit values in the Vercel dashboard, or
+change the defaults in `lib/event.js`.

@@ -63,7 +63,7 @@ in parallel — code doesn't need the keys until you want to test a purchase.
       | `price_max` | sliding scale up to here in €5 steps; equal to the min → one fixed price |
       | `group_deal` | `"4,3"` = 4 tickets for the price of 3; `false` → off |
       | `sold_out` | `true` closes checkout |
-      | `password_protection_enabled` | `false` opens the site publicly |
+      | `password_protection_enabled` | `true` puts the site behind `SITE_PASSWORD` (default off) |
       | `telegram_notifications` | per-sale Telegram message (default on) |
       | `email_notifications` | per-sale mail to `NOTIFY_EMAIL` (default off) |
       | `chef_password` | overrides `CHEF_PASSWORD` |
@@ -93,15 +93,11 @@ Roughly top-down by effort. Steps 1–3 are an afternoon; step 4 is the real wor
    price and group deal at runtime.
 2. **`app/layout.js`** — `metadataBase`, title, description, OG/Twitter image.
    Still says `kodama.life` and `sidequest`.
-3. **`public/`** — swap `favicon.ico`, `sidequest-logo.{svg,png}` (rename the
-   references), `bg.png`, `ticket_outline.svg` (PDF ticket art), and the folders
-   `gallery/`, `faq/`, `location/`, `directions/`, `sounds/`. Delete the
-   decorative sidequest set: `mini-monster*`, `fire*.png`, `fumetto*`, `star*`,
-   `spiral.gif`, `bird1.png`, `cerchio3.png`.
-4. **`app/HomeClient.js`** (612 lines) — the landing page: copy, lineup, logo,
-   date/place, sections. Budget real design time here, or replace it wholesale.
+3. **`app/icon.jpg`** (favicon, Next file convention) and `public/<name>-logo.*`
+   — referenced by `app/page.js` and `app/login/page.js`.
+4. **`app/page.js`** — the landing page. Currently logo + ticket button on a
+   flat background; build out from there.
 
-6. **`lib/faq.js`** — event content, and `public/faq/` + `public/location/`.
 7. **`app/api/tickets/download/route.js`** — PDF filename
    (`sidequest-tickets.pdf`) and the layout, if the ticket should look theirs.
 8. **German strings** — `app/api/checkout/create-intent/route.js` validation
@@ -112,10 +108,11 @@ Roughly top-down by effort. Steps 1–3 are an afternoon; step 4 is the real wor
 10. **`app/components/`** — `MiniMonsters`, `FireImg`, `IllustratedButtons`,
     `lib/sounds.js` are sidequest's visual identity. Delete or replace.
 
-This branch has already deleted the sidequest-only features: newsletters
-(pages, API, Resend segment, `subscribers` table), the `/directions` page and
-the `/partners` pitch. Restore any of them from git history if a client wants
-one.
+This branch has already deleted the sidequest-only parts: newsletters (pages,
+API, Resend segment, `subscribers` table), `/directions`, `/partners`, the FAQ
+(`lib/faq.js`), the illustrated landing page (`HomeClient.js`) and its
+decorative assets. `git show af64cd2:app/HomeClient.js` brings the old page
+back if a client wants that structure.
 
 Leave alone: `lib/jwt.js`, `proxy.ts`, `app/chef/*` (portal + scanner),
 `app/api/chef/*`, `app/api/guestlist/*`, magic links, PDF generation,

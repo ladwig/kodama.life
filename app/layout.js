@@ -1,24 +1,20 @@
 import "./globals.css";
 import AnalyticsFiltered from "./components/AnalyticsFiltered";
 
+// The favicon comes from app/icon.jpg (Next's file convention) — no icons entry.
 export const metadata = {
-  metadataBase: new URL("https://kodama.life"),
-  icons: { icon: "/favicon.ico" },
-  title: "sidequest",
-  description: "sidequest — a gathering outside of Berlin, 22. August 2026.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"),
+  title: "coppi",
   openGraph: {
-    title: "sidequest — 22. August 2026",
-    description: "sidequest — a gathering outside of Berlin, 22. August 2026.",
-    url: "https://kodama.life",
-    siteName: "sidequest",
+    title: "coppi",
+    siteName: "coppi",
     type: "website",
-    images: [{ url: "/sidequest-logo.png" }],
+    images: [{ url: "/coppi-logo.jpg" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "sidequest — 22. August 2026",
-    description: "sidequest — a gathering outside of Berlin, 22. August 2026.",
-    images: ["/sidequest-logo.png"],
+    title: "coppi",
+    images: ["/coppi-logo.jpg"],
   },
 };
 

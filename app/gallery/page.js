@@ -2,8 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import Link from 'next/link';
 import styles from './gallery.module.css';
+import { EVENT } from '@/lib/event';
 
-export const metadata = { title: 'What we built — sidequest' };
+export const metadata = { title: `What we built — ${EVENT.name}` };
 
 // ponytail: no list to maintain — drop files into public/gallery/ and they show up
 const EXT = /\.(jpe?g|png|webp|gif|avif)$/i;

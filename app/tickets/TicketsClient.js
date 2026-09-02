@@ -274,7 +274,7 @@ export default function TicketsClient({ pricing, groupDeal: deal = null }) {
                         : <button type="button" className={styles.backIcon} onClick={() => { playKeyboard(); handleBack(); }} aria-label="Back"><img src="/arrow.svg" alt="←" width={16} height={15} style={{ transform: 'rotate(180deg)' }} /></button>
                     }
                     <h1 className={styles.title}>
-                        {step === 'form' ? 'Join the Sidequest' : 'Payment'}
+                        {step === 'form' ? 'Tickets' : 'Payment'}
                     </h1>
                 </div>
 
@@ -336,9 +336,6 @@ export default function TicketsClient({ pricing, groupDeal: deal = null }) {
                                 Ticket Price
                                 <span className={styles.priceDisplay}>€{pricePerTicket}</span>
                             </h2>
-                            <p className={styles.selfFundedNote}>
-                                sidequest is a self-funded, community-driven project. It only happens through donations and volunteering.
-                            </p>
                             {priceOptions.length > 1 && (
                                 <>
                                     <p className={styles.selfFundedNote}>

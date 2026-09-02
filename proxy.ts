@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { get } from '@vercel/edge-config';
 import { verifyJWT } from './lib/jwt';
+import { isPasswordProtectionEnabled } from './lib/config';
 
 // Use Web Crypto API — Edge Runtime doesn't support Node's crypto module
 async function sha256Hex(str) {
@@ -77,6 +77,9 @@ export async function proxy(req) {
         return NextResponse.next();
     }
 
+    // Gate off (the default) → everything is public
+    if (!(await isPasswordProtectionEnabled())) return NextResponse.next();
+
     const ticketToken = req.cookies.get('ticket_token')?.value;
     const pwSession = req.cookies.get('pw_session')?.value;
 
@@ -92,14 +95,6 @@ export async function proxy(req) {
         for (const p of passwords) {
             if (pwSession === await sha256Hex(p)) return NextResponse.next();
         }
-    }
-
-    // Check if password protection is disabled via Edge Config
-    try {
-        const enabled = await get('password_protection_enabled');
-        if (enabled === false) return NextResponse.next();
-    } catch {
-        // Edge Config unavailable — fall through to redirect
     }
 
     // Redirect to login
