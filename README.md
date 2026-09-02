@@ -39,18 +39,12 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 Everything event-specific is in `lib/event.js` (name, date, ticket-code prefix,
 floor price, currency, processor fee model) plus the copy and assets under
-`app/` and `public/`. To fork:
+`app/` and `public/`. Untouched by a fork: auth/magic links (`lib/jwt.js`), the
+chef portal and QR scanner (`app/chef`), PDF tickets, guestlists, the password
+gate (`proxy.ts`).
 
-1. Change `lib/event.js`.
-2. Replace copy/assets: `app/HomeClient.js`, `app/gallery`, `app/directions`,
-   `app/partners`, `app/newsletters`, `lib/faq.js`, `lib/newsletters.js`,
-   `emails/`, `public/`.
-3. New accounts + env: Supabase (run `supabase/schema.sql`), Resend (domain,
-   from-address, ticket template), payment provider, Telegram bot, Vercel Edge
-   Config store, `SITE_PASSWORD`, `CHEF_PASSWORD`, `JWT_SECRET`.
-
-Untouched by a fork: auth/magic links (`lib/jwt.js`), the chef portal and QR
-scanner (`app/chef`), PDF tickets, guestlists, the password gate (`proxy.ts`).
+Step-by-step runbook — accounts, code, and a pre-handover checklist:
+**[FORK.md](FORK.md)**.
 
 Money-path self-check: `node scripts/check-event.mjs`.
 
