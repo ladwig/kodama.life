@@ -15,8 +15,6 @@ import { grossUpCents } from '@/lib/event';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
-const MAX_QUANTITY = 10;
-const PRICE_STEP = 5; // € increments on the sliding scale
 
 // ─── Payment Screen ───────────────────────────────────────────────────────
 function PaymentScreen({ total, totalWithFee, quantity, pricePerTicket, holderNames, onBack }) {
@@ -94,7 +92,7 @@ function PaymentScreen({ total, totalWithFee, quantity, pricePerTicket, holderNa
 
 // ─── Main Page ────────────────────────────────────────────────────────────
 export default function TicketsClient({ pricing, groupDeal: deal = null }) {
-    const { min: MIN_PRICE, max: MAX_PRICE } = pricing;
+    const { min: MIN_PRICE, max: MAX_PRICE, step: PRICE_STEP, maxQuantity: MAX_QUANTITY } = pricing;
     // max > min → the buyer picks a price in €5 steps; equal → one fixed price.
     const priceOptions = [];
     for (let p = MIN_PRICE; p <= MAX_PRICE; p += PRICE_STEP) priceOptions.push(p);

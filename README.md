@@ -62,6 +62,8 @@ every key has an env-var twin, `EDGE_<KEY>` in `.env.local`:
 ```
 EDGE_MIN_TICKET_PRICE=30
 EDGE_PRICE_MAX=60          # equal to the min → one fixed price
+EDGE_PRICE_STEP=5          # € between the sliding-scale steps
+EDGE_MAX_QUANTITY=10       # tickets per order
 EDGE_GROUP_DEAL=4,3        # false → no group deal
 EDGE_SOLD_OUT=true
 EDGE_SOUNDS_ENABLED=false   # silence the button click sounds

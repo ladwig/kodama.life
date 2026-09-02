@@ -3,9 +3,6 @@ import { getStripe } from '@/lib/stripe';
 import { getPricing, getGroupDeal } from '@/lib/config';
 import { EVENT, grossUpCents } from '@/lib/event';
 
-const STEP = 500; // 5 EUR increments
-const MAX_QUANTITY = 10;
-
 export async function POST(req) {
     try {
         const body = await req.json();
@@ -14,6 +11,8 @@ export async function POST(req) {
         const [pricing, deal] = await Promise.all([getPricing(), getGroupDeal()]);
         const MIN_PRICE = pricing.min * 100; // euros → cents
         const MAX_PRICE = pricing.max * 100;
+        const STEP = pricing.step * 100;
+        const MAX_QUANTITY = pricing.maxQuantity;
         // Group deal only counts if one is configured — can't be forced via the API
         const group_deal = !!body.group_deal && !!deal;
 
@@ -34,7 +33,7 @@ export async function POST(req) {
             return NextResponse.json({ error: `Höchstpreis ist ${MAX_PRICE / 100} €.` }, { status: 400 });
         }
         if ((price_per_ticket - MIN_PRICE) % STEP !== 0) {
-            return NextResponse.json({ error: 'Preis muss in 5 €-Schritten gewählt werden.' }, { status: 400 });
+            return NextResponse.json({ error: `Preis muss in ${pricing.step} €-Schritten gewählt werden.` }, { status: 400 });
         }
         if (!ticket_holders || ticket_holders.length !== quantity) {
             return NextResponse.json({ error: 'Bitte alle Ticket-Inhaber angeben.' }, { status: 400 });

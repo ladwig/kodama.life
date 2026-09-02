@@ -61,7 +61,9 @@ in parallel — code doesn't need the keys until you want to test a purchase.
       | key | effect |
       |---|---|
       | `min_ticket_price` | floor price in € |
-      | `price_max` | sliding scale up to here in €5 steps; equal to the min → one fixed price |
+      | `price_max` | sliding scale up to here; equal to the min → one fixed price |
+      | `price_step` | € between the sliding-scale steps |
+      | `max_quantity` | tickets per order |
       | `group_deal` | `"4,3"` = 4 tickets for the price of 3; `false` → off |
       | `sold_out` | `true` closes checkout |
       | `sounds_enabled` | `false` silences the button click sounds |
@@ -90,9 +92,9 @@ in parallel — code doesn't need the keys until you want to test a purchase.
 
 Roughly top-down by effort. Steps 1–3 are an afternoon; step 4 is the real work.
 
-1. **`lib/event.js`** — name, date, `ticketPrefix`, `minPrice`, `maxPrice`,
-   `groupDeal`, currency, `fee`. These are the defaults; Edge Config overrides
-   price and group deal at runtime.
+1. **`lib/event.js`** — name, date, `ticketPrefix`, `codeChars`, `minPrice`,
+   `maxPrice`, `priceStep`, `maxQuantity`, `groupDeal`, `sounds`, currency,
+   `fee`. These are the defaults; Edge Config overrides them at runtime.
 2. **`app/layout.js`** — `metadataBase`, title, description, OG/Twitter image.
    Still says `kodama.life` and `sidequest`.
 3. **`app/icon.jpg`** (favicon, Next file convention) and `public/<name>-logo.*`
@@ -131,7 +133,9 @@ Leave alone: `lib/jwt.js`, `proxy.ts`, `app/chef/*` (portal + scanner),
 - [ ] Chef stats: net revenue matches gross minus the real fee
 - [ ] Magic link with `uses: 3` sells exactly 3 tickets, then refuses
 - [ ] Guestlist link admits its `max_tickets` and no more
-- [ ] `price_max` equal to the min shows one price; higher shows the €5 steps
+- [ ] `price_max` equal to the min shows one price; higher shows the steps
+- [ ] `price_step` changes both the buttons and what the API accepts
+- [ ] `max_quantity` caps the stepper and is enforced server-side
 - [ ] `group_deal: "4,3"` bills 3 of 4 tickets; `false` hides the row, and the
       API rejects a forced `group_deal` in the request body
 - [ ] `telegram_notifications` / `email_notifications` both fire once
